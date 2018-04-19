@@ -1,29 +1,54 @@
 ﻿<!DOCTYPE html>
 <html>
-    <head>
+<head>
     <!--
         Customize the content security policy in the meta tag below as needed. Add 'unsafe-inline' to default-src to enable inline JavaScript.
         For details, see http://go.microsoft.com/fwlink/?LinkID=617521
     -->
-        <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *">
-        
-        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-        <meta name="format-detection" content="telephone=no">
-        <meta name="msapplication-tap-highlight" content="no">
-        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
-        <link rel="stylesheet" type="text/css" href="css/index.css">
-        <title>PencilCase</title>
-    </head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *">
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <link rel="stylesheet" type="text/css" href="css/index.css">
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <!-- The 'async' attribute is needed for RequireJS to work in a Windows app -->
+    <script type="text/javascript" data-main="scripts/startup" src="lib/require.2.1.8.js" async></script>
+    <script type="text/javascript" src="scripts/jquery-1.8.0.min.js"></script>
+    <script type="text/javascript" src="scripts/jquery.mobile-1.4.5.min.js"></script>
+    <script type="text/javascript" src="scripts/knockout-3.4.2.js"></script>
+
+    <title>PencilCase</title>
+</head>
     <body>
-        <div class="app">
-            <h1>Apache Cordova</h1>
-            <div id="deviceready" class="blink">
-                <p class="event listening">Connecting to Device</p>
-                <p class="event received">Device is Ready</p>
+        <div data-role="page" id="home">
+            <div data-role="header">
+                <h1>Pencil Case</h1>
             </div>
+            <div role="main" class="ui-content">
+                <p>Hello Mobile!</p>
+                <a href="#InternalPage1">Go to another page</a>
+            </div>
+            <footer data-role="footer" data-position="fixed">
+                <h4>@Copyright- Frank Sun</h4>
+            </footer>
         </div>
-        <script type="text/javascript" src="cordova.js"></script>
-        <!-- The 'async' attribute is needed for RequireJS to work in a Windows app -->
-        <script type="text/javascript" data-main="scripts/startup" src="lib/require.2.1.8.js" async></script>
+
+        <!-- Start of second page-->
+        <!--<div data-role="page" id="InternalPage1">
+            <div data-role="header">
+                <h1>Internal Page 1</h1>
+            </div>
+            <div data-role="main" class="ui-content">
+                <p>I am the second page.</p>
+                <a href="#home">Back to Home</a>
+            </div>
+            <div data-role="footer">
+                <h4>Footer</h4>
+            </div>
+        </div>-->
+        <!-- End of second page-->
     </body>
 </html>

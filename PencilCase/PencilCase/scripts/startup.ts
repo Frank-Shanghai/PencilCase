@@ -6,4 +6,4 @@ declare var require: (modules: string[], ready: Function, errback: Function) => 
 // More info at http://taco.visualstudio.com/en-us/docs/configure-app/#Content.
 require(["./platformOverrides"],
     () => Application.initialize(),
-    () => Application.initialize());
+    () => Application.onError());
