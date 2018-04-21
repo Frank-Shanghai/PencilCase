@@ -26,9 +26,11 @@
         <div data-role="header">
             <h1>Pencil Case</h1>
         </div>
-        <div role="main" class="ui-content">
-            <p>Hello Mobile!</p>
-            <a href="#InternalPage1">Go to another page</a>
+        <div role="main" class="ui-content">    
+            <a href="#" class="ui-btn ui-corner-all">Retail</a>
+            <a href="#" class="ui-btn ui-corner-all">Wholesale</a>
+            <a href="#ProductManagement" class="ui-btn ui-corner-all">Product Management</a>
+            <a href="#" class="ui-btn ui-corner-all">Data Analyse</a>
         </div>
         <footer data-role="footer" data-position="fixed">
             <h4>@Copyright - Frank Sun</h4>
@@ -36,17 +38,17 @@
     </div>
 
     <!-- Start of second page-->
-    <div data-role="page" id="InternalPage1">
-        <div data-role="header">
-            <h1>Internal Page 1</h1>
+    <div data-role="page" id="ProductManagement">
+        <div data-role="header" data-add-back-btn="true" data-back-btn-text="Back" data-back-btn-theme="b">
+            <h1>Product Management</h1>
         </div>
         <div data-role="main" class="ui-content">
-            <p>I am the second page.</p>
+            <p>CRUD Products</p>
             <a href="#home">Back to Home</a>
         </div>
-        <div data-role="footer">
+        <!--<div data-role="footer" data-position="fixed">
             <h4>Footer</h4>
-        </div>
+        </div>-->
     </div>
     <!-- End of second page-->
 </body>
