@@ -21,27 +21,56 @@ function onDeviceReady(): void {
     //listeningElement.setAttribute('style', 'display:none;');
     //receivedElement.setAttribute('style', 'display:block;');
 
-    createDatabse();
+    initializeDatabase();
 }
 
-function createDatabse() {    
+function initializeDatabase() {    
     let db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
     if (db) {
         db.transaction((transaction) => {
             // Uncomment the line below if need to re-create the table, like adding/removing/changing columns
             //transaction.executeSql('DROP TABLE IF EXISTS Product', [], null, onDBError);
-            transaction.executeSql('CREATE TABLE IF NOT EXISTS Product (Id text primary key, Name text, Description text, RetailPrice real, RetailUnit text, WholesalePrice real, WholesaleUnit text, ImportWholesalePrice real, ImportRetailPrice real, Times integer, Inventory integer, Image, CreatedDate datetime, ModifiedDate datetime )', [], null, onDBError);
+            transaction.executeSql('CREATE TABLE IF NOT EXISTS Product (\
+                                        Id text primary key,\
+                                        Name text not null, \
+                                        Description text,\
+                                        RetailPrice real not null,\
+                                        RetailUnit text,\
+                                        WholesalePrice real not null,\
+                                        WholesaleUnit text,\
+                                        ImportWholesalePrice real not  null,\
+                                        ImportRetailPrice real not null,\
+                                        Times integer not null,\
+                                        Inventory integer not null,\
+                                        Image,\
+                                        CreatedDate datetime,\
+                                        ModifiedDate datetime,\
+                                        foreign key(RetailUnit) references UnitOfMeasure(Id),\
+                                        foreign key(WholesaleUnit) references UnnitOfMeasure(Id)\
+                                        )', [], null, onDBError);
 
             // Uncomment the line below if need to re-create the table, like adding/removing/changing columns
             //transaction.executeSql('drop table if exists UnitOfMeasure', [], null, onDBError);
-            transaction.executeSql('create table if not exists UnitOfMeasure (Id text primary key, Name text, Description text)', [], null, onDBError);
+            transaction.executeSql('create table if not exists UnitOfMeasure (Id text primary key, Name text not null, Description text)', [], null, onDBError);
+        }, null, createTestData);
+    }
+    else {
+        alert("Failed to open database.")
+    }
+}
+
+// Just for testing, remove all function calls to it and this function
+function createTestData() {
+    let db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
+    if (db) {
+        db.transaction((transaction) => {
             transaction.executeSql('select Id from UnitOfMeasure', [], (transaction: SqlTransaction, resultSet: SqlResultSet) => {
                 if (resultSet.rows.length === 0) {
-                    // Just for testing, comment out following lines when release
                     transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '个')", [], null, onDBError);
                     transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '筒')", [], null, onDBError);
                     transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '箱')", [], null, onDBError);
                     transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '件')", [], null, onDBError);
+                    transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '块')", [], null, onDBError);
                 }
             }, onDBError);
         });
