@@ -5,32 +5,60 @@
 "use strict";
 
 import * as Utils from './Utils';
+import { PageBase } from './Pages/PageBase';
+import { HomePage } from './Pages/HomePage';
 
-export function initialize(): void {
-    document.addEventListener('deviceready', onDeviceReady, false);
-}
+export class Application {
+    public activePage: KnockoutObservable<PageBase> = ko.observable(null);
+    public pages: Array<PageBase> = [];
 
-function onDeviceReady(): void {
-    document.addEventListener('pause', onPause, false);
-    document.addEventListener('resume', onResume, false);
+    private static _instance: Application;
 
-    // TODO: Cordova has been loaded. Perform any initialization that requires Cordova here.
-    //var parentElement = document.getElementById('deviceready');
-    //var listeningElement = parentElement.querySelector('.listening');
-    //var receivedElement = parentElement.querySelector('.received');
-    //listeningElement.setAttribute('style', 'display:none;');
-    //receivedElement.setAttribute('style', 'display:block;');
+    public static get instance(): Application {
+        if (Application._instance == null) {
+            Application._instance = new Application();
+        }
 
-    initializeDatabase();
-}
+        return Application._instance;
+    }
 
-function initializeDatabase() {    
-    let db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
-    if (db) {
-        db.transaction((transaction) => {
-            // Uncomment the line below if need to re-create the table, like adding/removing/changing columns
-            //transaction.executeSql('DROP TABLE IF EXISTS Product', [], null, onDBError);
-            transaction.executeSql('CREATE TABLE IF NOT EXISTS Product (\
+    constructor() {
+        this.openHomePage();
+    }
+
+    private openHomePage() {
+        let homePage = new HomePage();
+        this.pages.push(homePage);
+        this.activePage(homePage);
+    }
+
+    public initialize(): void {
+        ko.applyBindings(Application.instance, document.documentElement);
+        document.addEventListener('deviceready', this.onDeviceReady, false);
+    }
+
+    private onDeviceReady(): void {
+        document.addEventListener('pause', this.onPause, false);
+        document.addEventListener('resume', this.onResume, false);
+
+        // TODO: Cordova has been loaded. Perform any initialization that requires Cordova here.
+        //var parentElement = document.getElementById('deviceready');
+        //var listeningElement = parentElement.querySelector('.listening');
+        //var receivedElement = parentElement.querySelector('.received');
+        //listeningElement.setAttribute('style', 'display:none;');
+        //receivedElement.setAttribute('style', 'display:block;');
+
+        this.initializeDatabase();
+    }
+
+    // Just for testing, remove all function calls to it and this function
+    private initializeDatabase() {
+        let db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
+        if (db) {
+            db.transaction((transaction) => {
+                // Uncomment the line below if need to re-create the table, like adding/removing/changing columns
+                //transaction.executeSql('DROP TABLE IF EXISTS Product', [], null, onDBError);
+                transaction.executeSql('CREATE TABLE IF NOT EXISTS Product (\
                                         Id text primary key,\
                                         Name text not null, \
                                         Description text,\
@@ -47,51 +75,55 @@ function initializeDatabase() {
                                         ModifiedDate datetime,\
                                         foreign key(RetailUnit) references UnitOfMeasure(Id),\
                                         foreign key(WholesaleUnit) references UnnitOfMeasure(Id)\
-                                        )', [], null, onDBError);
+                                        )', [], null, this.onDBError);
 
-            // Uncomment the line below if need to re-create the table, like adding/removing/changing columns
-            //transaction.executeSql('drop table if exists UnitOfMeasure', [], null, onDBError);
-            transaction.executeSql('create table if not exists UnitOfMeasure (Id text primary key, Name text not null, Description text)', [], null, onDBError);
-        }, null, createTestData);
+                // Uncomment the line below if need to re-create the table, like adding/removing/changing columns
+                //transaction.executeSql('drop table if exists UnitOfMeasure', [], null, onDBError);
+                transaction.executeSql('create table if not exists UnitOfMeasure (Id text primary key, Name text not null, Description text)', [], null, this.onDBError);
+            }, null, this.createTestData);
+        }
+        else {
+            alert("Failed to open database.")
+        }
     }
-    else {
-        alert("Failed to open database.")
+
+    private createTestData() {
+        let db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
+        if (db) {
+            db.transaction((transaction) => {
+                transaction.executeSql('select Id from UnitOfMeasure', [], (transaction: SqlTransaction, resultSet: SqlResultSet) => {
+                    if (resultSet.rows.length === 0) {
+                        transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '个')", [], null, this.onDBError);
+                        transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '筒')", [], null, this.onDBError);
+                        transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '箱')", [], null, this.onDBError);
+                        transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '件')", [], null, this.onDBError);
+                        transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '块')", [], null, this.onDBError);
+                    }
+                }, this.onDBError);
+            });
+        }
+        else {
+            alert("Failed to open database.")
+        }
     }
-}
 
-// Just for testing, remove all function calls to it and this function
-function createTestData() {
-    let db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
-    if (db) {
-        db.transaction((transaction) => {
-            transaction.executeSql('select Id from UnitOfMeasure', [], (transaction: SqlTransaction, resultSet: SqlResultSet) => {
-                if (resultSet.rows.length === 0) {
-                    transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '个')", [], null, onDBError);
-                    transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '筒')", [], null, onDBError);
-                    transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '箱')", [], null, onDBError);
-                    transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '件')", [], null, onDBError);
-                    transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '块')", [], null, onDBError);
-                }
-            }, onDBError);
-        });
+    private onDBError(transaction: SqlTransaction, sqlError: SqlError) {
+        alert(sqlError.message);
     }
-    else {
-        alert("Failed to open database.")
+
+    public onApplicationError(): void {
+        alert("Application Error happened.");
     }
+
+    private onPause(): void {
+        // TODO: This application has been suspended. Save application state here.
+    }
+
+    private onResume(): void {
+        // TODO: This application has been reactivated. Restore application state here.
+    }
+
 }
 
-function onDBError(transaction: SqlTransaction, sqlError: SqlError) {
-    alert(sqlError.message);
-}
 
-export function onError(): void {
-    alert("Error happened.");
-}
 
-function onPause(): void {
-    // TODO: This application has been suspended. Save application state here.
-}
-
-function onResume(): void {
-    // TODO: This application has been reactivated. Restore application state here.
-}
