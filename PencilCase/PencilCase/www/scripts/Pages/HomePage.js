@@ -20,6 +20,17 @@ define(["require", "exports", "./PageBase"], function (require, exports, PageBas
             _this.footer = ko.observable("@Copyright - Frank");
             return _this;
         }
+        HomePage.prototype.openProductManagementPage = function () {
+            // TODO: Look into more about page events
+            // Need to find the appropriate time point to chagne active page value
+            //let changeActivePage = (eventObject: any) => {
+            //    Application.instance.activePage(new ProductManagement());
+            //    $(document).unbind("pagebeforechange", changeActivePage);            
+            //};
+            //Application.instance.activePage(null);
+            //$(document).bind("pagebeforechange", changeActivePage);
+            ($).mobile.changePage("Pages/ProductManagement.html");
+        };
         return HomePage;
     }(PageBase_1.PageBase));
     exports.HomePage = HomePage;
