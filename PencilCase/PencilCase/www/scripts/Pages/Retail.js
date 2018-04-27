@@ -8,27 +8,18 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./PageBase", "../Navigator", "./Consts"], function (require, exports, PageBase_1, Navigator_1, Consts) {
+define(["require", "exports", "./PageBase", "../Navigator"], function (require, exports, PageBase_1, Navigator_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var ProductManagement = (function (_super) {
-        __extends(ProductManagement, _super);
-        function ProductManagement() {
+    var Retail = (function (_super) {
+        __extends(Retail, _super);
+        function Retail() {
             var _this = _super.call(this) || this;
             _this.navigator = Navigator_1.Navigator.instance;
-            _this.gotoTest = function () {
-                _this.navigator.navigateTo("Retail.html", {
-                    data: {
-                        pageInfo: Consts.Pages.Retail
-                    }
-                });
-            };
-            _this.title = ko.observable("Product Management Test");
-            _this.pageId = "ProductManagement";
             return _this;
         }
-        return ProductManagement;
+        return Retail;
     }(PageBase_1.PageBase));
-    exports.ProductManagement = ProductManagement;
+    exports.Retail = Retail;
 });
-//# sourceMappingURL=ProductManagement.js.map
+//# sourceMappingURL=Retail.js.map

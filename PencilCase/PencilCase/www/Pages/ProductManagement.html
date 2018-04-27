@@ -1,12 +1,12 @@
 ﻿<div data-role="page" id="ProductManagement">
+    <!--ko if: isActive -->
     <div data-role="header" data-add-back-btn="true" data-back-btn-text="Back" data-back-btn-theme="b">
-        <h1><span data-bind="text: title"></span></h1>
+        <a href="#" data-icon="home" data-bind="click: navigator.goHome">Home</a>
+        <h1><span data-bind="text: 'title'"></span></h1>
     </div>
     <div data-role="main" class="ui-content">
         <p>CRUD Products</p>
-        <a href="#home">Back to Home</a>
+        <a href="#" data-bind="click: gotoTest">Go To Retail</a>
     </div>
-    <!--<div data-role="footer" data-position="fixed">
-        <h4>Footer</h4>
-    </div>-->
+    <!-- /ko -->
 </div>

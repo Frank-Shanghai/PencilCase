@@ -1,0 +1,11 @@
+﻿export let Pages = {
+    // Here the permanent means: For these page instances, I will put them into one page collection, in this way, 
+    // they can be in the memory and not collected by the GC when active page changed and no references pointing to them.
+    // I only keep several ones in the collection like home page, retail and whosale page, for the others, they can be collected by GC automatically
+    // And when changing page, there will be one parameter indicates that if need to refresh the page, if so, the page initialize method will be executed.
+    HomePage: { Id: "HomePage", IsPermanent: true },
+    ProductManagement: { Id: "ProductManagement", IsPermanent: false },
+    Retail: { Id: "Retail", IsPermanent: true },
+    Whosale: { Id: "Whosale", IsPermanent: true },
+    DataAnalysis: { Id: "DataAnalysis", IsPermanent: false }
+};

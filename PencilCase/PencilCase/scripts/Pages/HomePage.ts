@@ -1,29 +1,34 @@
 ﻿import { PageBase } from "./PageBase";
 import { Application } from "../application";
 import { ProductManagement } from "./ProductManagement";
+import * as Consts from "./Consts";
+import { Navigator } from '../Navigator';
+
 export class HomePage extends PageBase {
+    private navigator: Navigator;
 
     constructor() {
         super();
-        this.pageId = "HomePage";
-
+        this.pageId = Consts.Pages.HomePage.Id;
+        this.isPermanent = Consts.Pages.HomePage.IsPermanent;
+        this.navigator = Navigator.instance;
         this.title = ko.observable("Pencil Case");
         this.footer = ko.observable("@Copyright - Frank")
     }
 
     private openProductManagementPage() {
-        // TODO: Look into more about page events
-        // Need to find the appropriate time point to chagne active page value
+        this.navigator.navigateTo("Pages/ProductManagement.html", {
+            data: {
+                pageInfo: Consts.Pages.ProductManagement
+            }
+        });
+    }
 
-        //let changeActivePage = (eventObject: any) => {
-        //    Application.instance.activePage(new ProductManagement());
-        //    $(document).unbind("pagebeforechange", changeActivePage);            
-        //};
-
-        //Application.instance.activePage(null);
-        //$(document).bind("pagebeforechange", changeActivePage);
-
-
-        (<any>($)).mobile.changePage("Pages/ProductManagement.html");
+    private openRetailPage() {
+        this.navigator.navigateTo("Pages/Retail.html", {
+            data: {
+                pageInfo: Consts.Pages.Retail
+            }
+        });
     }
 }

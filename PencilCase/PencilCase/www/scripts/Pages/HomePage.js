@@ -8,28 +8,33 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./PageBase"], function (require, exports, PageBase_1) {
+define(["require", "exports", "./PageBase", "./Consts", "../Navigator"], function (require, exports, PageBase_1, Consts, Navigator_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var HomePage = (function (_super) {
         __extends(HomePage, _super);
         function HomePage() {
             var _this = _super.call(this) || this;
-            _this.pageId = "HomePage";
+            _this.pageId = Consts.Pages.HomePage.Id;
+            _this.isPermanent = Consts.Pages.HomePage.IsPermanent;
+            _this.navigator = Navigator_1.Navigator.instance;
             _this.title = ko.observable("Pencil Case");
             _this.footer = ko.observable("@Copyright - Frank");
             return _this;
         }
         HomePage.prototype.openProductManagementPage = function () {
-            // TODO: Look into more about page events
-            // Need to find the appropriate time point to chagne active page value
-            //let changeActivePage = (eventObject: any) => {
-            //    Application.instance.activePage(new ProductManagement());
-            //    $(document).unbind("pagebeforechange", changeActivePage);            
-            //};
-            //Application.instance.activePage(null);
-            //$(document).bind("pagebeforechange", changeActivePage);
-            ($).mobile.changePage("Pages/ProductManagement.html");
+            this.navigator.navigateTo("Pages/ProductManagement.html", {
+                data: {
+                    pageInfo: Consts.Pages.ProductManagement
+                }
+            });
+        };
+        HomePage.prototype.openRetailPage = function () {
+            this.navigator.navigateTo("Pages/Retail.html", {
+                data: {
+                    pageInfo: Consts.Pages.Retail
+                }
+            });
         };
         return HomePage;
     }(PageBase_1.PageBase));

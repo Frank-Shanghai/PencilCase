@@ -7,6 +7,8 @@
 import * as Utils from './Utils';
 import { PageBase } from './Pages/PageBase';
 import { HomePage } from './Pages/HomePage';
+import { ProductManagement } from './Pages/ProductManagement';
+import { Navigator } from './Navigator';
 
 export class Application {
     public activePage: KnockoutObservable<PageBase> = ko.observable(null);
@@ -28,18 +30,23 @@ export class Application {
 
     private openHomePage() {
         let homePage = new HomePage();
-        this.pages.push(homePage);
         this.activePage(homePage);
+        this.pages.push(homePage);
     }
 
     public initialize(): void {
-        ko.applyBindings(Application.instance, document.documentElement);
         document.addEventListener('deviceready', this.onDeviceReady, false);
     }
 
-    private onDeviceReady(): void {
+    private onDeviceReady = (): void => {
         document.addEventListener('pause', this.onPause, false);
         document.addEventListener('resume', this.onResume, false);
+
+        // Home page binding
+        ko.applyBindings(this.activePage(), $("body").pagecontainer("getActivePage")[0]);
+        this.activePage().isActive(true);
+
+        Navigator.instance.initialize();
 
         // TODO: Cordova has been loaded. Perform any initialization that requires Cordova here.
         //var parentElement = document.getElementById('deviceready');
@@ -52,7 +59,7 @@ export class Application {
     }
 
     // Just for testing, remove all function calls to it and this function
-    private initializeDatabase() {
+    private initializeDatabase = () => {
         let db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
         if (db) {
             db.transaction((transaction) => {
@@ -87,7 +94,7 @@ export class Application {
         }
     }
 
-    private createTestData() {
+    private createTestData = () => {
         let db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
         if (db) {
             db.transaction((transaction) => {
@@ -107,19 +114,19 @@ export class Application {
         }
     }
 
-    private onDBError(transaction: SqlTransaction, sqlError: SqlError) {
+    private onDBError = (transaction: SqlTransaction, sqlError: SqlError) => {
         alert(sqlError.message);
     }
 
-    public onApplicationError(): void {
+    public onApplicationError = (): void => {
         alert("Application Error happened.");
     }
 
-    private onPause(): void {
+    private onPause = (): void => {
         // TODO: This application has been suspended. Save application state here.
     }
 
-    private onResume(): void {
+    private onResume = (): void => {
         // TODO: This application has been reactivated. Restore application state here.
     }
 
