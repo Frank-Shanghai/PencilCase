@@ -94,5 +94,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\" />
+    <Folder Include="www\Pages\" />
   </ItemGroup>
 </Project>

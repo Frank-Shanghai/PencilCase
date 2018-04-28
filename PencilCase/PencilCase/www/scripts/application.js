@@ -1,32 +1,36 @@
-define(["require", "exports", "./Utils"], function (require, exports, Utils) {
+define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], function (require, exports, Utils, HomePage_1, Navigator_1) {
     // For an introduction to the Blank template, see the following documentation:
     // http://go.microsoft.com/fwlink/?LinkID=397705
     // To debug code on page load in cordova-simulate or on Android devices/emulators: launch your app, set breakpoints, 
     // and then run "window.location.reload()" in the JavaScript Console.
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    function initialize() {
-        document.addEventListener('deviceready', onDeviceReady, false);
-    }
-    exports.initialize = initialize;
-    function onDeviceReady() {
-        document.addEventListener('pause', onPause, false);
-        document.addEventListener('resume', onResume, false);
-        // TODO: Cordova has been loaded. Perform any initialization that requires Cordova here.
-        //var parentElement = document.getElementById('deviceready');
-        //var listeningElement = parentElement.querySelector('.listening');
-        //var receivedElement = parentElement.querySelector('.received');
-        //listeningElement.setAttribute('style', 'display:none;');
-        //receivedElement.setAttribute('style', 'display:block;');
-        initializeDatabase();
-    }
-    function initializeDatabase() {
-        var db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
-        if (db) {
-            db.transaction(function (transaction) {
-                // Uncomment the line below if need to re-create the table, like adding/removing/changing columns
-                //transaction.executeSql('DROP TABLE IF EXISTS Product', [], null, onDBError);
-                transaction.executeSql('CREATE TABLE IF NOT EXISTS Product (\
+    var Application = (function () {
+        function Application() {
+            var _this = this;
+            this.activePage = ko.observable(null);
+            this.pages = [];
+            this.onDeviceReady = function () {
+                document.addEventListener('pause', _this.onPause, false);
+                document.addEventListener('resume', _this.onResume, false);
+                ko.applyBindings(Application.instance, document.documentElement);
+                Navigator_1.Navigator.instance.initialize();
+                // TODO: Cordova has been loaded. Perform any initialization that requires Cordova here.
+                //var parentElement = document.getElementById('deviceready');
+                //var listeningElement = parentElement.querySelector('.listening');
+                //var receivedElement = parentElement.querySelector('.received');
+                //listeningElement.setAttribute('style', 'display:none;');
+                //receivedElement.setAttribute('style', 'display:block;');
+                _this.initializeDatabase();
+            };
+            // Just for testing, remove all function calls to it and this function
+            this.initializeDatabase = function () {
+                var db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
+                if (db) {
+                    db.transaction(function (transaction) {
+                        // Uncomment the line below if need to re-create the table, like adding/removing/changing columns
+                        //transaction.executeSql('DROP TABLE IF EXISTS Product', [], null, onDBError);
+                        transaction.executeSql('CREATE TABLE IF NOT EXISTS Product (\
                                         Id text primary key,\
                                         Name text not null, \
                                         Description text,\
@@ -43,48 +47,69 @@ define(["require", "exports", "./Utils"], function (require, exports, Utils) {
                                         ModifiedDate datetime,\
                                         foreign key(RetailUnit) references UnitOfMeasure(Id),\
                                         foreign key(WholesaleUnit) references UnnitOfMeasure(Id)\
-                                        )', [], null, onDBError);
-                // Uncomment the line below if need to re-create the table, like adding/removing/changing columns
-                //transaction.executeSql('drop table if exists UnitOfMeasure', [], null, onDBError);
-                transaction.executeSql('create table if not exists UnitOfMeasure (Id text primary key, Name text not null, Description text)', [], null, onDBError);
-            }, null, createTestData);
+                                        )', [], null, _this.onDBError);
+                        // Uncomment the line below if need to re-create the table, like adding/removing/changing columns
+                        //transaction.executeSql('drop table if exists UnitOfMeasure', [], null, onDBError);
+                        transaction.executeSql('create table if not exists UnitOfMeasure (Id text primary key, Name text not null, Description text)', [], null, _this.onDBError);
+                    }, null, _this.createTestData);
+                }
+                else {
+                    alert("Failed to open database.");
+                }
+            };
+            this.createTestData = function () {
+                var db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
+                if (db) {
+                    db.transaction(function (transaction) {
+                        transaction.executeSql('select Id from UnitOfMeasure', [], function (transaction, resultSet) {
+                            if (resultSet.rows.length === 0) {
+                                transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '个')", [], null, _this.onDBError);
+                                transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '筒')", [], null, _this.onDBError);
+                                transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '箱')", [], null, _this.onDBError);
+                                transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '件')", [], null, _this.onDBError);
+                                transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '块')", [], null, _this.onDBError);
+                            }
+                        }, _this.onDBError);
+                    });
+                }
+                else {
+                    alert("Failed to open database.");
+                }
+            };
+            this.onDBError = function (transaction, sqlError) {
+                alert(sqlError.message);
+            };
+            this.onApplicationError = function () {
+                alert("Application Error happened.");
+            };
+            this.onPause = function () {
+                // TODO: This application has been suspended. Save application state here.
+            };
+            this.onResume = function () {
+                // TODO: This application has been reactivated. Restore application state here.
+            };
+            this.openHomePage();
         }
-        else {
-            alert("Failed to open database.");
-        }
-    }
-    // Just for testing, remove all function calls to it and this function
-    function createTestData() {
-        var db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
-        if (db) {
-            db.transaction(function (transaction) {
-                transaction.executeSql('select Id from UnitOfMeasure', [], function (transaction, resultSet) {
-                    if (resultSet.rows.length === 0) {
-                        transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '个')", [], null, onDBError);
-                        transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '筒')", [], null, onDBError);
-                        transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '箱')", [], null, onDBError);
-                        transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '件')", [], null, onDBError);
-                        transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '块')", [], null, onDBError);
-                    }
-                }, onDBError);
-            });
-        }
-        else {
-            alert("Failed to open database.");
-        }
-    }
-    function onDBError(transaction, sqlError) {
-        alert(sqlError.message);
-    }
-    function onError() {
-        alert("Error happened.");
-    }
-    exports.onError = onError;
-    function onPause() {
-        // TODO: This application has been suspended. Save application state here.
-    }
-    function onResume() {
-        // TODO: This application has been reactivated. Restore application state here.
-    }
+        Object.defineProperty(Application, "instance", {
+            get: function () {
+                if (Application._instance == null) {
+                    Application._instance = new Application();
+                }
+                return Application._instance;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Application.prototype.openHomePage = function () {
+            var homePage = new HomePage_1.HomePage();
+            this.activePage(homePage);
+            this.homePage = ko.observable(homePage);
+        };
+        Application.prototype.initialize = function () {
+            document.addEventListener('deviceready', this.onDeviceReady, false);
+        };
+        return Application;
+    }());
+    exports.Application = Application;
 });
 //# sourceMappingURL=application.js.map

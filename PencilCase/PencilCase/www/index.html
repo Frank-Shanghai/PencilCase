@@ -22,34 +22,58 @@
     <script type="text/javascript" src="scripts/knockout-3.4.2.js"></script>
 </head>
 <body>
-    <div data-role="page" id="home">
+    <!-- ==============Home Page================= -->
+    <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
+    <div data-role="page" id="HomePage">
+        <!-- ko with: homePage() -->
         <div data-role="header">
             <h1>Pencil Case</h1>
         </div>
-        <div role="main" class="ui-content">    
-            <a href="#" class="ui-btn ui-corner-all">Retail</a>
-            <a href="#" class="ui-btn ui-corner-all">Wholesale</a>
-            <a href="#ProductManagement" class="ui-btn ui-corner-all">Product Management</a>
-            <a href="#" class="ui-btn ui-corner-all">Data Analyse</a>
+        <div role="main" class="ui-content">
+            <a href="#Retail" class="ui-btn ui-corner-all" data-bind="click: openRetailPage">Retail</a>
+            <a href="#Wholesale" class="ui-btn ui-corner-all" data-bind="disable: true">Wholesale</a>
+            <a href="#ProductManagement" class="ui-btn ui-corner-all" data-bind="click: openProductManagementPage">Product Management</a>
+            <a href="#DataAnalyse" class="ui-btn ui-corner-all">Data Analyse</a>
         </div>
         <footer data-role="footer" data-position="fixed">
-            <h4>@Copyright - Frank Sun</h4>
+            <h4>@Copyright - Frank</h4>
         </footer>
+        <!-- /ko -->
     </div>
 
-    <!-- Start of second page-->
+    <!-- ==============Product Management Page================= -->
+    <!-- Try not bind UI stuff on Home Page like header and footer, because such UI binding will be applied until device ready, 
+        and at that time, static UI already loaded for a while, it is confusing for users becasue they can note that UI loaded at 2 different time point. -->
+    <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
     <div data-role="page" id="ProductManagement">
+        <!-- ko if: activePage().pageId === 'ProductManagement' -->
+        <!-- ko with: activePage() -->
         <div data-role="header" data-add-back-btn="true" data-back-btn-text="Back" data-back-btn-theme="b">
-            <h1>Product Management</h1>
+            <a href="#HomePage" data-icon="home" data-bind="click: navigator.goHome">Home</a>
+            <h1><span data-bind="text: title"></span></h1>
         </div>
         <div data-role="main" class="ui-content">
             <p>CRUD Products</p>
-            <a href="#home">Back to Home</a>
+            <a href="#" data-bind="click: gotoTest">Go To Retail</a>
         </div>
-        <!--<div data-role="footer" data-position="fixed">
-            <h4>Footer</h4>
-        </div>-->
+        <!-- /ko -->
+        <!-- /ko -->
     </div>
-    <!-- End of second page-->
+
+    <!-- ==============Retail Page================= -->
+    <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
+    <div data-role="page" id="Retail">
+        <!-- ko if: activePage().pageId === 'Retail' -->
+        <!-- ko with: activePage() -->
+        <div data-role="header">
+            <a href="#HomePage" data-icon="home" data-bind="click: navigator.goHome">Home</a>
+            <h1><span data-bind="text: title"></span></h1>
+        </div>
+        <div data-role="main" class="ui-content">
+            <p>Retail Page</p>
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->
+    </div>
 </body>
 </html>
