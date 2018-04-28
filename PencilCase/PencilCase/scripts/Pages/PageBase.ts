@@ -9,7 +9,6 @@
     public footer: KnockoutObservable<string>;
     public pageId: string;
     public isPermanent: boolean;
-    public isActive: KnockoutObservable<boolean> = ko.observable(false);
 
     public initialize = () => {
 

@@ -9,7 +9,7 @@ define(["require", "exports"], function (require, exports) {
         HomePage: { Id: "HomePage", IsPermanent: true },
         ProductManagement: { Id: "ProductManagement", IsPermanent: false },
         Retail: { Id: "Retail", IsPermanent: true },
-        Whosale: { Id: "Whosale", IsPermanent: true },
+        Whosale: { Id: "Wholesale", IsPermanent: true },
         DataAnalysis: { Id: "DataAnalysis", IsPermanent: false }
     };
 });

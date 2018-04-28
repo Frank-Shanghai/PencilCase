@@ -15,6 +15,25 @@ define(["require", "exports", "./PageBase", "./Consts", "../Navigator"], functio
         __extends(HomePage, _super);
         function HomePage() {
             var _this = _super.call(this) || this;
+            _this.openProductManagementPage = function () {
+                //this.navigator.navigateTo("Pages/ProductManagement.html", {
+                _this.navigator.navigateTo($("div#ProductManagement").first(), {
+                    data: {
+                        pageInfo: Consts.Pages.ProductManagement
+                    },
+                    changeHash: false,
+                    dataUrl: "ProdutManagement"
+                });
+            };
+            _this.openRetailPage = function () {
+                //this.navigator.navigateTo("Pages/Retail.html", {
+                _this.navigator.navigateTo($("div#Retail").first(), {
+                    data: {
+                        pageInfo: Consts.Pages.Retail
+                    },
+                    changeHash: false
+                });
+            };
             _this.pageId = Consts.Pages.HomePage.Id;
             _this.isPermanent = Consts.Pages.HomePage.IsPermanent;
             _this.navigator = Navigator_1.Navigator.instance;
@@ -22,20 +41,6 @@ define(["require", "exports", "./PageBase", "./Consts", "../Navigator"], functio
             _this.footer = ko.observable("@Copyright - Frank");
             return _this;
         }
-        HomePage.prototype.openProductManagementPage = function () {
-            this.navigator.navigateTo("Pages/ProductManagement.html", {
-                data: {
-                    pageInfo: Consts.Pages.ProductManagement
-                }
-            });
-        };
-        HomePage.prototype.openRetailPage = function () {
-            this.navigator.navigateTo("Pages/Retail.html", {
-                data: {
-                    pageInfo: Consts.Pages.Retail
-                }
-            });
-        };
         return HomePage;
     }(PageBase_1.PageBase));
     exports.HomePage = HomePage;

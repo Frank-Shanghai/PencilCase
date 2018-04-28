@@ -17,14 +17,14 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts"], functio
             var _this = _super.call(this) || this;
             _this.navigator = Navigator_1.Navigator.instance;
             _this.gotoTest = function () {
-                _this.navigator.navigateTo("Retail.html", {
+                _this.navigator.navigateTo($("div#Retail").first(), {
                     data: {
                         pageInfo: Consts.Pages.Retail
                     }
                 });
             };
-            _this.title = ko.observable("Product Management Test");
-            _this.pageId = "ProductManagement";
+            _this.title = ko.observable("Product Management");
+            _this.pageId = Consts.Pages.ProductManagement.Id;
             return _this;
         }
         return ProductManagement;

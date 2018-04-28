@@ -7,12 +7,12 @@ export class ProductManagement extends PageBase {
 
     constructor() {
         super();
-        this.title = ko.observable("Product Management Test");
-        this.pageId = "ProductManagement";
+        this.title = ko.observable("Product Management");
+        this.pageId = Consts.Pages.ProductManagement.Id;
     }
 
     private gotoTest = () => {
-        this.navigator.navigateTo("Retail.html", {
+        this.navigator.navigateTo($("div#Retail").first(), {
             data: {
                 pageInfo: Consts.Pages.Retail
             }

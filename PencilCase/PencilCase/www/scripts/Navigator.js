@@ -5,49 +5,46 @@ define(["require", "exports", "./Pages/ProductManagement", "./Pages/HomePage", "
         function Navigator() {
             // TODO: Pop up pages/dialogs handle 
             var _this = this;
+            //public navigateTo = (toPage: string | JQuery, options?: any) => {
+            // In JQuery Mobiel doc, the toPage can be string or JQuery object, but for my case,
+            // the navigation only works with JQuery object, it must be due to the navigation ways I implemented.
+            // So I restraint the type to be JQuery object here to avoid spending time on debugging.
+            // Whatever, I don't want to spend more time on it since it already took me much time to make everything works as it does currently
             this.navigateTo = function (toPage, options) {
-                $("body").pagecontainer("change", toPage, options);
+                ($).mobile.changePage(toPage, options);
             };
             this.goHome = function () {
-                //$("body").pagecontainer("change", $("div#home.ui-page").first(), {
-                var path = $.mobile.activePage.data("url");
-                var index = path.indexOf(".html");
-                var pathWithoutParameters = path.substring(0, index); //not include the end (index postion charactor)
-                var depth = -1;
-                for (var i = 0; i < pathWithoutParameters.length; i++) {
-                    if (pathWithoutParameters[i] === '/')
-                        depth++;
-                }
-                var homePath = "index.html";
-                for (var j = 0; j < depth; j++) {
-                    homePath = "../" + homePath;
-                }
-                $("body").pagecontainer("change", homePath, {
-                    data: {
-                        pageInfo: Consts.Pages.HomePage
-                    }
-                });
+                application_1.Application.instance.activePage(new HomePage_1.HomePage());
+                $(':mobile-pagecontainer').pagecontainer("change", "#HomePage");
             };
             this.initialize = function () {
-                $(document).on("pagebeforechange", function (eventObject, parameters) {
-                    if (parameters.options && parameters.options.data) {
-                        var data = parameters.options.data;
-                        // if options.data is not undefined, means start leaving [FromPage]
-                        if (application_1.Application.instance.activePage()) {
-                            application_1.Application.instance.activePage().isActive(false);
-                            ko.cleanNode($("body").pagecontainer("getActivePage")[0]);
+                $(':mobile-pagecontainer').on("pagecontainerbeforechange", function (eventObject, parameters) {
+                    if (parameters.toPage !== Consts.Pages.HomePage.Id) {
+                        if ((parameters.options && parameters.options.data)) {
+                            var data = parameters.options.data;
+                            var pp = application_1.Application.instance.activePage();
+                            if (application_1.Application.instance.activePage().pageId !== data.pageInfo.Id) {
+                                // Since this page before change event will be called 2 times, so add code here to avoid set active page 2 times
+                                var page = _this.getPage(data.pageInfo);
+                                if (data.refresh) {
+                                    // If have refresh parameter and value is true, refresh the target page
+                                    page.initialize();
+                                }
+                                application_1.Application.instance.activePage(page);
+                            }
                         }
-                        var page = _this.getPage(data.pageInfo);
-                        if (data.refresh) {
-                            // If have refresh parameter and value is true, refresh the target page
-                            page.initialize();
-                        }
-                        application_1.Application.instance.activePage(page);
+                    }
+                    else {
+                        application_1.Application.instance.activePage(application_1.Application.instance.homePage());
                     }
                 });
-                $(document).on("pagechange", function (eventObject, parameters) {
-                    ko.applyBindings(application_1.Application.instance.activePage(), $("body").pagecontainer("getActivePage")[0]);
-                    application_1.Application.instance.activePage().isActive(true);
+                $(':mobile-pagecontainer').pagecontainer({
+                    beforeshow: function (eventObject, ui) {
+                        if (!application_1.Application.instance.activePage().equals(application_1.Application.instance.homePage())) {
+                            // http://demos.jquerymobile.com/1.3.2/faq/injected-content-is-not-enhanced.html
+                            $("body").pagecontainer("getActivePage").trigger("create");
+                        }
+                    }
                 });
             };
         }
@@ -62,38 +59,35 @@ define(["require", "exports", "./Pages/ProductManagement", "./Pages/HomePage", "
             configurable: true
         });
         Navigator.prototype.getPage = function (pageInfo) {
-            var page = null;
+            var page;
+            var pageExisted = false;
             switch (pageInfo) {
-                case Consts.Pages.HomePage:
-                    if (this.needNewInstance(pageInfo, page)) {
-                        page = new HomePage_1.HomePage();
-                    }
-                    break;
                 case Consts.Pages.ProductManagement:
-                    if (this.needNewInstance(pageInfo, page)) {
+                    page = this.getExistedInstance(pageInfo);
+                    pageExisted = !(page == null);
+                    if (pageExisted == false)
                         page = new ProductManagement_1.ProductManagement();
-                    }
                     break;
                 case Consts.Pages.Retail:
-                    if (this.needNewInstance(pageInfo, page)) {
+                    page = this.getExistedInstance(pageInfo);
+                    pageExisted = !(page == null);
+                    if (pageExisted == false)
                         page = new Retail_1.Retail();
-                    }
                     break;
             }
-            if (pageInfo.IsPermanent === true)
+            if (pageExisted == false && pageInfo.IsPermanent === true)
                 application_1.Application.instance.pages.push(page);
             return page;
         };
-        Navigator.prototype.needNewInstance = function (pageInfo, page) {
+        Navigator.prototype.getExistedInstance = function (pageInfo) {
             if (pageInfo.IsPermanent == false)
-                return true;
+                return null;
             for (var i = 0; i < application_1.Application.instance.pages.length; i++) {
-                if (application_1.Application.instance.pages[i].pageId === pageInfo.pageId) {
-                    page = application_1.Application.instance.pages[i];
-                    return false;
+                if (application_1.Application.instance.pages[i].pageId === pageInfo.Id) {
+                    return application_1.Application.instance.pages[i];
                 }
             }
-            return true;
+            return null;
         };
         return Navigator;
     }());

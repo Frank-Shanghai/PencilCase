@@ -3,7 +3,6 @@ define(["require", "exports"], function (require, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
     var PageBase = (function () {
         function PageBase() {
-            this.isActive = ko.observable(false);
             this.initialize = function () {
             };
         }

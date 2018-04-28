@@ -13,6 +13,7 @@ import { Navigator } from './Navigator';
 export class Application {
     public activePage: KnockoutObservable<PageBase> = ko.observable(null);
     public pages: Array<PageBase> = [];
+    public homePage: KnockoutObservable<PageBase>;
 
     private static _instance: Application;
 
@@ -31,7 +32,7 @@ export class Application {
     private openHomePage() {
         let homePage = new HomePage();
         this.activePage(homePage);
-        this.pages.push(homePage);
+        this.homePage = ko.observable(homePage);
     }
 
     public initialize(): void {
@@ -42,9 +43,7 @@ export class Application {
         document.addEventListener('pause', this.onPause, false);
         document.addEventListener('resume', this.onResume, false);
 
-        // Home page binding
-        ko.applyBindings(this.activePage(), $("body").pagecontainer("getActivePage")[0]);
-        this.activePage().isActive(true);
+        ko.applyBindings(Application.instance, document.documentElement);
 
         Navigator.instance.initialize();
 

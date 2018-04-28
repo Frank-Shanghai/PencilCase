@@ -13,9 +13,7 @@ define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], fun
             this.onDeviceReady = function () {
                 document.addEventListener('pause', _this.onPause, false);
                 document.addEventListener('resume', _this.onResume, false);
-                // Home page binding
-                ko.applyBindings(_this.activePage(), $("body").pagecontainer("getActivePage")[0]);
-                _this.activePage().isActive(true);
+                ko.applyBindings(Application.instance, document.documentElement);
                 Navigator_1.Navigator.instance.initialize();
                 // TODO: Cordova has been loaded. Perform any initialization that requires Cordova here.
                 //var parentElement = document.getElementById('deviceready');
@@ -105,7 +103,7 @@ define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], fun
         Application.prototype.openHomePage = function () {
             var homePage = new HomePage_1.HomePage();
             this.activePage(homePage);
-            this.pages.push(homePage);
+            this.homePage = ko.observable(homePage);
         };
         Application.prototype.initialize = function () {
             document.addEventListener('deviceready', this.onDeviceReady, false);

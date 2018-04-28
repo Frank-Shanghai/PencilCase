@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./PageBase", "../Navigator"], function (require, exports, PageBase_1, Navigator_1) {
+define(["require", "exports", "./PageBase", "../Navigator", "./Consts"], function (require, exports, PageBase_1, Navigator_1, Consts) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Retail = (function (_super) {
@@ -16,6 +16,8 @@ define(["require", "exports", "./PageBase", "../Navigator"], function (require, 
         function Retail() {
             var _this = _super.call(this) || this;
             _this.navigator = Navigator_1.Navigator.instance;
+            _this.pageId = Consts.Pages.Retail.Id;
+            _this.title = ko.observable("Retail");
             return _this;
         }
         return Retail;
