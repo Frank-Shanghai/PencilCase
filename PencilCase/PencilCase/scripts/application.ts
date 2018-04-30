@@ -113,8 +113,8 @@ export class Application {
                         let clearStatement = "delete from Product";
                         // 箱， 个
                         let sqlStatement = "insert into Product values ('" + Utils.guid() + "', 'Product1', 'Product description ....', 1.5, '" + guidGe + "', 28, '" + guidXiang + "', 24, 1, 24, 9999, null, '4/25/2018', '4/25/2018')";
-                        let sqlStatement1 = "insert into Product values ('" + Utils.guid() + "', '可爱多', 'Product description ....', 6, '" + guidGe + "', 60, '" + guidXiang + "', 60, 5, 12, 9999, null, '4/25/2018', '4/25/2018')";
-                        let sqlStatement2 = "insert into Product values ('" + Utils.guid() + "', '东北大板', 'Product description ....', 6, '" + guidKuai + "', 60, '" + guidJian + "', 60, 5, 12, 9999, null, '4/25/2018', '4/25/2018')";
+                        let sqlStatement1 = "insert into Product values ('" + Utils.guid() + "', '可爱多', 'Product description ....', 6, '" + guidGe + "', 68, '" + guidXiang + "', 60, 5, 12, 9999, null, '4/25/2018', '4/25/2018')";
+                        let sqlStatement2 = "insert into Product values ('" + Utils.guid() + "', '东北大板', 'Product description ....', 6, '" + guidKuai + "', 68, '" + guidJian + "', 60, 5, 12, 9999, null, '4/25/2018', '4/25/2018')";
 
                         transaction.executeSql(clearStatement, [], null, this.onDBError);
                         transaction.executeSql(sqlStatement, [], null, this.onDBError);
