@@ -17,20 +17,13 @@ define(["require", "exports", "./PageBase", "./Consts", "../Navigator"], functio
             var _this = _super.call(this) || this;
             _this.openProductManagementPage = function () {
                 //this.navigator.navigateTo("Pages/ProductManagement.html", {
-                _this.navigator.navigateTo($("div#ProductManagement").first(), {
-                    data: {
-                        pageInfo: Consts.Pages.ProductManagement
-                    },
+                _this.navigator.navigateTo(Consts.Pages.ProductManagement, {
                     changeHash: false,
                     dataUrl: "ProdutManagement"
                 });
             };
             _this.openRetailPage = function () {
-                //this.navigator.navigateTo("Pages/Retail.html", {
-                _this.navigator.navigateTo($("div#Retail").first(), {
-                    data: {
-                        pageInfo: Consts.Pages.Retail
-                    },
+                _this.navigator.navigateTo(Consts.Pages.Retail, {
                     changeHash: false
                 });
             };

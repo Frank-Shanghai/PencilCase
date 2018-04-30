@@ -1,4 +1,4 @@
-define(["require", "exports", "./Pages/ProductManagement", "./Pages/HomePage", "./Pages/Retail", "./application", "./Pages/Consts"], function (require, exports, ProductManagement_1, HomePage_1, Retail_1, application_1, Consts) {
+define(["require", "exports", "./Pages/ProductManagement", "./Pages/ProductEditor", "./Pages/HomePage", "./Pages/Retail", "./application", "./Pages/Consts"], function (require, exports, ProductManagement_1, ProductEditor_1, HomePage_1, Retail_1, application_1, Consts) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Navigator = (function () {
@@ -10,8 +10,14 @@ define(["require", "exports", "./Pages/ProductManagement", "./Pages/HomePage", "
             // the navigation only works with JQuery object, it must be due to the navigation ways I implemented.
             // So I restraint the type to be JQuery object here to avoid spending time on debugging.
             // Whatever, I don't want to spend more time on it since it already took me much time to make everything works as it does currently
-            this.navigateTo = function (toPage, options) {
-                ($).mobile.changePage(toPage, options);
+            this.navigateTo = function (pageInfo, options) {
+                var jqueryPage = $("div#" + pageInfo.Id).first();
+                if (!options)
+                    options = {};
+                if (!options.data)
+                    options.data = {};
+                $.extend(options.data, { pageInfo: pageInfo });
+                ($).mobile.changePage(jqueryPage, options);
             };
             this.goHome = function () {
                 application_1.Application.instance.activePage(new HomePage_1.HomePage());
@@ -22,10 +28,9 @@ define(["require", "exports", "./Pages/ProductManagement", "./Pages/HomePage", "
                     if (parameters.toPage !== Consts.Pages.HomePage.Id) {
                         if ((parameters.options && parameters.options.data)) {
                             var data = parameters.options.data;
-                            var pp = application_1.Application.instance.activePage();
                             if (application_1.Application.instance.activePage().pageId !== data.pageInfo.Id) {
                                 // Since this page before change event will be called 2 times, so add code here to avoid set active page 2 times
-                                var page = _this.getPage(data.pageInfo);
+                                var page = _this.getPage(data);
                                 if (data.refresh) {
                                     // If have refresh parameter and value is true, refresh the target page
                                     page.initialize();
@@ -42,6 +47,7 @@ define(["require", "exports", "./Pages/ProductManagement", "./Pages/HomePage", "
                     beforeshow: function (eventObject, ui) {
                         if (!application_1.Application.instance.activePage().equals(application_1.Application.instance.homePage())) {
                             // http://demos.jquerymobile.com/1.3.2/faq/injected-content-is-not-enhanced.html
+                            // https://www.gajotres.net/jquery-mobile-and-how-to-enhance-the-markup-of-dynamically-added-content/
                             $("body").pagecontainer("getActivePage").trigger("create");
                         }
                     }
@@ -58,7 +64,8 @@ define(["require", "exports", "./Pages/ProductManagement", "./Pages/HomePage", "
             enumerable: true,
             configurable: true
         });
-        Navigator.prototype.getPage = function (pageInfo) {
+        Navigator.prototype.getPage = function (data) {
+            var pageInfo = data.pageInfo;
             var page;
             var pageExisted = false;
             switch (pageInfo) {
@@ -67,6 +74,12 @@ define(["require", "exports", "./Pages/ProductManagement", "./Pages/HomePage", "
                     pageExisted = !(page == null);
                     if (pageExisted == false)
                         page = new ProductManagement_1.ProductManagement();
+                    break;
+                case Consts.Pages.ProductEditor:
+                    page = this.getExistedInstance(pageInfo);
+                    pageExisted = !(page == null);
+                    if (pageExisted == false)
+                        page = new ProductEditor_1.ProductEditor(data.parameters);
                     break;
                 case Consts.Pages.Retail:
                     page = this.getExistedInstance(pageInfo);
