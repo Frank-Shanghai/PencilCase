@@ -1,4 +1,5 @@
 ﻿import { ProductManagement } from './Pages/ProductManagement';
+import { ProductEditor } from './Pages/ProductEditor';
 import { PageBase } from './Pages/PageBase';
 import { HomePage } from './Pages/HomePage';
 import { Retail } from './Pages/Retail';
@@ -24,8 +25,13 @@ export class Navigator {
     // the navigation only works with JQuery object, it must be due to the navigation ways I implemented.
     // So I restraint the type to be JQuery object here to avoid spending time on debugging.
     // Whatever, I don't want to spend more time on it since it already took me much time to make everything works as it does currently
-    public navigateTo = (toPage: JQuery, options?: any) => {
-        (<any>($)).mobile.changePage(toPage, options);
+    public navigateTo = (pageInfo: any, options?: any) => {
+        let jqueryPage = $("div#" + pageInfo.Id).first();
+        if (!options) options = {};
+        if (!options.data) options.data = {};
+        $.extend(options.data, { pageInfo: pageInfo });
+
+        (<any>($)).mobile.changePage(jqueryPage, options);
     }
 
     public goHome = () => {
@@ -38,10 +44,9 @@ export class Navigator {
             if (parameters.toPage !== Consts.Pages.HomePage.Id) { // No need the handling here for home page
                 if ((parameters.options && parameters.options.data)) {
                     let data = parameters.options.data;
-                    let pp = Application.instance.activePage();
                     if (Application.instance.activePage().pageId !== data.pageInfo.Id) {
                         // Since this page before change event will be called 2 times, so add code here to avoid set active page 2 times
-                        let page = this.getPage(data.pageInfo);
+                        let page = this.getPage(data);
                         if (data.refresh) {
                             // If have refresh parameter and value is true, refresh the target page
                             page.initialize();
@@ -60,13 +65,16 @@ export class Navigator {
             beforeshow: (eventObject: JQueryEventObject, ui: any) => {
                 if (!Application.instance.activePage().equals(Application.instance.homePage())) {
                     // http://demos.jquerymobile.com/1.3.2/faq/injected-content-is-not-enhanced.html
+                    // https://www.gajotres.net/jquery-mobile-and-how-to-enhance-the-markup-of-dynamically-added-content/
                     $("body").pagecontainer("getActivePage").trigger("create");
                 }
             }
         });
     }
 
-    private getPage(pageInfo: any) {
+    private getPage(data: any) {
+        let pageInfo = data.pageInfo;
+
         let page: PageBase;
         let pageExisted: boolean = false;
         switch (pageInfo) {
@@ -75,6 +83,12 @@ export class Navigator {
                 pageExisted = !(page == null);
                 if (pageExisted == false)
                     page = new ProductManagement();
+                break;
+            case Consts.Pages.ProductEditor:
+                page = this.getExistedInstance(pageInfo);
+                pageExisted = !(page == null);
+                if (pageExisted == false)
+                    page = new ProductEditor(data.parameters);
                 break;
             case Consts.Pages.Retail:
                 page = this.getExistedInstance(pageInfo);

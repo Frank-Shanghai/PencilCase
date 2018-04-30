@@ -16,17 +16,51 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts"], functio
         function ProductManagement() {
             var _this = _super.call(this) || this;
             _this.navigator = Navigator_1.Navigator.instance;
-            _this.gotoTest = function () {
-                _this.navigator.navigateTo($("div#Retail").first(), {
+            _this.products = ko.observableArray([]);
+            _this.addNewProduct = function () {
+                //this.navigator.navigateTo($("div#ProductEditor").first(), {
+                //    data: {
+                //        pageInfo: Consts.Pages.ProductEditor,
+                //        //selectedProduct: null or one product instance
+                //    }
+                //});
+                var first = _this.products()[0];
+                _this.products.push(first);
+            };
+            _this.showDetails = function (product) {
+                _this.navigator.navigateTo(Consts.Pages.ProductEditor, {
                     data: {
-                        pageInfo: Consts.Pages.Retail
-                    }
+                        parameters: {
+                            product: product
+                        }
+                    },
+                    changeHash: false
                 });
+            };
+            _this.onDBError = function (transaction, sqlError) {
+                alert(sqlError.message);
             };
             _this.title = ko.observable("Product Management");
             _this.pageId = Consts.Pages.ProductManagement.Id;
             return _this;
         }
+        ProductManagement.prototype.initialize = function () {
+            var _this = this;
+            var db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
+            if (db) {
+                db.transaction(function (transaction) {
+                    transaction.executeSql('select P.*, UOM1.Name RetailUnitName, UOM2.Name WholesaleUnitName from Product P \
+                                        join UnitOfMeasure UOM1 on P.RetailUnit = UOM1.Id \
+                                        join UnitOfMeasure UOM2 on P.WholesaleUnit = UOM2.Id', [], function (transaction, resultSet) {
+                        _this.products([]); // First, clear products collection
+                        var rows = resultSet.rows;
+                        for (var i = 0; i < rows.length; i++) {
+                            _this.products.push(rows[i]);
+                        }
+                    }, _this.onDBError);
+                });
+            }
+        };
         return ProductManagement;
     }(PageBase_1.PageBase));
     exports.ProductManagement = ProductManagement;

@@ -63,11 +63,24 @@ define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], fun
                     db.transaction(function (transaction) {
                         transaction.executeSql('select Id from UnitOfMeasure', [], function (transaction, resultSet) {
                             if (resultSet.rows.length === 0) {
-                                transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '个')", [], null, _this.onDBError);
+                                var guidGe = Utils.guid();
+                                var guidXiang = Utils.guid();
+                                var guidKuai = Utils.guid();
+                                var guidJian = Utils.guid();
+                                transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + guidGe + "', '个')", [], null, _this.onDBError);
                                 transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '筒')", [], null, _this.onDBError);
-                                transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '箱')", [], null, _this.onDBError);
-                                transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '件')", [], null, _this.onDBError);
-                                transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '块')", [], null, _this.onDBError);
+                                transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + guidXiang + "', '箱')", [], null, _this.onDBError);
+                                transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + guidJian + "', '件')", [], null, _this.onDBError);
+                                transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + guidKuai + "', '块')", [], null, _this.onDBError);
+                                var clearStatement = "delete from Product";
+                                // 箱， 个
+                                var sqlStatement = "insert into Product values ('" + Utils.guid() + "', 'Product1', 'Product description ....', 1.5, '" + guidGe + "', 28, '" + guidXiang + "', 24, 1, 24, 9999, null, '4/25/2018', '4/25/2018')";
+                                var sqlStatement1 = "insert into Product values ('" + Utils.guid() + "', '可爱多', 'Product description ....', 6, '" + guidGe + "', 60, '" + guidXiang + "', 60, 5, 12, 9999, null, '4/25/2018', '4/25/2018')";
+                                var sqlStatement2 = "insert into Product values ('" + Utils.guid() + "', '东北大板', 'Product description ....', 6, '" + guidKuai + "', 60, '" + guidJian + "', 60, 5, 12, 9999, null, '4/25/2018', '4/25/2018')";
+                                transaction.executeSql(clearStatement, [], null, _this.onDBError);
+                                transaction.executeSql(sqlStatement, [], null, _this.onDBError);
+                                transaction.executeSql(sqlStatement1, [], null, _this.onDBError);
+                                transaction.executeSql(sqlStatement2, [], null, _this.onDBError);
                             }
                         }, _this.onDBError);
                     });

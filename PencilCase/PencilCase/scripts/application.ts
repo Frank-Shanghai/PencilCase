@@ -99,11 +99,28 @@ export class Application {
             db.transaction((transaction) => {
                 transaction.executeSql('select Id from UnitOfMeasure', [], (transaction: SqlTransaction, resultSet: SqlResultSet) => {
                     if (resultSet.rows.length === 0) {
-                        transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '个')", [], null, this.onDBError);
+                        let guidGe = Utils.guid();
+                        let guidXiang = Utils.guid();
+                        let guidKuai = Utils.guid();
+                        let guidJian = Utils.guid();
+
+                        transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + guidGe + "', '个')", [], null, this.onDBError);
                         transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '筒')", [], null, this.onDBError);
-                        transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '箱')", [], null, this.onDBError);
-                        transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '件')", [], null, this.onDBError);
-                        transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + Utils.guid() + "', '块')", [], null, this.onDBError);
+                        transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + guidXiang + "', '箱')", [], null, this.onDBError);
+                        transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + guidJian + "', '件')", [], null, this.onDBError);
+                        transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + guidKuai + "', '块')", [], null, this.onDBError);
+
+                        let clearStatement = "delete from Product";
+                        // 箱， 个
+                        let sqlStatement = "insert into Product values ('" + Utils.guid() + "', 'Product1', 'Product description ....', 1.5, '" + guidGe + "', 28, '" + guidXiang + "', 24, 1, 24, 9999, null, '4/25/2018', '4/25/2018')";
+                        let sqlStatement1 = "insert into Product values ('" + Utils.guid() + "', '可爱多', 'Product description ....', 6, '" + guidGe + "', 60, '" + guidXiang + "', 60, 5, 12, 9999, null, '4/25/2018', '4/25/2018')";
+                        let sqlStatement2 = "insert into Product values ('" + Utils.guid() + "', '东北大板', 'Product description ....', 6, '" + guidKuai + "', 60, '" + guidJian + "', 60, 5, 12, 9999, null, '4/25/2018', '4/25/2018')";
+
+                        transaction.executeSql(clearStatement, [], null, this.onDBError);
+                        transaction.executeSql(sqlStatement, [], null, this.onDBError);
+                        transaction.executeSql(sqlStatement1, [], null, this.onDBError);
+                        transaction.executeSql(sqlStatement2, [], null, this.onDBError);
+
                     }
                 }, this.onDBError);
             });

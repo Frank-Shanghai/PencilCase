@@ -10,7 +10,11 @@
     public pageId: string;
     public isPermanent: boolean;
 
-    public initialize = () => {
+    constructor() {
+        this.initialize();
+    }
+
+    public initialize() {
 
     }
 

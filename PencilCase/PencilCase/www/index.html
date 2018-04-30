@@ -20,6 +20,8 @@
     <script type="text/javascript" src="scripts/jquery-1.8.0.min.js"></script>
     <script type="text/javascript" src="scripts/jquery.mobile-1.4.5.min.js"></script>
     <script type="text/javascript" src="scripts/knockout-3.4.2.js"></script>
+    <script type="text/javascript" src="scripts/CustomBindings/Bindings.js"></script>
+    <script type="text/javascript" src="scripts/CustomBindings/ListviewBinding.js"></script>
 </head>
 <body>
     <!-- ==============Home Page================= -->
@@ -42,7 +44,7 @@
     </div>
 
     <!-- ==============Product Management Page================= -->
-    <!-- Try not bind UI stuff on Home Page like header and footer, because such UI binding will be applied until device ready, 
+    <!-- Try not bind UI stuff on Home Page like header and footer, because such UI binding will be applied until device ready,
         and at that time, static UI already loaded for a while, it is confusing for users becasue they can note that UI loaded at 2 different time point. -->
     <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
     <div data-role="page" id="ProductManagement">
@@ -51,10 +53,43 @@
         <div data-role="header" data-add-back-btn="true" data-back-btn-text="Back" data-back-btn-theme="b">
             <a href="#HomePage" data-icon="home" data-bind="click: navigator.goHome">Home</a>
             <h1><span data-bind="text: title"></span></h1>
+            <a href="#" data-icon="plus" class="ui-icon-plus" data-bind="click: addNewProduct">Add</a>
         </div>
         <div data-role="main" class="ui-content">
-            <p>CRUD Products</p>
-            <a href="#" data-bind="click: gotoTest">Go To Retail</a>
+            <ul data-role="listview" data-inset="true" data-bind="foreach: products, listview: products">
+                <li>
+                    <a href="#" data-bind="click: $parent.showDetails">
+                        <h2><span data-bind="text: Name"></span></h2>
+                        <p>
+                            <span>单价：</span>
+                            <span data-bind="text: '￥' + RetailPrice"></span>
+                        </p>
+                        <p>
+                            <span>批发价：</span>
+                            <span data-bind="text: '￥' + WholesalePrice"></span>
+                            <span data-bind="text: '(' + Times + RetailUnitName + '/' + WholesaleUnitName + ')'"></span>
+                            <span class="ui-li-count" data-bind="text: '库存：' + Inventory"></span>
+                        </p>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->
+    </div>
+
+    <!-- ==============Product Editor Page================= -->
+    <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
+    <div data-role="page" id="ProductEditor">
+        <!-- ko if: activePage().pageId === 'ProductEditor' -->
+        <!-- ko with: activePage() -->
+        <div data-role="header">
+            <a href="#ProductManagement" data-icon="back" data-bind="click: goBack">Back</a>
+            <h1><span data-bind="text: title"></span></h1>
+        </div>
+        <div data-role="main" class="ui-content">
+            <p><h2><span data-bind="text: name"></span></h2></p>
+            <p>Product Editor Page</p>
         </div>
         <!-- /ko -->
         <!-- /ko -->

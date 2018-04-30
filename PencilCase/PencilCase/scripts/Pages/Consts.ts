@@ -5,6 +5,7 @@
     // And when changing page, there will be one parameter indicates that if need to refresh the page, if so, the page initialize method will be executed.
     HomePage: { Id: "HomePage", IsPermanent: true },
     ProductManagement: { Id: "ProductManagement", IsPermanent: false },
+    ProductEditor: { Id: "ProductEditor", IsPermanent: false },
     Retail: { Id: "Retail", IsPermanent: true },
     Whosale: { Id: "Wholesale", IsPermanent: true },
     DataAnalysis: { Id: "DataAnalysis", IsPermanent: false }
