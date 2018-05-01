@@ -22,6 +22,7 @@
     <script type="text/javascript" src="scripts/knockout-3.4.2.js"></script>
     <script type="text/javascript" src="scripts/CustomBindings/Bindings.js"></script>
     <script type="text/javascript" src="scripts/CustomBindings/ListviewBinding.js"></script>
+    <script type="text/javascript" src="scripts/CustomBindings/SelectComponentInitialValueBinding.js"></script>
 </head>
 <body>
     <!-- ==============Home Page================= -->
@@ -88,9 +89,109 @@
             <h1><span data-bind="text: title"></span></h1>
         </div>
         <div data-role="main" class="ui-content">
-            <p><h2><span data-bind="text: name"></span></h2></p>
-            <p>Product Editor Page</p>
+            <!--<div data-role="tabs" id="detailTabs" data-bind="visible: !isInEditingMode()">-->
+            <div data-role="tabs" id="detailTabs" data-bind="visible: !isInEditingMode()">
+                <div data-role="navbar">
+                    <ul>
+                        <li><a href="#detailsGeneral" data-ajax="false" class="ui-btn-active">General Info</a></li>
+                        <li><a href="#detailsPrice" data-ajax="false">Prices</a></li>
+                    </ul>
+                </div>
+                <div id="detailsGeneral" class="ui-body-d ui-content">
+                    <form>
+                        <p>
+                            <span style="font-weight: bold">名称：</span><span data-bind="text: originalProduct().Name"></span>
+                        </p>
+                        <p>
+                            <span style="font-weight: bold">描述：</span><span data-bind="text: originalProduct().Description"></span>
+                        </p>
+                        <p>
+                            <span style="font-weight: bold">库存：</span><span data-bind="text: originalProduct().Inventory"></span>
+                        </p>
+                        <p>
+                            <span style="font-weight: bold">图片：</span><span data-bind="text: '暂不可用'"></span>
+                        </p>
+                    </form>
+                </div>
+                <div id="detailsPrice" class="ui-body-d ui-content">
+                    <form>
+                        <p>
+                            <span style="font-weight: bold">零售单位：</span><span data-bind="text: originalProduct().RetailUnitName"></span>
+                        </p>
+                        <p>
+                            <span style="font-weight: bold">零售价：</span><span data-bind="text: originalProduct().RetailPrice + '元'"></span>
+                        </p>
+                        <p>
+                            <span style="font-weight: bold">批发单位：</span><span data-bind="text: originalProduct().WholesaleUnitName"></span>
+                        </p>
+                        <p>
+                            <span style="font-weight: bold">单位关系：</span><span data-bind="text: originalProduct().Times + originalProduct().RetailUnitName + '/' + originalProduct().WholesaleUnitName"></span>
+                        </p>
+                        <p>
+                            <span style="font-weight: bold">批发价：</span><span data-bind="text: originalProduct().WholesalePrice + '元'"></span>
+                        </p>
+                        <p>
+                            元
+                            <span style="font-weight: bold">进货价（按批发单位）：</span><span data-bind="text: originalProduct().ImportWholesalePrice + '元'"></span>
+                        </p>
+                        <p>
+                            <span style="font-weight: bold">进货价（按零售单位）：</span><span data-bind="text: originalProduct().ImportRetailPrice + '元'"></span>
+                        </p>
+                    </form>
+                </div>
+            </div>
+            <div data-role="tabs" id="editingTabs" data-bind="visible: isInEditingMode">
+                <div data-role="navbar">
+                    <ul>
+                        <li><a href="#editingGeneral" data-ajax="false" class="ui-btn-active">General Info</a></li>
+                        <li><a href="#editingPrice" data-ajax="false">Prices</a></li>
+                    </ul>
+                </div>
+                <div id="editingGeneral" class="ui-body-d ui-content">
+                    <form>
+                        <label style="font-weight: bold" for="productName">名称：</label>
+                        <input type="text" name="productName" data-bind="value: name" />
+                        <label style="font-weight: bold" for="productDescription">描述：</label>
+                        <textarea name="productDescription" data-bind="text: description"></textarea>
+                        <label style="font-weight: bold" for="productInventory">库存：</label>
+                        <input type="text" name="productInventory" data-bind="value: inventory" />
+                        <label style="font-weight: bold">图片：</label>
+                        <span data-bind="text: '暂不可用'"></span>
+                    </form>
+                </div>
+                <div id="editingPrice" class="ui-body-d ui-content">
+                    <form>
+                        <label style="font-weight: bold" for="productRetailUnit">零售单位：</label>
+                        <select name="productRetailUnit" data-bind="options: uomDataSource, optionsText: 'Name', optionsValue: 'Id', value: retailUnit, selectComponentInitialValue: retailUnit"></select>
+                        <label for="productRetailPrice" style="font-weight: bold">零售价(元)：</label>
+                        <input type="text" name="productRetailPrice" data-bind="value: retailPrice" />
+                        <label for="productWholesaleUnit" style="font-weight: bold">批发单位：</label>
+                        <select name="productWholesaleUnit" data-bind="options: uomDataSource, optionsText: 'Name', optionsValue: 'Id', value: wholesaleUnit, selectComponentInitialValue: wholesaleUnit"></select>
+                        <label for="productTimes" style="font-weight: bold">单位关系：<span data-bind="text: '(如：12个每箱就填12)'"></span></label>
+                        <input type="text" name="productTimes" data-bind="value: times" />
+                        <label for="productWholesalePrice" style="font-weight: bold">批发价(元)：</label>
+                        <input type="text" name="productWholesalePrice" data-bind="value: wholesalePrice" />
+                        <lable for="productImportWholesalePrice" style="font-weight: bold">进货价(元)（按批发单位）：</lable>
+                        <input type="text" name="productImportWholesalePrice" data-bind="value: importWholesalePrice" />
+                    </form>
+                </div>
+            </div>
         </div>
+        <footer data-role="footer" data-position="fixed">
+            <div data-role="navbar" data-grid="a">
+                <ul>
+                    <li>
+                        <a id="editButton" href="#" data-bind="click: startEditing, visible: !isInEditingMode()" data-icon="edit">Edit</a>
+                        <a id="saveButton" href="#" data-bind="click: save, visible: isInEditingMode" data-icon="check">Save</a>
+                    </li>
+                    <li>
+                        <!-- click 绑定的方法名不能是delete，花了1小时发现的问题，难道是某种豫留关键字或什么东西。 -->
+                        <a id="deleteButton" href="#" data-bind="click: deleteProduct, visible: !isInEditingMode()" data-icon="delete">Delete</a>
+                        <a id="cancelButton" href="#" data-bind="click: cancel, visible: isInEditingMode" data-icon="arrow-u-l">Cancel</a>
+                    </li>
+                </ul>
+            </div>
+        </footer>
         <!-- /ko -->
         <!-- /ko -->
     </div>

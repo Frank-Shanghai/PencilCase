@@ -22,7 +22,7 @@ export class ProductManagement extends PageBase {
                     this.products([]); // First, clear products collection
                     let rows = resultSet.rows;
                     for (let i = 0; i < rows.length; i++) {
-                        this.products.push(rows[i]);
+                        this.products.push(rows.item(i));
                     }
                 }, this.onDBError);
             });

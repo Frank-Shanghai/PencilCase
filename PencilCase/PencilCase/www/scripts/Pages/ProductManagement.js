@@ -55,7 +55,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts"], functio
                         _this.products([]); // First, clear products collection
                         var rows = resultSet.rows;
                         for (var i = 0; i < rows.length; i++) {
-                            _this.products.push(rows[i]);
+                            _this.products.push(rows.item(i));
                         }
                     }, _this.onDBError);
                 });
