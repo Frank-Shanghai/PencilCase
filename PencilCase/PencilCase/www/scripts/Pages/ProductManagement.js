@@ -18,14 +18,14 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts"], functio
             _this.navigator = Navigator_1.Navigator.instance;
             _this.products = ko.observableArray([]);
             _this.addNewProduct = function () {
-                //this.navigator.navigateTo($("div#ProductEditor").first(), {
-                //    data: {
-                //        pageInfo: Consts.Pages.ProductEditor,
-                //        //selectedProduct: null or one product instance
-                //    }
-                //});
-                var first = _this.products()[0];
-                _this.products.push(first);
+                _this.navigator.navigateTo(Consts.Pages.ProductEditor, {
+                    data: {
+                        parameters: {
+                            product: null
+                        }
+                    },
+                    changeHash: false
+                });
             };
             _this.showDetails = function (product) {
                 _this.navigator.navigateTo(Consts.Pages.ProductEditor, {

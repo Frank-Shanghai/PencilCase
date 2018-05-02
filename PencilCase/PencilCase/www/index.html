@@ -24,13 +24,14 @@
     <script type="text/javascript" src="scripts/CustomBindings/ListviewBinding.js"></script>
     <script type="text/javascript" src="scripts/CustomBindings/SelectComponentInitialValueBinding.js"></script>
     <script type="text/javascript" src="scripts/CustomBindings/InitialSelectedTabBinding.js"></script>
+    <script type="text/javascript" src="scripts/moment.min.js"></script>
 </head>
 <body>
     <!-- ==============Home Page================= -->
     <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
     <div data-role="page" id="HomePage">
         <!-- ko with: homePage() -->
-        <div data-role="header">
+        <div data-role="header" data-position="fixed">
             <h1>Pencil Case</h1>
         </div>
         <div role="main" class="ui-content">
@@ -52,7 +53,7 @@
     <div data-role="page" id="ProductManagement">
         <!-- ko if: activePage().pageId === 'ProductManagement' -->
         <!-- ko with: activePage() -->
-        <div data-role="header" data-add-back-btn="true" data-back-btn-text="Back" data-back-btn-theme="b">
+        <div data-role="header" data-position="fixed">
             <a href="#HomePage" data-icon="home" data-bind="click: navigator.goHome">Home</a>
             <h1><span data-bind="text: title"></span></h1>
             <a href="#" data-icon="plus" class="ui-icon-plus" data-bind="click: addNewProduct">Add</a>
@@ -85,12 +86,11 @@
     <div data-role="page" id="ProductEditor">
         <!-- ko if: activePage().pageId === 'ProductEditor' -->
         <!-- ko with: activePage() -->
-        <div data-role="header">
+        <div data-role="header" data-position="fixed">
             <a href="#ProductManagement" data-icon="back" data-bind="click: goBack">Back</a>
             <h1><span data-bind="text: title"></span></h1>
         </div>
         <div data-role="main" class="ui-content">
-            <!--<div data-role="tabs" id="detailTabs" data-bind="visible: !isInEditingMode()">-->
             <div data-role="tabs" id="detailTabs" data-bind="visible: !isInEditingMode(), initialSelectedTab: {condition: isNotInEditingMode, selector: 'a[href=\'#detailsGeneral\']'}">
                 <div data-role="navbar">
                     <ul>
@@ -132,7 +132,6 @@
                             <span style="font-weight: bold">批发价：</span><span data-bind="text: originalProduct().WholesalePrice + '元'"></span>
                         </p>
                         <p>
-                            元
                             <span style="font-weight: bold">进货价（按批发单位）：</span><span data-bind="text: originalProduct().ImportWholesalePrice + '元'"></span>
                         </p>
                         <p>
@@ -141,6 +140,7 @@
                     </form>
                 </div>
             </div>
+
             <div data-role="tabs" id="editingTabs" data-bind="visible: isInEditingMode, initialSelectedTab: {condition: isInEditingMode, selector: 'a[href=\'#editingGeneral\']'}">
                 <div data-role="navbar">
                     <ul>
@@ -153,9 +153,9 @@
                         <label style="font-weight: bold" for="productName">名称：</label>
                         <input type="text" name="productName" data-bind="value: name" />
                         <label style="font-weight: bold" for="productDescription">描述：</label>
-                        <textarea name="productDescription" data-bind="text: description"></textarea>
+                        <textarea name="productDescription" data-bind="value: description"></textarea>
                         <label style="font-weight: bold" for="productInventory">库存：</label>
-                        <input type="text" name="productInventory" data-bind="value: inventory" />
+                        <input type="number" name="productInventory" data-bind="value: inventory" />
                         <label style="font-weight: bold">图片：</label>
                         <span data-bind="text: '暂不可用'"></span>
                     </form>
@@ -165,15 +165,16 @@
                         <label style="font-weight: bold" for="productRetailUnit">零售单位：</label>
                         <select name="productRetailUnit" data-bind="options: uomDataSource, optionsText: 'Name', optionsValue: 'Id', value: retailUnit, selectComponentInitialValue: retailUnit"></select>
                         <label for="productRetailPrice" style="font-weight: bold">零售价(元)：</label>
-                        <input type="text" name="productRetailPrice" data-bind="value: retailPrice" />
+                        <input type="number" name="productRetailPrice" data-bind="value: retailPrice" />
                         <label for="productWholesaleUnit" style="font-weight: bold">批发单位：</label>
                         <select name="productWholesaleUnit" data-bind="options: uomDataSource, optionsText: 'Name', optionsValue: 'Id', value: wholesaleUnit, selectComponentInitialValue: wholesaleUnit"></select>
                         <label for="productTimes" style="font-weight: bold">单位关系：<span data-bind="text: '(如：12个每箱就填12)'"></span></label>
-                        <input type="text" name="productTimes" data-bind="value: times" />
+                        <input type="number" name="productTimes" data-bind="value: times" />
                         <label for="productWholesalePrice" style="font-weight: bold">批发价(元)：</label>
-                        <input type="text" name="productWholesalePrice" data-bind="value: wholesalePrice" />
+                        <input type="number" name="productWholesalePrice" data-bind="value: wholesalePrice" />
+                        <!-- 此处应为成本价，TODO: 决定是否允许编辑，应由进货价格和库存计算得出 -->
                         <lable for="productImportWholesalePrice" style="font-weight: bold">进货价(元)（按批发单位）：</lable>
-                        <input type="text" name="productImportWholesalePrice" data-bind="value: importWholesalePrice" />
+                        <input type="number" name="productImportWholesalePrice" data-bind="value: importWholesalePrice" />
                     </form>
                 </div>
             </div>

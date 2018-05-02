@@ -30,15 +30,14 @@ export class ProductManagement extends PageBase {
     }
 
     private addNewProduct = () => {
-        //this.navigator.navigateTo($("div#ProductEditor").first(), {
-        //    data: {
-        //        pageInfo: Consts.Pages.ProductEditor,
-        //        //selectedProduct: null or one product instance
-        //    }
-        //});
-
-        let first = this.products()[0];
-        this.products.push(first);
+        this.navigator.navigateTo(Consts.Pages.ProductEditor, {
+            data: {
+                parameters: {
+                    product: null
+                }
+            },
+            changeHash: false
+        });
     }
 
     private showDetails = (product: any) => {
