@@ -23,6 +23,7 @@
     <script type="text/javascript" src="scripts/CustomBindings/Bindings.js"></script>
     <script type="text/javascript" src="scripts/CustomBindings/ListviewBinding.js"></script>
     <script type="text/javascript" src="scripts/CustomBindings/SelectComponentInitialValueBinding.js"></script>
+    <script type="text/javascript" src="scripts/CustomBindings/InitialSelectedTabBinding.js"></script>
 </head>
 <body>
     <!-- ==============Home Page================= -->
@@ -90,7 +91,7 @@
         </div>
         <div data-role="main" class="ui-content">
             <!--<div data-role="tabs" id="detailTabs" data-bind="visible: !isInEditingMode()">-->
-            <div data-role="tabs" id="detailTabs" data-bind="visible: !isInEditingMode()">
+            <div data-role="tabs" id="detailTabs" data-bind="visible: !isInEditingMode(), initialSelectedTab: {condition: isNotInEditingMode, selector: 'a[href=\'#detailsGeneral\']'}">
                 <div data-role="navbar">
                     <ul>
                         <li><a href="#detailsGeneral" data-ajax="false" class="ui-btn-active">General Info</a></li>
@@ -140,7 +141,7 @@
                     </form>
                 </div>
             </div>
-            <div data-role="tabs" id="editingTabs" data-bind="visible: isInEditingMode">
+            <div data-role="tabs" id="editingTabs" data-bind="visible: isInEditingMode, initialSelectedTab: {condition: isInEditingMode, selector: 'a[href=\'#editingGeneral\']'}">
                 <div data-role="navbar">
                     <ul>
                         <li><a href="#editingGeneral" data-ajax="false" class="ui-btn-active">General Info</a></li>

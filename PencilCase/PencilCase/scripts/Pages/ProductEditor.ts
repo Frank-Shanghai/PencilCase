@@ -5,6 +5,7 @@ import * as Consts from './Consts';
 export class ProductEditor extends PageBase {
     private navigator: Navigator = Navigator.instance;
     private isInEditingMode: KnockoutObservable<boolean> = ko.observable(false);
+    private isNotInEditingMode: KnockoutComputed<boolean>;
     private originalProduct: KnockoutObservable<any> = ko.observable(null);
     private uomDataSource: KnockoutObservableArray<any> = ko.observableArray([]);
 
@@ -23,6 +24,9 @@ export class ProductEditor extends PageBase {
         super();
         this.title = ko.observable("Product Editor");
         this.pageId = Consts.Pages.ProductEditor.Id;
+        this.isNotInEditingMode = ko.computed(() => {
+            return !this.isInEditingMode();
+        });
 
         if (parameters && parameters.product) {
             this.originalProduct(parameters.product);

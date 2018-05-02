@@ -65,6 +65,9 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts"], functio
             };
             _this.title = ko.observable("Product Editor");
             _this.pageId = Consts.Pages.ProductEditor.Id;
+            _this.isNotInEditingMode = ko.computed(function () {
+                return !_this.isInEditingMode();
+            });
             if (parameters && parameters.product) {
                 _this.originalProduct(parameters.product);
             }
