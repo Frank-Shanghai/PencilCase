@@ -48,7 +48,17 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
             // 方法名不能是delete，否则前台绑定后，有奇怪的错误，viewmodel识别不了。
             // 花了1小时发现的问题，难道是某种豫留关键字或什么东西。
             _this.deleteProduct = function () {
-                alert("Not implemented yet.");
+                var doDelete = function () {
+                    var db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
+                    if (db) {
+                        db.transaction(function (transaction) {
+                            transaction.executeSql("delete from Product where Id = '" + _this.originalProduct().Id + "'", [], function (transaction, resultSet) {
+                                _this.goBack();
+                            }, _this.onDBError);
+                        });
+                    }
+                };
+                _this.navigator.showConfirmDialog("删除产品", "是否确认删除？", doDelete);
             };
             _this.save = function () {
                 var db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
@@ -117,8 +127,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
             };
             _this.goBack = function () {
                 _this.navigator.navigateTo(Consts.Pages.ProductManagement, {
-                    changeHash: false,
-                    dataUrl: "ProdutManagement"
+                    changeHash: true,
                 });
             };
             _this.onDBError = function (transaction, sqlError) {

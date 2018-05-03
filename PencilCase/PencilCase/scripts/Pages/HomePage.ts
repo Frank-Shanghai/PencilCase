@@ -20,14 +20,13 @@ export class HomePage extends PageBase {
     private openProductManagementPage = () => {
         //this.navigator.navigateTo("Pages/ProductManagement.html", {
         this.navigator.navigateTo(Consts.Pages.ProductManagement, {
-            changeHash: false,
-            dataUrl: "ProdutManagement"
+            changeHash: true,
         });
     }
 
     private openRetailPage = () => {
         this.navigator.navigateTo(Consts.Pages.Retail, {
-            changeHash: false
+            changeHash: true
         });
     }
 }

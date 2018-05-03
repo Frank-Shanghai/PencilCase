@@ -24,7 +24,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts"], functio
                             product: null
                         }
                     },
-                    changeHash: false
+                    changeHash: true
                 });
             };
             _this.showDetails = function (product) {
@@ -34,7 +34,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts"], functio
                             product: product
                         }
                     },
-                    changeHash: false
+                    changeHash: true
                 });
             };
             _this.onDBError = function (transaction, sqlError) {

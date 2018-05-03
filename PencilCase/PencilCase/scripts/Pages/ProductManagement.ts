@@ -36,7 +36,7 @@ export class ProductManagement extends PageBase {
                     product: null
                 }
             },
-            changeHash: false
+            changeHash: true
         });
     }
 
@@ -47,7 +47,7 @@ export class ProductManagement extends PageBase {
                     product: product
                 }
             },
-            changeHash: false
+            changeHash: true
         });
     }
 

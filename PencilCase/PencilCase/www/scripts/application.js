@@ -10,6 +10,7 @@ define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], fun
             var _this = this;
             this.activePage = ko.observable(null);
             this.pages = [];
+            this.confirmDialog = ko.observable(null);
             this.onDeviceReady = function () {
                 document.addEventListener('pause', _this.onPause, false);
                 document.addEventListener('resume', _this.onResume, false);

@@ -81,6 +81,23 @@
         <!-- /ko -->
     </div>
 
+    <!-- ============== Confirm Dialog ================= -->
+    <!-- Public Confirm Dialog that everyone can use, so, for this app, there can be only one confirm dialog at one time -->
+    <div data-role="dialog" id="ConfirmDialog">
+        <!-- ko if: confirmDialog -->
+        <!-- ko with: confirmDialog() -->
+        <div data-role="content" class="ui-content ui-body-a">
+            <h3><span data-bind="text: header"></span></h3>
+            <p><span data-bind="text: content"></span></p>
+            <fieldset class="ui-grid-a">
+                <div class="ui-block-a"><a href="#" data-role="button" data-bind="click: confirm">是</a></div>                
+                <div class="ui-block-b"><a href="#" data-role="button" data-rel="back">否</a></div>
+            </fieldset>            
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->
+    </div>
+    
     <!-- ==============Product Editor Page================= -->
     <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
     <div data-role="page" id="ProductEditor">

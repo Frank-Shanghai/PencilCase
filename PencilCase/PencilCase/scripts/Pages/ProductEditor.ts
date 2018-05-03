@@ -104,7 +104,18 @@ export class ProductEditor extends PageBase {
     // 方法名不能是delete，否则前台绑定后，有奇怪的错误，viewmodel识别不了。
     // 花了1小时发现的问题，难道是某种豫留关键字或什么东西。
     private deleteProduct = () => {
-        alert("Not implemented yet.");
+        let doDelete = () => {
+            let db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
+            if (db) {
+                db.transaction((transaction: SqlTransaction) => {
+                    transaction.executeSql("delete from Product where Id = '" + this.originalProduct().Id + "'", [], (transaction: SqlTransaction, resultSet: SqlResultSet) => {
+                        this.goBack();
+                    }, this.onDBError);
+                });
+            }
+        }
+
+        this.navigator.showConfirmDialog("删除产品", "是否确认删除？", doDelete);
     }
 
     private save = () => {
@@ -187,8 +198,7 @@ export class ProductEditor extends PageBase {
 
     private goBack = () => {
         this.navigator.navigateTo(Consts.Pages.ProductManagement, {
-            changeHash: false,
-            dataUrl: "ProdutManagement"
+            changeHash: true,
         });
     }
 

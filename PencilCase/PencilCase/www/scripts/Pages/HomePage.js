@@ -18,13 +18,12 @@ define(["require", "exports", "./PageBase", "./Consts", "../Navigator"], functio
             _this.openProductManagementPage = function () {
                 //this.navigator.navigateTo("Pages/ProductManagement.html", {
                 _this.navigator.navigateTo(Consts.Pages.ProductManagement, {
-                    changeHash: false,
-                    dataUrl: "ProdutManagement"
+                    changeHash: true,
                 });
             };
             _this.openRetailPage = function () {
                 _this.navigator.navigateTo(Consts.Pages.Retail, {
-                    changeHash: false
+                    changeHash: true
                 });
             };
             _this.pageId = Consts.Pages.HomePage.Id;
