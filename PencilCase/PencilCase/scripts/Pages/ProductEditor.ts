@@ -37,6 +37,10 @@ export class ProductEditor extends PageBase {
         else {
             if (parameters.product == null) {
                 // Adding a new product
+                // To avoid refreshing the content view, initialize the originalProduct as an empty product with requested fields
+                // KO if works, but lost Jquery enhancement when DOM re-created, and KO visible binding just didn't remove DOM but make them invisible, so the binding behind still works,
+                // and it will fail because of binding to fields of null (orginalProduct is null when adding new product)
+                // So here I didn't use KO if, but set orginalProduct as an empty entity, in this way, KO visible binding works
                 this.originalProduct(this.createEmptyProduct());
                 this.isInEditingMode(true);
                 this.isNewProduct = true;
@@ -127,27 +131,43 @@ export class ProductEditor extends PageBase {
             let image = '暂不可用';
             let modifiedDate = new Date(Date.now());
 
-            let sqlString = "insert into Product values ('" + guid + "','" + name + "','" + description + "'," + retailPrice + ",'" + retailUnit + "'," +
-                wholesalePrice + ",'" + wholesaleUnit + "'," + importWholesalePrice + "," + importRetailPrice + "," + times + "," + inventory + ",'" + image + "','" +
-                moment(modifiedDate.toISOString()).format("YYYY-MM-DD") + "','" + moment(modifiedDate.toISOString()).format("YYYY-MM-DD") + "')";
 
             if (this.isNewProduct == true) {
+                let sqlString = "insert into Product values ('" + guid + "','" + name + "','" + description + "'," + retailPrice + ",'" + retailUnit + "'," +
+                    wholesalePrice + ",'" + wholesaleUnit + "'," + importWholesalePrice + "," + importRetailPrice + "," + times + "," + inventory + ",'" + image + "','" +
+                    moment(modifiedDate.toISOString()).format("YYYY-MM-DD") + "','" + moment(modifiedDate.toISOString()).format("YYYY-MM-DD") + "')";
+
                 db.transaction((transaction) => {
                     transaction.executeSql(sqlString, [], (transaction: SqlTransaction, resultSet: SqlResultSet) => {
                         transaction.executeSql("select P.*, UOM1.Name RetailUnitName, UOM2.Name WholesaleUnitName from Product P \
                                                 join UnitOfMeasure UOM1 on P.RetailUnit = UOM1.Id\
                                                 join UnitOfMeasure UOM2 on P.WholesaleUnit = UOM2.Id\
-                                                where P.rowid = "
-                            + resultSet.insertId, [], (trans: SqlTransaction, results: SqlResultSet) => {
+                                                where P.rowid = " + resultSet.insertId,
+                            [], (trans: SqlTransaction, results: SqlResultSet) => {
                                 this.originalProduct(results.rows.item(0));
                                 this.isInEditingMode(false);
                                 this.isNewProduct = false;
-                            });
+                            }, this.onDBError);
                     }, this.onDBError);
                 });
             }
             else {
-                // TODO: Update existed Product
+                db.transaction((transaction) => {
+                    let sqlString = "update Product set Name = '" + name + "', Description = '" + description + "', RetailPrice = " + retailPrice + ", RetailUnit = '" + retailUnit + "', WholesalePrice = " +
+                        wholesalePrice + ", WholesaleUnit = '" + wholesaleUnit + "', ImportWholesalePrice = " + importWholesalePrice + ", ImportRetailPrice = " + importRetailPrice + ", Times = " + times + ", Inventory = " + inventory + ", Image = '" + image + "', ModifiedDate = '" +
+                        moment(modifiedDate.toISOString()).format("YYYY-MM-DD") + "' where Id = '" + guid + "'";
+
+                    transaction.executeSql(sqlString, [], (transaction: SqlTransaction, resultSet: SqlResultSet) => {
+                        transaction.executeSql("select P.*, UOM1.Name RetailUnitName, UOM2.Name WholesaleUnitName from Product P \
+                                                    join UnitOfMeasure UOM1 on P.RetailUnit = UOM1.Id\
+                                                    join UnitOfMeasure UOM2 on P.WholesaleUnit = UOM2.Id\
+                                                    where P.Id = '" + guid + "'", [],
+                            (trans: SqlTransaction, results: SqlResultSet) => {
+                                this.originalProduct(results.rows.item(0));
+                                this.isInEditingMode(false);
+                            }, this.onDBError);
+                    }, this.onDBError);
+                });
             }
         }
     }
