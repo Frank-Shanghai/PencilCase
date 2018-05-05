@@ -28,7 +28,6 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
             _this.wholesaleUnit = ko.observable(null);
             _this.times = ko.observable(undefined);
             _this.wholesalePrice = ko.observable(undefined);
-            _this.importWholesalePrice = ko.observable(undefined);
             _this.isNewProduct = false;
             _this.startEditing = function () {
                 _this.isInEditingMode(true);
@@ -43,7 +42,6 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
                 _this.retailUnit(_this.parameters.product.RetailUnit);
                 _this.wholesaleUnit(_this.parameters.product.WholesaleUnit);
                 _this.wholesalePrice(_this.parameters.product.WholesalePrice);
-                _this.importWholesalePrice(_this.parameters.product.ImportWholesalePrice);
             };
             // 方法名不能是delete，否则前台绑定后，有奇怪的错误，viewmodel识别不了。
             // 花了1小时发现的问题，难道是某种豫留关键字或什么东西。
@@ -76,8 +74,8 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
                     var retailUnit_1 = _this.retailUnit();
                     var wholesalePrice_1 = _this.wholesalePrice();
                     var wholesaleUnit_1 = _this.wholesaleUnit();
-                    var importWholesalePrice_1 = _this.importWholesalePrice(); // TODO: May set as not editable but calculate the actual value everytime when importing products
-                    var importRetailPrice_1 = _this.importWholesalePrice() / _this.times();
+                    var importWholesalePrice_1 = _this.originalProduct().ImportWholesalePrice;
+                    var importRetailPrice_1 = _this.originalProduct().ImportRetailPrice;
                     var times_1 = _this.times();
                     var inventory_1 = _this.inventory();
                     var image_1 = '暂不可用';
@@ -185,8 +183,11 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
                 Times: 0,
                 WholesalePrice: 0,
                 ImportWholesalePrice: 0,
+                ImportRetailPrice: 0,
                 RetailUnit: null,
-                WholesaleUnit: null
+                WholesaleUnit: null,
+                CreatedDate: moment((new Date(Date.now())).toISOString()).format("YYYY-MM-DD"),
+                ModifiedDate: moment((new Date(Date.now())).toISOString()).format("YYYY-MM-DD"),
             };
         };
         ProductEditor.prototype.validate = function () {

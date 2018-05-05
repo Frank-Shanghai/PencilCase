@@ -90,14 +90,14 @@
             <h3><span data-bind="text: header"></span></h3>
             <p><span data-bind="text: content"></span></p>
             <fieldset class="ui-grid-a">
-                <div class="ui-block-a"><a href="#" data-role="button" data-bind="click: confirm">是</a></div>                
+                <div class="ui-block-a"><a href="#" data-role="button" data-bind="click: confirm">是</a></div>
                 <div class="ui-block-b"><a href="#" data-role="button" data-rel="back">否</a></div>
-            </fieldset>            
+            </fieldset>
         </div>
         <!-- /ko -->
         <!-- /ko -->
     </div>
-    
+
     <!-- ==============Product Editor Page================= -->
     <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
     <div data-role="page" id="ProductEditor">
@@ -129,6 +129,13 @@
                         <p>
                             <span style="font-weight: bold">图片：</span><span data-bind="text: '暂不可用'"></span>
                         </p>
+                        <p>
+                            <span style="font-weight: bold">创建时间：</span><span data-bind="text: originalProduct().CreatedDate"></span>
+                        </p>
+                        <p>
+                            <span style="font-weight: bold">上次修改时间：</span><span data-bind="text: originalProduct().ModifiedDate"></span>
+                        </p>
+
                     </form>
                 </div>
                 <div id="detailsPrice" class="ui-body-d ui-content">
@@ -190,8 +197,11 @@
                         <label for="productWholesalePrice" style="font-weight: bold">批发价(元)：</label>
                         <input type="number" name="productWholesalePrice" data-bind="value: wholesalePrice" />
                         <!-- 此处应为成本价，TODO: 决定是否允许编辑，应由进货价格和库存计算得出 -->
+                        <lable for="productImportRetailPrice" style="font-weight: bold">进货价(元)（按零售单位）：</lable>
+                        <input type="number" name="productImportRetailPrice" data-bind="value: originalProduct().ImportRetailPrice, enable: false" />
+                        <!-- 此处应为成本价，TODO: 决定是否允许编辑，应由进货价格和库存计算得出 -->
                         <lable for="productImportWholesalePrice" style="font-weight: bold">进货价(元)（按批发单位）：</lable>
-                        <input type="number" name="productImportWholesalePrice" data-bind="value: importWholesalePrice" />
+                        <input type="number" name="productImportWholesalePrice" data-bind="value: originalProduct().ImportWholesalePrice, enable: false" />
                     </form>
                 </div>
             </div>

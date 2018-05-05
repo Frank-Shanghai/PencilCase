@@ -19,7 +19,6 @@ export class ProductEditor extends PageBase {
     private wholesaleUnit: KnockoutObservable<string> = ko.observable(null);
     private times: KnockoutObservable<number> = ko.observable(undefined);
     private wholesalePrice: KnockoutObservable<number> = ko.observable(undefined);
-    private importWholesalePrice: KnockoutObservable<number> = ko.observable(undefined);
 
     private isNewProduct = false;
 
@@ -84,7 +83,6 @@ export class ProductEditor extends PageBase {
         this.retailUnit(this.parameters.product.RetailUnit);
         this.wholesaleUnit(this.parameters.product.WholesaleUnit);
         this.wholesalePrice(this.parameters.product.WholesalePrice);
-        this.importWholesalePrice(this.parameters.product.ImportWholesalePrice);
     }
 
     private createEmptyProduct() {
@@ -96,8 +94,11 @@ export class ProductEditor extends PageBase {
             Times: 0,
             WholesalePrice: 0,
             ImportWholesalePrice: 0,
+            ImportRetailPrice: 0,
             RetailUnit: null,
-            WholesaleUnit: null
+            WholesaleUnit: null,
+            CreatedDate: moment((new Date(Date.now())).toISOString()).format("YYYY-MM-DD"),
+            ModifiedDate: moment((new Date(Date.now())).toISOString()).format("YYYY-MM-DD"),
         };
     }
 
@@ -135,8 +136,8 @@ export class ProductEditor extends PageBase {
             let retailUnit = this.retailUnit();
             let wholesalePrice = this.wholesalePrice();
             let wholesaleUnit = this.wholesaleUnit();
-            let importWholesalePrice = this.importWholesalePrice(); // TODO: May set as not editable but calculate the actual value everytime when importing products
-            let importRetailPrice = this.importWholesalePrice() / this.times();
+            let importWholesalePrice = this.originalProduct().ImportWholesalePrice;
+            let importRetailPrice = this.originalProduct().ImportRetailPrice;
             let times = this.times();
             let inventory = this.inventory();
             let image = '暂不可用';
