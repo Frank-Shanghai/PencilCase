@@ -8,5 +8,6 @@
     ProductEditor: { Id: "ProductEditor", IsPermanent: false },
     Retail: { Id: "Retail", IsPermanent: true },
     Whosale: { Id: "Wholesale", IsPermanent: true },
-    DataAnalysis: { Id: "DataAnalysis", IsPermanent: false }
+    DataAnalysis: { Id: "DataAnalysis", IsPermanent: false },
+    ConfirmDialog: {Id: "ConfirmDialog", IsPermanent: false}
 };

@@ -22,7 +22,7 @@ export class ProductManagement extends PageBase {
                     this.products([]); // First, clear products collection
                     let rows = resultSet.rows;
                     for (let i = 0; i < rows.length; i++) {
-                        this.products.push(rows[i]);
+                        this.products.push(rows.item(i));
                     }
                 }, this.onDBError);
             });
@@ -30,15 +30,14 @@ export class ProductManagement extends PageBase {
     }
 
     private addNewProduct = () => {
-        //this.navigator.navigateTo($("div#ProductEditor").first(), {
-        //    data: {
-        //        pageInfo: Consts.Pages.ProductEditor,
-        //        //selectedProduct: null or one product instance
-        //    }
-        //});
-
-        let first = this.products()[0];
-        this.products.push(first);
+        this.navigator.navigateTo(Consts.Pages.ProductEditor, {
+            data: {
+                parameters: {
+                    product: null
+                }
+            },
+            changeHash: true
+        });
     }
 
     private showDetails = (product: any) => {
@@ -48,7 +47,7 @@ export class ProductManagement extends PageBase {
                     product: product
                 }
             },
-            changeHash: false
+            changeHash: true
         });
     }
 

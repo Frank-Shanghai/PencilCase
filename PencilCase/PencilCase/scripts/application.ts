@@ -14,6 +14,7 @@ export class Application {
     public activePage: KnockoutObservable<PageBase> = ko.observable(null);
     public pages: Array<PageBase> = [];
     public homePage: KnockoutObservable<PageBase>;
+    public confirmDialog: KnockoutObservable<any> = ko.observable(null);
 
     private static _instance: Application;
 
@@ -34,7 +35,7 @@ export class Application {
         this.activePage(homePage);
         this.homePage = ko.observable(homePage);
     }
-
+    
     public initialize(): void {
         document.addEventListener('deviceready', this.onDeviceReady, false);
     }

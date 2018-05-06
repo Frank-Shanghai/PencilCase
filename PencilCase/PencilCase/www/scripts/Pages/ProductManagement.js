@@ -18,14 +18,14 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts"], functio
             _this.navigator = Navigator_1.Navigator.instance;
             _this.products = ko.observableArray([]);
             _this.addNewProduct = function () {
-                //this.navigator.navigateTo($("div#ProductEditor").first(), {
-                //    data: {
-                //        pageInfo: Consts.Pages.ProductEditor,
-                //        //selectedProduct: null or one product instance
-                //    }
-                //});
-                var first = _this.products()[0];
-                _this.products.push(first);
+                _this.navigator.navigateTo(Consts.Pages.ProductEditor, {
+                    data: {
+                        parameters: {
+                            product: null
+                        }
+                    },
+                    changeHash: true
+                });
             };
             _this.showDetails = function (product) {
                 _this.navigator.navigateTo(Consts.Pages.ProductEditor, {
@@ -34,7 +34,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts"], functio
                             product: product
                         }
                     },
-                    changeHash: false
+                    changeHash: true
                 });
             };
             _this.onDBError = function (transaction, sqlError) {
@@ -55,7 +55,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts"], functio
                         _this.products([]); // First, clear products collection
                         var rows = resultSet.rows;
                         for (var i = 0; i < rows.length; i++) {
-                            _this.products.push(rows[i]);
+                            _this.products.push(rows.item(i));
                         }
                     }, _this.onDBError);
                 });

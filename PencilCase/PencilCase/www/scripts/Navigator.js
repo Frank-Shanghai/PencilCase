@@ -14,6 +14,7 @@ define(["require", "exports", "./Pages/ProductManagement", "./Pages/ProductEdito
                 var jqueryPage = $("div#" + pageInfo.Id).first();
                 if (!options)
                     options = {};
+                $.extend(options, { showLoadMsg: true });
                 if (!options.data)
                     options.data = {};
                 $.extend(options.data, { pageInfo: pageInfo });
@@ -21,11 +22,11 @@ define(["require", "exports", "./Pages/ProductManagement", "./Pages/ProductEdito
             };
             this.goHome = function () {
                 application_1.Application.instance.activePage(new HomePage_1.HomePage());
-                $(':mobile-pagecontainer').pagecontainer("change", "#HomePage");
+                $(':mobile-pagecontainer').pagecontainer("change", "#" + Consts.Pages.HomePage.Id, { showLoadMsg: true });
             };
             this.initialize = function () {
                 $(':mobile-pagecontainer').on("pagecontainerbeforechange", function (eventObject, parameters) {
-                    if (parameters.toPage !== Consts.Pages.HomePage.Id) {
+                    if (parameters.toPage !== ('#' + Consts.Pages.HomePage.Id) && parameters.toPage !== ('#' + Consts.Pages.ConfirmDialog.Id)) {
                         if ((parameters.options && parameters.options.data)) {
                             var data = parameters.options.data;
                             if (application_1.Application.instance.activePage().pageId !== data.pageInfo.Id) {
@@ -38,9 +39,6 @@ define(["require", "exports", "./Pages/ProductManagement", "./Pages/ProductEdito
                                 application_1.Application.instance.activePage(page);
                             }
                         }
-                    }
-                    else {
-                        application_1.Application.instance.activePage(application_1.Application.instance.homePage());
                     }
                 });
                 $(':mobile-pagecontainer').pagecontainer({
@@ -64,6 +62,25 @@ define(["require", "exports", "./Pages/ProductManagement", "./Pages/ProductEdito
             enumerable: true,
             configurable: true
         });
+        Navigator.prototype.showConfirmDialog = function (header, content, confirm, cancel) {
+            application_1.Application.instance.confirmDialog({
+                header: header,
+                content: content,
+                confirm: function () {
+                    if (confirm) {
+                        confirm();
+                    }
+                    application_1.Application.instance.confirmDialog(null);
+                },
+                cancel: function () {
+                    if (cancel) {
+                        cancel();
+                    }
+                    application_1.Application.instance.confirmDialog(null);
+                }
+            });
+            $(':mobile-pagecontainer').pagecontainer("change", "#" + Consts.Pages.ConfirmDialog.Id, { showLoadMsg: true });
+        };
         Navigator.prototype.getPage = function (data) {
             var pageInfo = data.pageInfo;
             var page;
