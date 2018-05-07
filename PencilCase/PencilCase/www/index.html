@@ -130,10 +130,10 @@
                             <span style="font-weight: bold">图片：</span><span data-bind="text: '暂不可用'"></span>
                         </p>
                         <p>
-                            <span style="font-weight: bold">创建时间：</span><span data-bind="text: originalProduct().CreatedDate"></span>
+                            <span style="font-weight: bold">创建时间：</span><span data-bind="text: moment(originalProduct().CreatedDate).format('YYYY-MM-DD')"></span>
                         </p>
                         <p>
-                            <span style="font-weight: bold">上次修改时间：</span><span data-bind="text: originalProduct().ModifiedDate"></span>
+                            <span style="font-weight: bold">上次修改时间：</span><span data-bind="text: moment(originalProduct().ModifiedDate).format('YYYY-MM-DD')"></span>
                         </p>
 
                     </form>

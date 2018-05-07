@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./PageBase", "../Navigator", "./Consts"], function (require, exports, PageBase_1, Navigator_1, Consts) {
+define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Models/Product"], function (require, exports, PageBase_1, Navigator_1, Consts, Product_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ProductManagement = (function (_super) {
@@ -55,7 +55,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts"], functio
                         _this.products([]); // First, clear products collection
                         var rows = resultSet.rows;
                         for (var i = 0; i < rows.length; i++) {
-                            _this.products.push(rows.item(i));
+                            _this.products.push(new Product_1.Product(rows.item(i)));
                         }
                     }, _this.onDBError);
                 });

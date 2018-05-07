@@ -1,10 +1,11 @@
 ﻿import { PageBase } from './PageBase';
 import { Navigator } from '../Navigator';
 import * as Consts from './Consts';
+import { Product } from '../Models/Product';
 
 export class ProductManagement extends PageBase {
     private navigator: Navigator = Navigator.instance;
-    private products: KnockoutObservableArray<any> = ko.observableArray([]);
+    private products: KnockoutObservableArray<Product> = ko.observableArray([]);
 
     constructor() {
         super();
@@ -22,7 +23,7 @@ export class ProductManagement extends PageBase {
                     this.products([]); // First, clear products collection
                     let rows = resultSet.rows;
                     for (let i = 0; i < rows.length; i++) {
-                        this.products.push(rows.item(i));
+                        this.products.push(new Product(rows.item(i)));
                     }
                 }, this.onDBError);
             });
@@ -40,7 +41,7 @@ export class ProductManagement extends PageBase {
         });
     }
 
-    private showDetails = (product: any) => {
+    private showDetails = (product: Product) => {
         this.navigator.navigateTo(Consts.Pages.ProductEditor, {
             data: {
                 parameters: {

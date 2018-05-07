@@ -11,6 +11,17 @@ define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], fun
             this.activePage = ko.observable(null);
             this.pages = [];
             this.confirmDialog = ko.observable(null);
+            this.openDataBase = function () {
+                if (_this.db) {
+                    return _this.db;
+                }
+                else {
+                    _this.db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
+                    if (_this.db)
+                        return _this.db;
+                    return null;
+                }
+            };
             this.onDeviceReady = function () {
                 document.addEventListener('pause', _this.onPause, false);
                 document.addEventListener('resume', _this.onResume, false);
@@ -26,7 +37,7 @@ define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], fun
             };
             // Just for testing, remove all function calls to it and this function
             this.initializeDatabase = function () {
-                var db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
+                var db = _this.openDataBase();
                 if (db) {
                     db.transaction(function (transaction) {
                         // Uncomment the line below if need to re-create the table, like adding/removing/changing columns
@@ -59,7 +70,7 @@ define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], fun
                 }
             };
             this.createTestData = function () {
-                var db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
+                var db = _this.openDataBase();
                 if (db) {
                     db.transaction(function (transaction) {
                         transaction.executeSql('select Id from UnitOfMeasure', [], function (transaction, resultSet) {
@@ -90,8 +101,12 @@ define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], fun
                     alert("Failed to open database.");
                 }
             };
-            this.onDBError = function (transaction, sqlError) {
-                alert(sqlError.message);
+            this.onDBError = function (transaction, sqlError, customMessage) {
+                var errorMessage = sqlError.message;
+                if (customMessage) {
+                    errorMessage = "User Message: " + customMessage + "\r\n" + errorMessage;
+                }
+                alert(errorMessage);
             };
             this.onApplicationError = function () {
                 alert("Application Error happened.");
