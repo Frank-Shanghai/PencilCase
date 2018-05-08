@@ -15,6 +15,7 @@ export class Application {
     public pages: Array<PageBase> = [];
     public homePage: KnockoutObservable<PageBase>;
     public confirmDialog: KnockoutObservable<any> = ko.observable(null);
+    private db: Database;
 
     private static _instance: Application;
 
@@ -34,6 +35,17 @@ export class Application {
         let homePage = new HomePage();
         this.activePage(homePage);
         this.homePage = ko.observable(homePage);
+    }
+
+    public openDataBase = (): Database => {
+        if (this.db) {
+            return this.db;
+        }
+        else {
+            this.db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
+            if (this.db) return this.db;
+            return null;
+        }
     }
     
     public initialize(): void {
@@ -60,7 +72,7 @@ export class Application {
 
     // Just for testing, remove all function calls to it and this function
     private initializeDatabase = () => {
-        let db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
+        let db = this.openDataBase();
         if (db) {
             db.transaction((transaction) => {
                 // Uncomment the line below if need to re-create the table, like adding/removing/changing columns
@@ -95,7 +107,7 @@ export class Application {
     }
 
     private createTestData = () => {
-        let db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
+        let db = this.openDataBase();
         if (db) {
             db.transaction((transaction) => {
                 transaction.executeSql('select Id from UnitOfMeasure', [], (transaction: SqlTransaction, resultSet: SqlResultSet) => {
@@ -131,8 +143,13 @@ export class Application {
         }
     }
 
-    private onDBError = (transaction: SqlTransaction, sqlError: SqlError) => {
-        alert(sqlError.message);
+    private onDBError = (transaction: SqlTransaction, sqlError: SqlError, customMessage?: string) => {
+        let errorMessage = sqlError.message;
+        if (customMessage) {
+            errorMessage = "User Message: " + customMessage + "\r\n" + errorMessage;
+        }
+
+        alert(errorMessage);
     }
 
     public onApplicationError = (): void => {

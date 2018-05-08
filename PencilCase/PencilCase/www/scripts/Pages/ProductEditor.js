@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Consts"], function (require, exports, PageBase_1, Navigator_1, Utils, Consts) {
+define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Consts", "../Models/Product", "../Repositories/ProductRepository"], function (require, exports, PageBase_1, Navigator_1, Utils, Consts, Product_1, ProductRepository_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ProductEditor = (function (_super) {
@@ -17,6 +17,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
             var _this = _super.call(this) || this;
             _this.parameters = parameters;
             _this.navigator = Navigator_1.Navigator.instance;
+            _this.repository = new ProductRepository_1.ProductRepository();
             _this.isInEditingMode = ko.observable(false);
             _this.originalProduct = ko.observable(null);
             _this.uomDataSource = ko.observableArray([]);
@@ -47,72 +48,47 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
             // 花了1小时发现的问题，难道是某种豫留关键字或什么东西。
             _this.deleteProduct = function () {
                 var doDelete = function () {
-                    var db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
-                    if (db) {
-                        db.transaction(function (transaction) {
-                            transaction.executeSql("delete from Product where Id = '" + _this.originalProduct().Id + "'", [], function (transaction, resultSet) {
-                                _this.goBack();
-                            }, _this.onDBError);
-                        });
-                    }
+                    _this.repository.delete(_this.originalProduct().Id, function (transaction, resultSet) {
+                        _this.goBack();
+                    }, _this.onDBError);
                 };
                 _this.navigator.showConfirmDialog("删除产品", "是否确认删除？", doDelete);
             };
             _this.save = function () {
-                var db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
-                if (db) {
-                    var guid_1 = null;
-                    if (_this.isNewProduct === true) {
-                        guid_1 = Utils.guid();
-                    }
-                    else {
-                        guid_1 = _this.parameters.product.Id;
-                    }
-                    var name_1 = _this.name();
-                    var description_1 = _this.description();
-                    var retailPrice_1 = _this.retailPrice();
-                    var retailUnit_1 = _this.retailUnit();
-                    var wholesalePrice_1 = _this.wholesalePrice();
-                    var wholesaleUnit_1 = _this.wholesaleUnit();
-                    var importWholesalePrice_1 = _this.originalProduct().ImportWholesalePrice;
-                    var importRetailPrice_1 = _this.originalProduct().ImportRetailPrice;
-                    var times_1 = _this.times();
-                    var inventory_1 = _this.inventory();
-                    var image_1 = '暂不可用';
-                    var modifiedDate_1 = new Date(Date.now());
-                    if (_this.isNewProduct == true) {
-                        var sqlString_1 = "insert into Product values ('" + guid_1 + "','" + name_1 + "','" + description_1 + "'," + retailPrice_1 + ",'" + retailUnit_1 + "'," +
-                            wholesalePrice_1 + ",'" + wholesaleUnit_1 + "'," + importWholesalePrice_1 + "," + importRetailPrice_1 + "," + times_1 + "," + inventory_1 + ",'" + image_1 + "','" +
-                            moment(modifiedDate_1.toISOString()).format("YYYY-MM-DD") + "','" + moment(modifiedDate_1.toISOString()).format("YYYY-MM-DD") + "')";
-                        db.transaction(function (transaction) {
-                            transaction.executeSql(sqlString_1, [], function (transaction, resultSet) {
-                                transaction.executeSql("select P.*, UOM1.Name RetailUnitName, UOM2.Name WholesaleUnitName from Product P \
-                                                join UnitOfMeasure UOM1 on P.RetailUnit = UOM1.Id\
-                                                join UnitOfMeasure UOM2 on P.WholesaleUnit = UOM2.Id\
-                                                where P.rowid = " + resultSet.insertId, [], function (trans, results) {
-                                    _this.originalProduct(results.rows.item(0));
-                                    _this.isInEditingMode(false);
-                                    _this.isNewProduct = false;
-                                }, _this.onDBError);
-                            }, _this.onDBError);
-                        });
-                    }
-                    else {
-                        db.transaction(function (transaction) {
-                            var sqlString = "update Product set Name = '" + name_1 + "', Description = '" + description_1 + "', RetailPrice = " + retailPrice_1 + ", RetailUnit = '" + retailUnit_1 + "', WholesalePrice = " +
-                                wholesalePrice_1 + ", WholesaleUnit = '" + wholesaleUnit_1 + "', ImportWholesalePrice = " + importWholesalePrice_1 + ", ImportRetailPrice = " + importRetailPrice_1 + ", Times = " + times_1 + ", Inventory = " + inventory_1 + ", Image = '" + image_1 + "', ModifiedDate = '" +
-                                moment(modifiedDate_1.toISOString()).format("YYYY-MM-DD") + "' where Id = '" + guid_1 + "'";
-                            transaction.executeSql(sqlString, [], function (transaction, resultSet) {
-                                transaction.executeSql("select P.*, UOM1.Name RetailUnitName, UOM2.Name WholesaleUnitName from Product P \
-                                                    join UnitOfMeasure UOM1 on P.RetailUnit = UOM1.Id\
-                                                    join UnitOfMeasure UOM2 on P.WholesaleUnit = UOM2.Id\
-                                                    where P.Id = '" + guid_1 + "'", [], function (trans, results) {
-                                    _this.originalProduct(results.rows.item(0));
-                                    _this.isInEditingMode(false);
-                                }, _this.onDBError);
-                            }, _this.onDBError);
-                        });
-                    }
+                var product = new Product_1.Product();
+                product.Name = _this.name();
+                product.Description = _this.description();
+                product.RetailPrice = _this.retailPrice();
+                product.RetailUnit = _this.retailUnit();
+                product.WholesalePrice = _this.wholesalePrice();
+                product.WholesaleUnit = _this.wholesaleUnit();
+                product.ImportWholesalePrice = _this.originalProduct().ImportWholesalePrice;
+                product.ImportRetailPrice = _this.originalProduct().ImportRetailPrice;
+                product.Times = _this.times();
+                product.Inventory = _this.inventory();
+                product.Image = '暂不可用';
+                product.ModifiedDate = new Date(Date.now());
+                var guid = null;
+                if (_this.isNewProduct === true) {
+                    product.Id = Utils.guid();
+                    product.CreatedDate = new Date(Date.now());
+                    _this.repository.insert(product, function (transaction, resultSet) {
+                        _this.repository.getProductByRowId(resultSet.insertId, function (trans, results) {
+                            _this.originalProduct(new Product_1.Product(results.rows.item(0)));
+                            _this.isInEditingMode(false);
+                            _this.isNewProduct = false;
+                        }, _this.onDBError);
+                    }, _this.onDBError);
+                }
+                else {
+                    product.Id = _this.originalProduct().Id;
+                    product.CreatedDate = _this.originalProduct().CreatedDate;
+                    _this.repository.update(product, function (transaction, resultSet) {
+                        _this.repository.getProductById(product.Id, function (trans, results) {
+                            _this.originalProduct(new Product_1.Product(results.rows.item(0)));
+                            _this.isInEditingMode(false);
+                        }, _this.onDBError);
+                    }, _this.onDBError);
                 }
             };
             _this.cancel = function () {
@@ -129,7 +105,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
                 });
             };
             _this.onDBError = function (transaction, sqlError) {
-                alert(sqlError.message);
+                alert("Product Editor: " + sqlError.message);
             };
             _this.title = ko.observable("Product Editor");
             _this.pageId = Consts.Pages.ProductEditor.Id;
@@ -146,7 +122,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
                     // KO if works, but lost Jquery enhancement when DOM re-created, and KO visible binding just didn't remove DOM but make them invisible, so the binding behind still works,
                     // and it will fail because of binding to fields of null (orginalProduct is null when adding new product)
                     // So here I didn't use KO if, but set orginalProduct as an empty entity, in this way, KO visible binding works
-                    _this.originalProduct(_this.createEmptyProduct());
+                    _this.originalProduct(new Product_1.Product());
                     _this.isInEditingMode(true);
                     _this.isNewProduct = true;
                 }
@@ -173,22 +149,6 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
                     }, _this.onDBError);
                 });
             }
-        };
-        ProductEditor.prototype.createEmptyProduct = function () {
-            return {
-                Name: '',
-                Description: '',
-                Inventory: 0,
-                RetailPrice: 0,
-                Times: 0,
-                WholesalePrice: 0,
-                ImportWholesalePrice: 0,
-                ImportRetailPrice: 0,
-                RetailUnit: null,
-                WholesaleUnit: null,
-                CreatedDate: moment((new Date(Date.now())).toISOString()).format("YYYY-MM-DD"),
-                ModifiedDate: moment((new Date(Date.now())).toISOString()).format("YYYY-MM-DD"),
-            };
         };
         ProductEditor.prototype.validate = function () {
             // TODO: Fields validation before saving

@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./PageBase", "../Navigator", "./Consts"], function (require, exports, PageBase_1, Navigator_1, Consts) {
+define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Models/Product", "../Repositories/ProductRepository"], function (require, exports, PageBase_1, Navigator_1, Consts, Product_1, ProductRepository_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ProductManagement = (function (_super) {
@@ -17,6 +17,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts"], functio
             var _this = _super.call(this) || this;
             _this.navigator = Navigator_1.Navigator.instance;
             _this.products = ko.observableArray([]);
+            _this.productRepository = new ProductRepository_1.ProductRepository();
             _this.addNewProduct = function () {
                 _this.navigator.navigateTo(Consts.Pages.ProductEditor, {
                     data: {
@@ -38,7 +39,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts"], functio
                 });
             };
             _this.onDBError = function (transaction, sqlError) {
-                alert(sqlError.message);
+                alert("Product Management Page: " + sqlError.message);
             };
             _this.title = ko.observable("Product Management");
             _this.pageId = Consts.Pages.ProductManagement.Id;
@@ -46,20 +47,14 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts"], functio
         }
         ProductManagement.prototype.initialize = function () {
             var _this = this;
-            var db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
-            if (db) {
-                db.transaction(function (transaction) {
-                    transaction.executeSql('select P.*, UOM1.Name RetailUnitName, UOM2.Name WholesaleUnitName from Product P \
-                                        join UnitOfMeasure UOM1 on P.RetailUnit = UOM1.Id \
-                                        join UnitOfMeasure UOM2 on P.WholesaleUnit = UOM2.Id', [], function (transaction, resultSet) {
-                        _this.products([]); // First, clear products collection
-                        var rows = resultSet.rows;
-                        for (var i = 0; i < rows.length; i++) {
-                            _this.products.push(rows.item(i));
-                        }
-                    }, _this.onDBError);
-                });
-            }
+            var productRepository = new ProductRepository_1.ProductRepository();
+            productRepository.getAll(function (transaction, resultSet) {
+                _this.products([]); // First, clear products collection
+                var rows = resultSet.rows;
+                for (var i = 0; i < rows.length; i++) {
+                    _this.products.push(new Product_1.Product(rows.item(i)));
+                }
+            }, this.onDBError);
         };
         return ProductManagement;
     }(PageBase_1.PageBase));
