@@ -4,6 +4,13 @@ define(["require", "exports", "../application"], function (require, exports, app
     var ProductRepository = (function () {
         function ProductRepository() {
             var _this = this;
+            this.getAll = function (successCallback, errorCallback) {
+                _this.db.transaction(function (transaction) {
+                    transaction.executeSql('select P.*, UOM1.Name RetailUnitName, UOM2.Name WholesaleUnitName from Product P \
+                                        join UnitOfMeasure UOM1 on P.RetailUnit = UOM1.Id \
+                                        join UnitOfMeasure UOM2 on P.WholesaleUnit = UOM2.Id', [], successCallback, errorCallback);
+                });
+            };
             this.update = function (product, successCallback, errorCallback) {
                 var sqlString = "update Product set Name = '" + product.Name + "', Description = '" + product.Description + "', RetailPrice = " + product.RetailPrice + ", RetailUnit = '" + product.RetailUnit + "', WholesalePrice = " +
                     product.WholesalePrice + ", WholesaleUnit = '" + product.WholesaleUnit + "', ImportWholesalePrice = " + product.ImportWholesalePrice + ", ImportRetailPrice = " + product.ImportRetailPrice + ", Times = " + product.Times + ", Inventory = " + product.Inventory + ", Image = '" + product.Image + "', ModifiedDate = '" +
@@ -34,6 +41,11 @@ define(["require", "exports", "../application"], function (require, exports, app
                                                 join UnitOfMeasure UOM1 on P.RetailUnit = UOM1.Id\
                                                 join UnitOfMeasure UOM2 on P.WholesaleUnit = UOM2.Id\
                                                 where P.rowid = " + rowId, [], successCallback, errorCallback);
+                });
+            };
+            this.delete = function (id, successCallback, errorCallback) {
+                _this.db.transaction(function (transaction) {
+                    transaction.executeSql("delete from Product where Id = '" + id + "'", [], successCallback, errorCallback);
                 });
             };
             this.db = application_1.Application.instance.openDataBase();

@@ -92,14 +92,9 @@ export class ProductEditor extends PageBase {
     // 花了1小时发现的问题，难道是某种豫留关键字或什么东西。
     private deleteProduct = () => {
         let doDelete = () => {
-            let db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
-            if (db) {
-                db.transaction((transaction: SqlTransaction) => {
-                    transaction.executeSql("delete from Product where Id = '" + this.originalProduct().Id + "'", [], (transaction: SqlTransaction, resultSet: SqlResultSet) => {
-                        this.goBack();
-                    }, this.onDBError);
-                });
-            }
+            this.repository.delete(this.originalProduct().Id, (transaction: SqlTransaction, resultSet: SqlResultSet) => {
+                this.goBack();
+            }, this.onDBError);
         }
 
         this.navigator.showConfirmDialog("删除产品", "是否确认删除？", doDelete);
@@ -127,10 +122,10 @@ export class ProductEditor extends PageBase {
             product.CreatedDate = new Date(Date.now());
             this.repository.insert(product, (transaction: SqlTransaction, resultSet: SqlResultSet) => {
                 this.repository.getProductByRowId(resultSet.insertId, (trans: SqlTransaction, results: SqlResultSet) => {
-                        this.originalProduct(new Product(results.rows.item(0)));
-                        this.isInEditingMode(false);
-                        this.isNewProduct = false;
-                    }, this.onDBError);
+                    this.originalProduct(new Product(results.rows.item(0)));
+                    this.isInEditingMode(false);
+                    this.isNewProduct = false;
+                }, this.onDBError);
             }, this.onDBError);
         }
         else {
@@ -164,13 +159,8 @@ export class ProductEditor extends PageBase {
         });
     }
 
-    private onDBError = (transaction: SqlTransaction, sqlError: SqlError, customMessage?: string) => {
-        let errorMessage = sqlError.message;
-        if (customMessage) {
-            errorMessage = "User Message: " + customMessage + "\r\n" + errorMessage;
-        }
-
-        alert(errorMessage);
+    private onDBError = (transaction: SqlTransaction, sqlError: SqlError) => {
+        alert("Product Editor: " + sqlError.message);
     }
 
 }

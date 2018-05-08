@@ -2,10 +2,12 @@
 import { Navigator } from '../Navigator';
 import * as Consts from './Consts';
 import { Product } from '../Models/Product';
+import { ProductRepository } from '../Repositories/ProductRepository';
 
 export class ProductManagement extends PageBase {
     private navigator: Navigator = Navigator.instance;
     private products: KnockoutObservableArray<Product> = ko.observableArray([]);
+    private productRepository: ProductRepository = new ProductRepository();
 
     constructor() {
         super();
@@ -14,20 +16,14 @@ export class ProductManagement extends PageBase {
     }
 
     public initialize() {
-        let db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
-        if (db) {
-            db.transaction((transaction) => {
-                transaction.executeSql('select P.*, UOM1.Name RetailUnitName, UOM2.Name WholesaleUnitName from Product P \
-                                        join UnitOfMeasure UOM1 on P.RetailUnit = UOM1.Id \
-                                        join UnitOfMeasure UOM2 on P.WholesaleUnit = UOM2.Id', [], (transaction: SqlTransaction, resultSet: SqlResultSet) => {
-                    this.products([]); // First, clear products collection
-                    let rows = resultSet.rows;
-                    for (let i = 0; i < rows.length; i++) {
-                        this.products.push(new Product(rows.item(i)));
-                    }
-                }, this.onDBError);
-            });
-        }
+        let productRepository: ProductRepository = new ProductRepository();
+        productRepository.getAll((transaction: SqlTransaction, resultSet: SqlResultSet) => {
+            this.products([]); // First, clear products collection
+            let rows = resultSet.rows;
+            for (let i = 0; i < rows.length; i++) {
+                this.products.push(new Product(rows.item(i)));
+            }
+        }, this.onDBError);
     }
 
     private addNewProduct = () => {
@@ -53,6 +49,6 @@ export class ProductManagement extends PageBase {
     }
 
     private onDBError = (transaction: SqlTransaction, sqlError: SqlError) => {
-        alert(sqlError.message);
+        alert("Product Management Page: " + sqlError.message);
     }
 }

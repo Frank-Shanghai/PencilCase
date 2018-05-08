@@ -48,14 +48,9 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
             // 花了1小时发现的问题，难道是某种豫留关键字或什么东西。
             _this.deleteProduct = function () {
                 var doDelete = function () {
-                    var db = window.openDatabase("PencilCase", "0.1", "Pencil Case", 2 * 1024 * 1024);
-                    if (db) {
-                        db.transaction(function (transaction) {
-                            transaction.executeSql("delete from Product where Id = '" + _this.originalProduct().Id + "'", [], function (transaction, resultSet) {
-                                _this.goBack();
-                            }, _this.onDBError);
-                        });
-                    }
+                    _this.repository.delete(_this.originalProduct().Id, function (transaction, resultSet) {
+                        _this.goBack();
+                    }, _this.onDBError);
                 };
                 _this.navigator.showConfirmDialog("删除产品", "是否确认删除？", doDelete);
             };
@@ -109,12 +104,8 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
                     changeHash: true,
                 });
             };
-            _this.onDBError = function (transaction, sqlError, customMessage) {
-                var errorMessage = sqlError.message;
-                if (customMessage) {
-                    errorMessage = "User Message: " + customMessage + "\r\n" + errorMessage;
-                }
-                alert(errorMessage);
+            _this.onDBError = function (transaction, sqlError) {
+                alert("Product Editor: " + sqlError.message);
             };
             _this.title = ko.observable("Product Editor");
             _this.pageId = Consts.Pages.ProductEditor.Id;

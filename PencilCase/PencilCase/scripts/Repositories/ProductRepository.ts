@@ -8,6 +8,14 @@ export class ProductRepository {
         this.db = Application.instance.openDataBase();
     }
 
+    public getAll = (successCallback?: (transaction: SqlTransaction, resultSet: SqlResultSet) => void, errorCallback?: (transaction: SqlTransaction, sqlError: SqlError) => void) => {
+        this.db.transaction((transaction) => {
+            transaction.executeSql('select P.*, UOM1.Name RetailUnitName, UOM2.Name WholesaleUnitName from Product P \
+                                        join UnitOfMeasure UOM1 on P.RetailUnit = UOM1.Id \
+                                        join UnitOfMeasure UOM2 on P.WholesaleUnit = UOM2.Id', [], successCallback, errorCallback);
+        });
+    }
+
     public update = (product: Product, successCallback?: (transaction: SqlTransaction, resultSet: SqlResultSet) => void, errorCallback?: (transaction: SqlTransaction, sqlError: SqlError) => void) => {
         let sqlString = "update Product set Name = '" + product.Name + "', Description = '" + product.Description + "', RetailPrice = " + product.RetailPrice + ", RetailUnit = '" + product.RetailUnit + "', WholesalePrice = " +
             product.WholesalePrice + ", WholesaleUnit = '" + product.WholesaleUnit + "', ImportWholesalePrice = " + product.ImportWholesalePrice + ", ImportRetailPrice = " + product.ImportRetailPrice + ", Times = " + product.Times + ", Inventory = " + product.Inventory + ", Image = '" + product.Image + "', ModifiedDate = '" +
@@ -48,4 +56,9 @@ export class ProductRepository {
         });
     }
 
+    public delete = (id: string, successCallback?: (transaction: SqlTransaction, resultSet: SqlResultSet) => void, errorCallback?: (transaction: SqlTransaction, sqlError: SqlError) => void) => {
+        this.db.transaction((transaction: SqlTransaction) => {
+            transaction.executeSql("delete from Product where Id = '" + id + "'", [], successCallback, errorCallback);
+        });
+    }
 }
