@@ -35,10 +35,15 @@
             <h1>Pencil Case</h1>
         </div>
         <div role="main" class="ui-content">
-            <a href="#Retail" class="ui-btn ui-corner-all" data-bind="click: openRetailPage">Retail</a>
-            <a href="#Wholesale" class="ui-btn ui-corner-all" data-bind="disable: true">Wholesale</a>
-            <a href="#ProductManagement" class="ui-btn ui-corner-all" data-bind="click: openProductManagementPage">Product Management</a>
-            <a href="#DataAnalyse" class="ui-btn ui-corner-all">Data Analyse</a>
+            <div style="display: none" data-bind="visible: $parent.isDataLoaded">
+                <a href="#Retail" class="ui-btn ui-corner-all" data-bind="click: openRetailPage">Retail</a>
+                <a href="#Wholesale" class="ui-btn ui-corner-all" data-bind="disable: true">Wholesale</a>
+                <a href="#ProductManagement" class="ui-btn ui-corner-all" data-bind="click: openProductManagementPage">Product Management</a>
+                <a href="#DataAnalyse" class="ui-btn ui-corner-all">Data Analyse</a>
+            </div>
+            <div data-bind="visible: !$parent.isDataLoaded()">
+                <h1>正在加载数据……</h1>
+            </div>
         </div>
         <footer data-role="footer" data-position="fixed">
             <h4>@Copyright - Frank</h4>
