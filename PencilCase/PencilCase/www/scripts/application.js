@@ -11,6 +11,7 @@ define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], fun
             this.activePage = ko.observable(null);
             this.pages = [];
             this.confirmDialog = ko.observable(null);
+            this.isDataLoaded = ko.observable(false);
             this.openDataBase = function () {
                 if (_this.db) {
                     return _this.db;
@@ -95,6 +96,10 @@ define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], fun
                                 transaction.executeSql(sqlStatement2, [], null, _this.onDBError);
                             }
                         }, _this.onDBError);
+                    }, function () {
+                        alert("Failed to initialize data.");
+                    }, function () {
+                        _this.isDataLoaded(true);
                     });
                 }
                 else {

@@ -13,9 +13,10 @@ import { Navigator } from './Navigator';
 export class Application {
     public activePage: KnockoutObservable<PageBase> = ko.observable(null);
     public pages: Array<PageBase> = [];
-    public homePage: KnockoutObservable<PageBase>;
+    public homePage: KnockoutObservable<HomePage>;
     public confirmDialog: KnockoutObservable<any> = ko.observable(null);
     private db: Database;
+    private isDataLoaded: KnockoutObservable<boolean> = ko.observable(false);
 
     private static _instance: Application;
 
@@ -47,7 +48,7 @@ export class Application {
             return null;
         }
     }
-    
+
     public initialize(): void {
         document.addEventListener('deviceready', this.onDeviceReady, false);
     }
@@ -136,7 +137,13 @@ export class Application {
 
                     }
                 }, this.onDBError);
-            });
+            },
+                () => {
+                    alert("Failed to initialize data.")
+                },
+                () => {
+                    this.isDataLoaded(true);
+                });
         }
         else {
             alert("Failed to open database.")
