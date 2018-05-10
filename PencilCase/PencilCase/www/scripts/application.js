@@ -26,6 +26,16 @@ define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], fun
             this.onDeviceReady = function () {
                 document.addEventListener('pause', _this.onPause, false);
                 document.addEventListener('resume', _this.onResume, false);
+                document.addEventListener('backbutton', function (evt) {
+                    //if (cordova.platformId !== 'windows') {
+                    //    return;
+                    //}
+                    //if (window.location.href !== firstPageUrl) {
+                    //    window.history.back();
+                    //} else {
+                    //    throw new Error('Exit'); // This will suspend the app
+                    //}
+                }, false);
                 ko.applyBindings(Application.instance, document.documentElement);
                 Navigator_1.Navigator.instance.initialize();
                 // TODO: Cordova has been loaded. Perform any initialization that requires Cordova here.
