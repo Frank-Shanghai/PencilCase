@@ -56,6 +56,17 @@ export class Application {
     private onDeviceReady = (): void => {
         document.addEventListener('pause', this.onPause, false);
         document.addEventListener('resume', this.onResume, false);
+        document.addEventListener('backbutton', function (evt) {
+            //if (cordova.platformId !== 'windows') {
+            //    return;
+            //}
+
+            //if (window.location.href !== firstPageUrl) {
+            //    window.history.back();
+            //} else {
+            //    throw new Error('Exit'); // This will suspend the app
+            //}
+        }, false);
 
         ko.applyBindings(Application.instance, document.documentElement);
 
