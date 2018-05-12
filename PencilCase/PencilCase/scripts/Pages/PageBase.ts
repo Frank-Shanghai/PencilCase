@@ -9,6 +9,7 @@
     public footer: KnockoutObservable<string>;
     public pageId: string;
     public isPermanent: boolean;
+    public back: () => void = null;
 
     constructor() {
         this.initialize();

@@ -24,17 +24,21 @@ define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], fun
                 }
             };
             this.onDeviceReady = function () {
+                var firstPageUrl = window.location.href;
                 document.addEventListener('pause', _this.onPause, false);
                 document.addEventListener('resume', _this.onResume, false);
                 document.addEventListener('backbutton', function (evt) {
-                    //if (cordova.platformId !== 'windows') {
-                    //    return;
-                    //}
-                    //if (window.location.href !== firstPageUrl) {
-                    //    window.history.back();
-                    //} else {
-                    //    throw new Error('Exit'); // This will suspend the app
-                    //}
+                    if (cordova.platformId !== 'android') {
+                        return;
+                    }
+                    if (!Application.instance.confirmDialog()) {
+                        if (Application.instance.activePage().back)
+                            Application.instance.activePage().back();
+                    }
+                    else {
+                        Application.instance.confirmDialog(null);
+                        window.history.back();
+                    }
                 }, false);
                 ko.applyBindings(Application.instance, document.documentElement);
                 Navigator_1.Navigator.instance.initialize();

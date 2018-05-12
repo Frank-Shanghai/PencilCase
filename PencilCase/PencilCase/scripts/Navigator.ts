@@ -80,6 +80,10 @@ export class Navigator {
                 }
             }
         }
+
+        if (parameters.toPage === ('#' + Consts.Pages.HomePage.Id)) {
+            Application.instance.activePage(Application.instance.homePage());
+        }
     });
 
     $(':mobile-pagecontainer').pagecontainer({
