@@ -56,6 +56,9 @@ define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], fun
                 if (db) {
                     db.transaction(function (transaction) {
                         // Uncomment the line below if need to re-create the table, like adding/removing/changing columns
+                        //transaction.executeSql('drop table if exists UnitOfMeasure', [], null, onDBError);
+                        transaction.executeSql('create table if not exists UnitOfMeasure (Id text primary key, Name text not null, Description text)', [], null, _this.onDBError);
+                        // Uncomment the line below if need to re-create the table, like adding/removing/changing columns
                         //transaction.executeSql('DROP TABLE IF EXISTS Product', [], null, onDBError);
                         transaction.executeSql('CREATE TABLE IF NOT EXISTS Product (\
                                         Id text primary key,\
@@ -73,11 +76,23 @@ define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], fun
                                         CreatedDate datetime,\
                                         ModifiedDate datetime,\
                                         foreign key(RetailUnit) references UnitOfMeasure(Id),\
-                                        foreign key(WholesaleUnit) references UnnitOfMeasure(Id)\
+                                        foreign key(WholesaleUnit) references UnitOfMeasure(Id)\
                                         )', [], null, _this.onDBError);
-                        // Uncomment the line below if need to re-create the table, like adding/removing/changing columns
-                        //transaction.executeSql('drop table if exists UnitOfMeasure', [], null, onDBError);
-                        transaction.executeSql('create table if not exists UnitOfMeasure (Id text primary key, Name text not null, Description text)', [], null, _this.onDBError);
+                        // I have to name the table as Orders instead of Order, because Order is a reserved word by SQL Lite, it did took me some time
+                        // https://www.sqlite.org/lang_keywords.html
+                        //transaction.executeSql('DROP TABLE IF EXISTS Orders', [], null, this.onDBError);
+                        transaction.executeSql('CREATE TABLE Orders (\
+                                        Id text primary key not null,\
+                                        BatchId text not null,\
+                                        ProductId text not null, \
+                                        Type int,\
+                                        Unit text not null,\
+                                        Quantity real,\
+                                        CreatedDate datetime, \
+                                        ModifiedDate datetime,\
+                                        foreign key(Unit) references UnitOfMeasure(Id),\
+                                        foreign key(ProductId) references Product(Id)\
+                                        )', [], null, _this.onDBError);
                     }, null, _this.createTestData);
                 }
                 else {
