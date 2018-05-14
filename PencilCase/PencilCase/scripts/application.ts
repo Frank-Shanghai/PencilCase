@@ -115,6 +115,26 @@ export class Application {
                 // Uncomment the line below if need to re-create the table, like adding/removing/changing columns
                 //transaction.executeSql('drop table if exists UnitOfMeasure', [], null, onDBError);
                 transaction.executeSql('create table if not exists UnitOfMeasure (Id text primary key, Name text not null, Description text)', [], null, this.onDBError);
+
+                //transaction.executeSql('CREATE TABLE IF NOT EXISTS Product (\
+                //                        Id text primary key,\
+                //                        Name text not null, \
+                //                        Description text,\
+                //                        RetailPrice real not null,\
+                //                        RetailUnit text,\
+                //                        WholesalePrice real not null,\
+                //                        WholesaleUnit text,\
+                //                        ImportWholesalePrice real not  null,\
+                //                        ImportRetailPrice real not null,\
+                //                        Times integer not null,\
+                //                        Inventory integer not null,\
+                //                        Image,\
+                //                        CreatedDate datetime,\
+                //                        ModifiedDate datetime,\
+                //                        foreign key(RetailUnit) references UnitOfMeasure(Id),\
+                //                        foreign key(WholesaleUnit) references UnnitOfMeasure(Id)\
+                //                        )', [], null, this.onDBError);
+
             }, null, this.createTestData);
         }
         else {
