@@ -238,6 +238,18 @@
         <div data-role="header">
             <a href="#HomePage" data-icon="home" data-bind="click: navigator.goHome">Home</a>
             <h1><span data-bind="text: title"></span></h1>
+            <form>
+                <div class="ui-field-contain">
+                    <label for="title-filter-menu">Placeholder:</label>
+                    <select id="filtertext" data-native-menu="false" class="filterable-select">
+                        <option>Select fruit...</option>
+                        <option value="orange" data-filtertext="Florida">Orange</option>
+                        <option value="apple">Apple</option>
+                        <option value="peach">Peach</option>
+                        <option value="lemon">Lemon</option>
+                    </select>
+                </div>
+            </form>
         </div>
         <div data-role="main" class="ui-content">
             <p>Retail Page</p>
