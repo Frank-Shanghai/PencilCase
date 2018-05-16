@@ -40,6 +40,9 @@ define(["require", "exports", "./Pages/ProductManagement", "./Pages/ProductEdito
                             }
                         }
                     }
+                    if (parameters.toPage === ('#' + Consts.Pages.HomePage.Id)) {
+                        application_1.Application.instance.activePage(application_1.Application.instance.homePage());
+                    }
                 });
                 $(':mobile-pagecontainer').pagecontainer({
                     beforeshow: function (eventObject, ui) {

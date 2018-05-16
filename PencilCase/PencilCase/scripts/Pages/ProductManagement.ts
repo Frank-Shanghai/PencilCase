@@ -13,6 +13,7 @@ export class ProductManagement extends PageBase {
         super();
         this.title = ko.observable("Product Management");
         this.pageId = Consts.Pages.ProductManagement.Id;
+        this.back = Navigator.instance.goHome;
     }
 
     public initialize() {

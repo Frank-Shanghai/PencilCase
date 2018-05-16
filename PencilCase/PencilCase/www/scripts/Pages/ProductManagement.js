@@ -43,6 +43,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             };
             _this.title = ko.observable("Product Management");
             _this.pageId = Consts.Pages.ProductManagement.Id;
+            _this.back = Navigator_1.Navigator.instance.goHome;
             return _this;
         }
         ProductManagement.prototype.initialize = function () {

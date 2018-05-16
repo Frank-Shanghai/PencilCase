@@ -109,7 +109,7 @@
         <!-- ko if: activePage().pageId === 'ProductEditor' -->
         <!-- ko with: activePage() -->
         <div data-role="header" data-position="fixed">
-            <a href="#ProductManagement" data-icon="back" data-bind="click: goBack">Back</a>
+            <a href="#ProductManagement" data-icon="back" data-bind="click: back">Back</a>
             <h1><span data-bind="text: title"></span></h1>
         </div>
         <div data-role="main" class="ui-content">
@@ -215,7 +215,7 @@
             <div data-role="navbar" data-grid="a">
                 <ul>
                     <li>
-                        <a id="editButton" href="#" data-bind="click: startEditing, visible: !isInEditingMode()" data-icon="edit">Edit</a>
+                        <a id="editButton" href="#" data-bind="click: startEditing, visible: !isInEditingMode(), css: {'ui-btn-active': isInEditingMode}" data-icon="edit">Edit</a>
                         <a id="saveButton" href="#" data-bind="click: save, visible: isInEditingMode" data-icon="check">Save</a>
                     </li>
                     <li>

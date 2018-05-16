@@ -49,7 +49,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
             _this.deleteProduct = function () {
                 var doDelete = function () {
                     _this.repository.delete(_this.originalProduct().Id, function (transaction, resultSet) {
-                        _this.goBack();
+                        _this.doGoBack();
                     }, _this.onDBError);
                 };
                 _this.navigator.showConfirmDialog("删除产品", "是否确认删除？", doDelete);
@@ -93,13 +93,13 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
             };
             _this.cancel = function () {
                 if (_this.isNewProduct == true) {
-                    _this.goBack();
+                    _this.doGoBack();
                 }
                 else {
                     _this.isInEditingMode(false);
                 }
             };
-            _this.goBack = function () {
+            _this.doGoBack = function () {
                 _this.navigator.navigateTo(Consts.Pages.ProductManagement, {
                     changeHash: true,
                 });
@@ -109,6 +109,14 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
             };
             _this.title = ko.observable("Product Editor");
             _this.pageId = Consts.Pages.ProductEditor.Id;
+            _this.back = function () {
+                if (_this.isInEditingMode() === true) {
+                    _this.cancel();
+                }
+                else {
+                    _this.doGoBack();
+                }
+            };
             _this.isNotInEditingMode = ko.computed(function () {
                 return !_this.isInEditingMode();
             });

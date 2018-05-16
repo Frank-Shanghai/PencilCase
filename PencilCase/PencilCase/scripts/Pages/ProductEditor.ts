@@ -29,6 +29,15 @@ export class ProductEditor extends PageBase {
         super();
         this.title = ko.observable("Product Editor");
         this.pageId = Consts.Pages.ProductEditor.Id;
+        this.back = () => {
+            if (this.isInEditingMode() === true) {
+                this.cancel();
+            }
+            else {
+                this.doGoBack();
+            }
+        }
+
         this.isNotInEditingMode = ko.computed(() => {
             return !this.isInEditingMode();
         });
@@ -93,7 +102,7 @@ export class ProductEditor extends PageBase {
     private deleteProduct = () => {
         let doDelete = () => {
             this.repository.delete(this.originalProduct().Id, (transaction: SqlTransaction, resultSet: SqlResultSet) => {
-                this.goBack();
+                this.doGoBack();
             }, this.onDBError);
         }
 
@@ -142,21 +151,21 @@ export class ProductEditor extends PageBase {
 
     private cancel = () => {
         if (this.isNewProduct == true) {
-            this.goBack();
+            this.doGoBack();
         }
         else {
             this.isInEditingMode(false);
         }
     }
 
-    private validate() {
-        // TODO: Fields validation before saving
-    }
-
-    private goBack = () => {
+    private doGoBack = () => {
         this.navigator.navigateTo(Consts.Pages.ProductManagement, {
             changeHash: true,
         });
+    }
+
+    private validate() {
+        // TODO: Fields validation before saving
     }
 
     private onDBError = (transaction: SqlTransaction, sqlError: SqlError) => {
