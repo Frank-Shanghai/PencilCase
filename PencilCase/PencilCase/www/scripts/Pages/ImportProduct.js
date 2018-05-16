@@ -17,13 +17,24 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             var _this = _super.call(this) || this;
             _this.navigator = Navigator_1.Navigator.instance;
             _this.products = ko.observableArray([]);
-            _this.selectedProduct = ko.observable(null);
+            _this.dict = {};
+            _this.selectOptions = { Id: "placeholder", Name: "选择产品……", WholesalePrice: 0, WholesaleUnitName: '' };
+            _this.selectedProductId = ko.observable(_this.selectOptions.Id);
+            _this.selectedProduct = ko.observable(_this.selectOptions);
+            _this.productSelected = ko.computed(function () {
+                if (_this.selectedProduct() && _this.selectedProduct().Id !== _this.selectOptions.Id)
+                    return true;
+                return false;
+            });
             _this.onDBError = function (transaction, sqlError) {
                 alert("Import Product Page: " + sqlError.message);
             };
             _this.title = ko.observable("进货");
             _this.pageId = Consts.Pages.ImportProduct.Id;
             _this.back = Navigator_1.Navigator.instance.goHome;
+            _this.selectedProductId.subscribe(function (newValue) {
+                _this.selectedProduct(_this.dict[newValue]);
+            });
             return _this;
         }
         ImportProduct.prototype.initialize = function () {
@@ -33,10 +44,14 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                 _this.products([]); // First, clear products collection
                 var rows = resultSet.rows;
                 var array = [];
+                _this.dict = {};
                 for (var i = 0; i < rows.length; i++) {
                     //this.products.push(new Product(rows.item(i)));
                     array.push(new product_1.Product(rows.item(i)));
+                    _this.dict[(rows.item(i)).Id] = rows.item(i);
                 }
+                array.splice(0, 0, _this.selectOptions);
+                _this.dict[_this.selectOptions.Id] = _this.selectOptions;
                 _this.products(array);
             }, this.onDBError);
         };

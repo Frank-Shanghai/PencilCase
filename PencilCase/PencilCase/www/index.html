@@ -258,16 +258,14 @@
         </div>
         <div data-role="main" class="ui-content">
             <form>
-                <label style="font-weight: bold" for="product">产品：</label>
-                <select data-native-menu="false" class="filterable-select" id="product" data-bind="options: products, optionsText: 'Name', optionsValue: 'Id', value: selectedProduct"></select>
-
-                <!--<select id="product" data-native-menu="false" class="filterable-select">
-                    <option>选择商品……</option>
-                    <option value="orange" data-filtertext="Florida">Orange</option>
-                    <option value="苹果">Apple</option>
-                    <option value="桃子">Peach</option>
-                    <option value="lemon">Lemon</option>
-                </select>-->
+                <div class="ui-field-contain">
+                    <label style="font-weight: bold" for="product">产品：</label>
+                    <select data-mini="true" data-native-menu="false" class="filterable-select" name="product" data-bind="options: products, optionsText: 'Name', optionsValue: 'Id', value: selectedProductId"></select>
+                </div>
+                <div class="ui-field-contain" data-bind="visible: productSelected">
+                    <label style="font-weight: bold" for="Price">价格：</label>
+                    <span name="Price" data-bind="text: selectedProduct() ? selectedProduct().WholesalePrice + '元/' + selectedProduct().WholesaleUnitName: ''"></span>
+                </div>
             </form>
         </div>
         <!-- /ko -->
