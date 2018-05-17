@@ -17,6 +17,9 @@ export class ImportProduct extends PageBase {
         return false;
     });
     private selectedProductQuantity: KnockoutObservable<number> = ko.observable(1);
+    private clearSelection = ko.observable(false);
+
+    private selectedProducts = ko.observableArray([{ProductId: "test"}]);
 
     constructor() {
         super();
@@ -50,15 +53,14 @@ export class ImportProduct extends PageBase {
 
     private addProduct = () => {
         //Add Product
-        this.selectedProductId(this.selectOptions.Id);
+
+        this.cancelProductAdding();
     }
 
     private cancelProductAdding = () => {
-        let array = this.products();
-        this.products([]);
-        this.products(array);
-
         this.selectedProductId(this.selectOptions.Id);
+        this.clearSelection(true);
+        this.selectedProductQuantity(1);
     }
 
     private increaseQuantity = () => {

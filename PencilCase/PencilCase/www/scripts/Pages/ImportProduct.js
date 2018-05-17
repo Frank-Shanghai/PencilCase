@@ -27,15 +27,16 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                 return false;
             });
             _this.selectedProductQuantity = ko.observable(1);
+            _this.clearSelection = ko.observable(false);
+            _this.selectedProducts = ko.observableArray([{ ProductId: "test" }]);
             _this.addProduct = function () {
                 //Add Product
-                _this.selectedProductId(_this.selectOptions.Id);
+                _this.cancelProductAdding();
             };
             _this.cancelProductAdding = function () {
-                var array = _this.products();
-                _this.products([]);
-                _this.products(array);
                 _this.selectedProductId(_this.selectOptions.Id);
+                _this.clearSelection(true);
+                _this.selectedProductQuantity(1);
             };
             _this.increaseQuantity = function () {
                 _this.selectedProductQuantity(_this.selectedProductQuantity() + 1);
