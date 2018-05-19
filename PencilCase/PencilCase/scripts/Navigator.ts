@@ -1,10 +1,11 @@
-﻿import { ProductManagement } from './Pages/ProductManagement';
+﻿import { Application } from './application';
+import * as Consts from './Pages/Consts';
+import { ProductManagement } from './Pages/ProductManagement';
 import { ProductEditor } from './Pages/ProductEditor';
 import { PageBase } from './Pages/PageBase';
 import { HomePage } from './Pages/HomePage';
 import { Retail } from './Pages/Retail';
-import { Application } from './application';
-import * as Consts from './Pages/Consts';
+import { ImportProduct } from './Pages/ImportProduct';
 
 export class Navigator {
     // TODO: Pop up pages/dialogs handle 
@@ -68,6 +69,7 @@ export class Navigator {
         if (parameters.toPage !== ('#' + Consts.Pages.HomePage.Id) && parameters.toPage !== ('#' + Consts.Pages.ConfirmDialog.Id)) { // No need the handling here for home page
             if ((parameters.options && parameters.options.data)) {
                 let data = parameters.options.data;
+                let test = Application.instance.activePage().pageId;
                 if (Application.instance.activePage().pageId !== data.pageInfo.Id) {
                     // Since this page before change event will be called 2 times, so add code here to avoid set active page 2 times
                     let page = this.getPage(data);
@@ -120,6 +122,12 @@ export class Navigator {
             pageExisted = !(page == null);
             if (pageExisted == false)
                 page = new Retail();
+            break;
+        case Consts.Pages.ImportProduct:
+            page = this.getExistedInstance(pageInfo);
+            pageExisted = !(page == null);
+            if (pageExisted == false)
+                page = new ImportProduct();
             break;
     }
 

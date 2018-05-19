@@ -39,6 +39,7 @@
                 <a href="#Retail" class="ui-btn ui-corner-all" data-bind="click: openRetailPage">Retail</a>
                 <a href="#Wholesale" class="ui-btn ui-corner-all" data-bind="disable: true">Wholesale</a>
                 <a href="#ProductManagement" class="ui-btn ui-corner-all" data-bind="click: openProductManagementPage">Product Management</a>
+                <a href="#ImportProduct" class="ui-btn ui-corner-all" data-bind="click: openImportProductPage">进货</a>
                 <a href="#DataAnalyse" class="ui-btn ui-corner-all">Data Analyse</a>
             </div>
             <div data-bind="visible: !$parent.isDataLoaded()">
@@ -184,7 +185,7 @@
                         <label style="font-weight: bold" for="productDescription">描述：</label>
                         <textarea name="productDescription" data-bind="value: description"></textarea>
                         <label style="font-weight: bold" for="productInventory">库存：</label>
-                        <input type="number" name="productInventory" data-bind="value: inventory" />
+                        <input type="number" name="productInventory" data-bind="value: inventory, enabled: false" />
                         <label style="font-weight: bold">图片：</label>
                         <span data-bind="text: '暂不可用'"></span>
                     </form>
@@ -238,21 +239,36 @@
         <div data-role="header">
             <a href="#HomePage" data-icon="home" data-bind="click: navigator.goHome">Home</a>
             <h1><span data-bind="text: title"></span></h1>
-            <form>
-                <div class="ui-field-contain">
-                    <label for="title-filter-menu">Placeholder:</label>
-                    <select id="filtertext" data-native-menu="false" class="filterable-select">
-                        <option>Select fruit...</option>
-                        <option value="orange" data-filtertext="Florida">Orange</option>
-                        <option value="apple">Apple</option>
-                        <option value="peach">Peach</option>
-                        <option value="lemon">Lemon</option>
-                    </select>
-                </div>
-            </form>
         </div>
         <div data-role="main" class="ui-content">
             <p>Retail Page</p>
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->
+    </div>
+
+    <!-- ==============Import Product Page================= -->
+    <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
+    <div data-role="page" id="ImportProduct">
+        <!-- ko if: activePage().pageId === 'ImportProduct' -->
+        <!-- ko with: activePage() -->
+        <div data-role="header">
+            <a href="#HomePage" data-icon="home" data-bind="click: navigator.goHome">Home</a>
+            <h1><span data-bind="text: title"></span></h1>
+        </div>
+        <div data-role="main" class="ui-content">
+            <form>
+                <label style="font-weight: bold" for="product">产品：</label>
+                <select data-native-menu="false" class="filterable-select" id="product" data-bind="options: products, optionsText: 'Name', optionsValue: 'Id', value: selectedProduct"></select>
+
+                <!--<select id="product" data-native-menu="false" class="filterable-select">
+                    <option>选择商品……</option>
+                    <option value="orange" data-filtertext="Florida">Orange</option>
+                    <option value="苹果">Apple</option>
+                    <option value="桃子">Peach</option>
+                    <option value="lemon">Lemon</option>
+                </select>-->
+            </form>
         </div>
         <!-- /ko -->
         <!-- /ko -->
