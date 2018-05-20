@@ -16,6 +16,7 @@ export class ImportProduct extends PageBase {
             return true;
         return false;
     });
+    private selectedProductQuantity: KnockoutObservable<number> = ko.observable(1);
 
     constructor() {
         super();
@@ -45,6 +46,28 @@ export class ImportProduct extends PageBase {
 
             this.products(array);
         }, this.onDBError);
+    }
+
+    private addProduct = () => {
+        //Add Product
+        this.selectedProductId(this.selectOptions.Id);
+    }
+
+    private cancelProductAdding = () => {
+        let array = this.products();
+        this.products([]);
+        this.products(array);
+
+        this.selectedProductId(this.selectOptions.Id);
+    }
+
+    private increaseQuantity = () => {
+        this.selectedProductQuantity(this.selectedProductQuantity() + 1);
+    }
+
+    private decreaseQuantity = () => {
+        if (this.selectedProductQuantity() > 0)
+            this.selectedProductQuantity(this.selectedProductQuantity() - 1);
     }
 
     private onDBError = (transaction: SqlTransaction, sqlError: SqlError) => {

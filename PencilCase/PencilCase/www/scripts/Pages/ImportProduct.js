@@ -26,6 +26,24 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                     return true;
                 return false;
             });
+            _this.selectedProductQuantity = ko.observable(1);
+            _this.addProduct = function () {
+                //Add Product
+                _this.selectedProductId(_this.selectOptions.Id);
+            };
+            _this.cancelProductAdding = function () {
+                var array = _this.products();
+                _this.products([]);
+                _this.products(array);
+                _this.selectedProductId(_this.selectOptions.Id);
+            };
+            _this.increaseQuantity = function () {
+                _this.selectedProductQuantity(_this.selectedProductQuantity() + 1);
+            };
+            _this.decreaseQuantity = function () {
+                if (_this.selectedProductQuantity() > 0)
+                    _this.selectedProductQuantity(_this.selectedProductQuantity() - 1);
+            };
             _this.onDBError = function (transaction, sqlError) {
                 alert("Import Product Page: " + sqlError.message);
             };

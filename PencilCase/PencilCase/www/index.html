@@ -257,16 +257,29 @@
             <h1><span data-bind="text: title"></span></h1>
         </div>
         <div data-role="main" class="ui-content">
-            <form>
-                <div class="ui-field-contain">
-                    <label style="font-weight: bold" for="product">产品：</label>
-                    <select data-mini="true" data-native-menu="false" class="filterable-select" name="product" data-bind="options: products, optionsText: 'Name', optionsValue: 'Id', value: selectedProductId"></select>
+            <select data-mini="true" data-native-menu="false" class="filterable-select" data-bind="options: products, optionsText: 'Name', optionsValue: 'Id', value: selectedProductId"></select>
+            <div data-bind="visible: productSelected" style="margin-top: 10px; margin-left: 3px;">
+                <label style="font-weight: bold; display: inline" for="Price">价格：</label>
+                <span name="Price" data-bind="text: selectedProduct() ? selectedProduct().WholesalePrice + '元/' + selectedProduct().WholesaleUnitName: ''"></span>
+            </div>
+            <div data-bind="visible: productSelected">
+                <table>
+                    <tr>
+                        <td><span style="font-weight: bold; display: inline">数量：</span></td>
+                        <td><a href="#" data-bind="click: increaseQuantity" class="ui-btn ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-notext ui-btn-inline">Plus</a></td>
+                        <td><input style="width: 50px" data-bind="value: selectedProductQuantity" /></td>
+                        <td style="padding-left: 8px"><a href="#" data-bind="click: decreaseQuantity" class="ui-btn ui-shadow ui-corner-all ui-icon-minus ui-btn-icon-notext ui-btn-inline">Minus</a></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="ui-grid-a" data-bind="visible: productSelected">
+                <div class="ui-block-a">
+                    <a data-role="button" class="ui-btn ui-icon-plus" data-icon="" href="#" data-bind="click: addProduct">添加商品</a>
                 </div>
-                <div class="ui-field-contain" data-bind="visible: productSelected">
-                    <label style="font-weight: bold" for="Price">价格：</label>
-                    <span name="Price" data-bind="text: selectedProduct() ? selectedProduct().WholesalePrice + '元/' + selectedProduct().WholesaleUnitName: ''"></span>
+                <div class="ui-block-b">
+                    <a data-role="button" class="ui-btn ui-icon-minus" href="#" data-bind="click: cancelProductAdding">取消</a>
                 </div>
-            </form>
+            </div>
         </div>
         <!-- /ko -->
         <!-- /ko -->
