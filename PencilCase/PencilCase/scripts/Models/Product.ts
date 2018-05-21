@@ -10,6 +10,8 @@ export class Product {
     public WholesaleUnit: string = null;
     public ImportWholesalePrice: number = 0;
     public ImportRetailPrice: number = 0;    
+    public WholesaleCost: number = 0;
+    public RetailCost: number = 0;
     public Times: number = 0;
     public Inventory: number = 0;
     public Image: any = null;
@@ -30,6 +32,8 @@ export class Product {
             this.WholesaleUnit = product.WholesaleUnit;
             this.ImportWholesalePrice = product.ImportWholesalePrice;
             this.ImportRetailPrice = product.ImportRetailPrice;
+            this.WholesaleCost = product.WholesaleCost;
+            this.RetailCost = product.RetailCost;
             this.Times = product.Times;
             this.Inventory = product.Inventory;
             this.Image = product.Image;

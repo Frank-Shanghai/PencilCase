@@ -1,10 +1,11 @@
-﻿import { ProductManagement } from './Pages/ProductManagement';
+﻿import { Application } from './application';
+import * as Consts from './Pages/Consts';
+import { ProductManagement } from './Pages/ProductManagement';
 import { ProductEditor } from './Pages/ProductEditor';
 import { PageBase } from './Pages/PageBase';
 import { HomePage } from './Pages/HomePage';
 import { Retail } from './Pages/Retail';
-import { Application } from './application';
-import * as Consts from './Pages/Consts';
+import { ImportProduct } from './Pages/ImportProduct';
 
 export class Navigator {
     // TODO: Pop up pages/dialogs handle 
@@ -28,7 +29,7 @@ export class Navigator {
     public navigateTo = (pageInfo: any, options?: any) => {
         let jqueryPage = $("div#" + pageInfo.Id).first();
         if (!options) options = {};
-        $.extend(options, { showLoadMsg: true })
+        $.extend(options, { showLoadMsg: true, transition: "flip" })
         if (!options.data) options.data = {};
         $.extend(options.data, { pageInfo: pageInfo });
 
@@ -37,13 +38,17 @@ export class Navigator {
 
     public goHome = () => {
         Application.instance.activePage(new HomePage());
-        $(':mobile-pagecontainer').pagecontainer("change", "#" + Consts.Pages.HomePage.Id, { showLoadMsg: true });
+        $(':mobile-pagecontainer').pagecontainer("change", "#" + Consts.Pages.HomePage.Id, { showLoadMsg: true, transition: "flip" });
     }
 
-    public showConfirmDialog(header: string, content: string, confirm: () => void, cancel?: () => void) {
+    public showConfirmDialog(header: string, content: string, showConfirm: boolean, showCancel: boolean, confirm: () => void, cancel?: () => void, confirmButtonText?: string, cancelButtonText?: string) {
     Application.instance.confirmDialog({
         header: header,
         content: content,
+        showConfirm: showConfirm ? true : false,
+        showCancel: showCancel ? true : false,
+        confirmButtonText: confirmButtonText ? confirmButtonText : "是",
+        cancelButtonText: cancelButtonText ? cancelButtonText : "否",
         confirm: () => {
             if (confirm) {
                 confirm();
@@ -52,6 +57,7 @@ export class Navigator {
             Application.instance.confirmDialog(null);
         },
         cancel: () => {
+            // didn't bind this handler to cancel button click event since it works just by set cancel button as data-rel="back", so cancel handler actually useless here.
             if (cancel) {
                 cancel();
             }
@@ -68,6 +74,7 @@ export class Navigator {
         if (parameters.toPage !== ('#' + Consts.Pages.HomePage.Id) && parameters.toPage !== ('#' + Consts.Pages.ConfirmDialog.Id)) { // No need the handling here for home page
             if ((parameters.options && parameters.options.data)) {
                 let data = parameters.options.data;
+                let test = Application.instance.activePage().pageId;
                 if (Application.instance.activePage().pageId !== data.pageInfo.Id) {
                     // Since this page before change event will be called 2 times, so add code here to avoid set active page 2 times
                     let page = this.getPage(data);
@@ -120,6 +127,12 @@ export class Navigator {
             pageExisted = !(page == null);
             if (pageExisted == false)
                 page = new Retail();
+            break;
+        case Consts.Pages.ImportProduct:
+            page = this.getExistedInstance(pageInfo);
+            pageExisted = !(page == null);
+            if (pageExisted == false)
+                page = new ImportProduct();
             break;
     }
 

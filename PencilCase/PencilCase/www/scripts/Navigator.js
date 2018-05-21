@@ -1,4 +1,4 @@
-define(["require", "exports", "./Pages/ProductManagement", "./Pages/ProductEditor", "./Pages/HomePage", "./Pages/Retail", "./application", "./Pages/Consts"], function (require, exports, ProductManagement_1, ProductEditor_1, HomePage_1, Retail_1, application_1, Consts) {
+define(["require", "exports", "./application", "./Pages/Consts", "./Pages/ProductManagement", "./Pages/ProductEditor", "./Pages/HomePage", "./Pages/Retail", "./Pages/ImportProduct"], function (require, exports, application_1, Consts, ProductManagement_1, ProductEditor_1, HomePage_1, Retail_1, ImportProduct_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Navigator = (function () {
@@ -14,7 +14,7 @@ define(["require", "exports", "./Pages/ProductManagement", "./Pages/ProductEdito
                 var jqueryPage = $("div#" + pageInfo.Id).first();
                 if (!options)
                     options = {};
-                $.extend(options, { showLoadMsg: true });
+                $.extend(options, { showLoadMsg: true, transition: "flip" });
                 if (!options.data)
                     options.data = {};
                 $.extend(options.data, { pageInfo: pageInfo });
@@ -22,13 +22,14 @@ define(["require", "exports", "./Pages/ProductManagement", "./Pages/ProductEdito
             };
             this.goHome = function () {
                 application_1.Application.instance.activePage(new HomePage_1.HomePage());
-                $(':mobile-pagecontainer').pagecontainer("change", "#" + Consts.Pages.HomePage.Id, { showLoadMsg: true });
+                $(':mobile-pagecontainer').pagecontainer("change", "#" + Consts.Pages.HomePage.Id, { showLoadMsg: true, transition: "flip" });
             };
             this.initialize = function () {
                 $(':mobile-pagecontainer').on("pagecontainerbeforechange", function (eventObject, parameters) {
                     if (parameters.toPage !== ('#' + Consts.Pages.HomePage.Id) && parameters.toPage !== ('#' + Consts.Pages.ConfirmDialog.Id)) {
                         if ((parameters.options && parameters.options.data)) {
                             var data = parameters.options.data;
+                            var test = application_1.Application.instance.activePage().pageId;
                             if (application_1.Application.instance.activePage().pageId !== data.pageInfo.Id) {
                                 // Since this page before change event will be called 2 times, so add code here to avoid set active page 2 times
                                 var page = _this.getPage(data);
@@ -65,10 +66,14 @@ define(["require", "exports", "./Pages/ProductManagement", "./Pages/ProductEdito
             enumerable: true,
             configurable: true
         });
-        Navigator.prototype.showConfirmDialog = function (header, content, confirm, cancel) {
+        Navigator.prototype.showConfirmDialog = function (header, content, showConfirm, showCancel, confirm, cancel, confirmButtonText, cancelButtonText) {
             application_1.Application.instance.confirmDialog({
                 header: header,
                 content: content,
+                showConfirm: showConfirm ? true : false,
+                showCancel: showCancel ? true : false,
+                confirmButtonText: confirmButtonText ? confirmButtonText : "是",
+                cancelButtonText: cancelButtonText ? cancelButtonText : "否",
                 confirm: function () {
                     if (confirm) {
                         confirm();
@@ -76,6 +81,7 @@ define(["require", "exports", "./Pages/ProductManagement", "./Pages/ProductEdito
                     application_1.Application.instance.confirmDialog(null);
                 },
                 cancel: function () {
+                    // didn't bind this handler to cancel button click event since it works just by set cancel button as data-rel="back", so cancel handler actually useless here.
                     if (cancel) {
                         cancel();
                     }
@@ -106,6 +112,12 @@ define(["require", "exports", "./Pages/ProductManagement", "./Pages/ProductEdito
                     pageExisted = !(page == null);
                     if (pageExisted == false)
                         page = new Retail_1.Retail();
+                    break;
+                case Consts.Pages.ImportProduct:
+                    page = this.getExistedInstance(pageInfo);
+                    pageExisted = !(page == null);
+                    if (pageExisted == false)
+                        page = new ImportProduct_1.ImportProduct();
                     break;
             }
             if (pageExisted == false && pageInfo.IsPermanent === true)

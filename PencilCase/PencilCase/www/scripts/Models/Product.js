@@ -12,6 +12,8 @@ define(["require", "exports", "../Utils"], function (require, exports, Utils) {
             this.WholesaleUnit = null;
             this.ImportWholesalePrice = 0;
             this.ImportRetailPrice = 0;
+            this.WholesaleCost = 0;
+            this.RetailCost = 0;
             this.Times = 0;
             this.Inventory = 0;
             this.Image = null;
@@ -25,6 +27,8 @@ define(["require", "exports", "../Utils"], function (require, exports, Utils) {
                 this.WholesaleUnit = product.WholesaleUnit;
                 this.ImportWholesalePrice = product.ImportWholesalePrice;
                 this.ImportRetailPrice = product.ImportRetailPrice;
+                this.WholesaleCost = product.WholesaleCost;
+                this.RetailCost = product.RetailCost;
                 this.Times = product.Times;
                 this.Inventory = product.Inventory;
                 this.Image = product.Image;

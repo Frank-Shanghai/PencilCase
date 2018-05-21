@@ -13,7 +13,7 @@ define(["require", "exports", "../application"], function (require, exports, app
             };
             this.update = function (product, successCallback, errorCallback) {
                 var sqlString = "update Product set Name = '" + product.Name + "', Description = '" + product.Description + "', RetailPrice = " + product.RetailPrice + ", RetailUnit = '" + product.RetailUnit + "', WholesalePrice = " +
-                    product.WholesalePrice + ", WholesaleUnit = '" + product.WholesaleUnit + "', ImportWholesalePrice = " + product.ImportWholesalePrice + ", ImportRetailPrice = " + product.ImportRetailPrice + ", Times = " + product.Times + ", Inventory = " + product.Inventory + ", Image = '" + product.Image + "', ModifiedDate = '" +
+                    product.WholesalePrice + ", WholesaleUnit = '" + product.WholesaleUnit + "', ImportWholesalePrice = " + product.ImportWholesalePrice + ", ImportRetailPrice = " + product.ImportRetailPrice + ", WholesaleCost = " + product.WholesaleCost + ", RetailCost = " + product.RetailCost + ", Times = " + product.Times + ", Inventory = " + product.Inventory + ", Image = '" + product.Image + "', ModifiedDate = '" +
                     moment(product.ModifiedDate.toISOString()).format("YYYY-MM-DD") + "' where Id = '" + product.Id + "'";
                 _this.db.transaction(function (transaction) {
                     transaction.executeSql(sqlString, [], successCallback, errorCallback);
@@ -21,7 +21,7 @@ define(["require", "exports", "../application"], function (require, exports, app
             };
             this.insert = function (product, successCallback, errorCallback) {
                 var sqlString = "insert into Product values ('" + product.Id + "','" + product.Name + "','" + product.Description + "'," + product.RetailPrice + ",'" + product.RetailUnit + "'," +
-                    product.WholesalePrice + ",'" + product.WholesaleUnit + "'," + product.ImportWholesalePrice + "," + product.ImportRetailPrice + "," + product.Times + "," + product.Inventory + ",'" + product.Image + "','" +
+                    product.WholesalePrice + ",'" + product.WholesaleUnit + "'," + product.ImportWholesalePrice + "," + product.ImportRetailPrice + "," + product.WholesaleCost + "," + product.RetailCost + "," + product.Times + "," + product.Inventory + ",'" + product.Image + "','" +
                     moment(product.CreatedDate.toISOString()).format("YYYY-MM-DD") + "','" + moment(product.ModifiedDate.toISOString()).format("YYYY-MM-DD") + "')";
                 _this.db.transaction(function (transaction) {
                     transaction.executeSql(sqlString, [], successCallback, errorCallback);
