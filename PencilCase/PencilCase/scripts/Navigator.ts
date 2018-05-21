@@ -29,7 +29,7 @@ export class Navigator {
     public navigateTo = (pageInfo: any, options?: any) => {
         let jqueryPage = $("div#" + pageInfo.Id).first();
         if (!options) options = {};
-        $.extend(options, { showLoadMsg: true })
+        $.extend(options, { showLoadMsg: true, transition: "flip" })
         if (!options.data) options.data = {};
         $.extend(options.data, { pageInfo: pageInfo });
 
@@ -38,7 +38,7 @@ export class Navigator {
 
     public goHome = () => {
         Application.instance.activePage(new HomePage());
-        $(':mobile-pagecontainer').pagecontainer("change", "#" + Consts.Pages.HomePage.Id, { showLoadMsg: true });
+        $(':mobile-pagecontainer').pagecontainer("change", "#" + Consts.Pages.HomePage.Id, { showLoadMsg: true, transition: "flip" });
     }
 
     public showConfirmDialog(header: string, content: string, confirm: () => void, cancel?: () => void) {

@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Models/product", "../Repositories/ProductRepository"], function (require, exports, PageBase_1, Navigator_1, Consts, product_1, ProductRepository_1) {
+define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Models/Product", "../Repositories/ProductRepository"], function (require, exports, PageBase_1, Navigator_1, Consts, Product_1, ProductRepository_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ImportProduct = (function (_super) {
@@ -28,9 +28,24 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             });
             _this.selectedProductQuantity = ko.observable(1);
             _this.clearSelection = ko.observable(false);
-            _this.selectedProducts = ko.observableArray([{ ProductId: "test" }]);
+            _this.selectedProducts = ko.observableArray([]);
             _this.addProduct = function () {
                 //Add Product
+                var isNew = true;
+                for (var i = 0; i < _this.selectedProducts().length; i++) {
+                    if (_this.selectedProducts()[i].product.Id === _this.selectedProduct().Id) {
+                        _this.selectedProducts()[i].quantity(_this.selectedProducts()[i].quantity() + _this.selectedProductQuantity());
+                        isNew = false;
+                        break;
+                    }
+                }
+                if (isNew) {
+                    _this.selectedProducts.push({
+                        product: _this.selectedProduct(),
+                        quantity: ko.observable(_this.selectedProductQuantity()),
+                        total: 100
+                    });
+                }
                 _this.cancelProductAdding();
             };
             _this.cancelProductAdding = function () {
@@ -66,7 +81,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                 _this.dict = {};
                 for (var i = 0; i < rows.length; i++) {
                     //this.products.push(new Product(rows.item(i)));
-                    array.push(new product_1.Product(rows.item(i)));
+                    array.push(new Product_1.Product(rows.item(i)));
                     _this.dict[(rows.item(i)).Id] = rows.item(i);
                 }
                 array.splice(0, 0, _this.selectOptions);

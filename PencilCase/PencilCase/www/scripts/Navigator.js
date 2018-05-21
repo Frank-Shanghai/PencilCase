@@ -14,7 +14,7 @@ define(["require", "exports", "./application", "./Pages/Consts", "./Pages/Produc
                 var jqueryPage = $("div#" + pageInfo.Id).first();
                 if (!options)
                     options = {};
-                $.extend(options, { showLoadMsg: true });
+                $.extend(options, { showLoadMsg: true, transition: "flip" });
                 if (!options.data)
                     options.data = {};
                 $.extend(options.data, { pageInfo: pageInfo });
@@ -22,7 +22,7 @@ define(["require", "exports", "./application", "./Pages/Consts", "./Pages/Produc
             };
             this.goHome = function () {
                 application_1.Application.instance.activePage(new HomePage_1.HomePage());
-                $(':mobile-pagecontainer').pagecontainer("change", "#" + Consts.Pages.HomePage.Id, { showLoadMsg: true });
+                $(':mobile-pagecontainer').pagecontainer("change", "#" + Consts.Pages.HomePage.Id, { showLoadMsg: true, transition: "flip" });
             };
             this.initialize = function () {
                 $(':mobile-pagecontainer').on("pagecontainerbeforechange", function (eventObject, parameters) {

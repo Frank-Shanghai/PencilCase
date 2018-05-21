@@ -1,7 +1,7 @@
 ﻿import { PageBase } from './PageBase';
 import { Navigator } from '../Navigator';
 import * as Consts from './Consts';
-import { Product } from '../Models/product';
+import { Product } from '../Models/Product';
 import { ProductRepository } from '../Repositories/ProductRepository';
 
 export class ImportProduct extends PageBase {
@@ -19,7 +19,7 @@ export class ImportProduct extends PageBase {
     private selectedProductQuantity: KnockoutObservable<number> = ko.observable(1);
     private clearSelection = ko.observable(false);
 
-    private selectedProducts = ko.observableArray([{ProductId: "test"}]);
+    private selectedProducts = ko.observableArray([]);
 
     constructor() {
         super();
@@ -53,6 +53,22 @@ export class ImportProduct extends PageBase {
 
     private addProduct = () => {
         //Add Product
+        let isNew = true;
+        for (let i = 0; i < this.selectedProducts().length; i++) {
+            if (this.selectedProducts()[i].product.Id === this.selectedProduct().Id) {
+                this.selectedProducts()[i].quantity(this.selectedProducts()[i].quantity() + this.selectedProductQuantity());
+                isNew = false;
+                break;
+            }
+        }
+
+        if (isNew) {
+            this.selectedProducts.push({
+                product: this.selectedProduct(),
+                quantity: ko.observable(this.selectedProductQuantity()),
+                total: 100
+            });
+        }
 
         this.cancelProductAdding();
     }
