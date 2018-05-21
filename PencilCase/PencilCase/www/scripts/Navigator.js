@@ -66,10 +66,14 @@ define(["require", "exports", "./application", "./Pages/Consts", "./Pages/Produc
             enumerable: true,
             configurable: true
         });
-        Navigator.prototype.showConfirmDialog = function (header, content, confirm, cancel) {
+        Navigator.prototype.showConfirmDialog = function (header, content, showConfirm, showCancel, confirm, cancel, confirmButtonText, cancelButtonText) {
             application_1.Application.instance.confirmDialog({
                 header: header,
                 content: content,
+                showConfirm: showConfirm ? true : false,
+                showCancel: showCancel ? true : false,
+                confirmButtonText: confirmButtonText ? confirmButtonText : "是",
+                cancelButtonText: cancelButtonText ? cancelButtonText : "否",
                 confirm: function () {
                     if (confirm) {
                         confirm();
@@ -77,6 +81,7 @@ define(["require", "exports", "./application", "./Pages/Consts", "./Pages/Produc
                     application_1.Application.instance.confirmDialog(null);
                 },
                 cancel: function () {
+                    // didn't bind this handler to cancel button click event since it works just by set cancel button as data-rel="back", so cancel handler actually useless here.
                     if (cancel) {
                         cancel();
                     }

@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Models/Product", "../Repositories/ProductRepository", "../Models/Order", "../Utils", "../Models/Order"], function (require, exports, PageBase_1, Navigator_1, Consts, Product_1, ProductRepository_1, Order_1, Utils, Order_2) {
+define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Models/Product", "../Repositories/ProductRepository", "../Repositories/OrderRepository", "../Models/Order", "../Utils", "../Models/Order"], function (require, exports, PageBase_1, Navigator_1, Consts, Product_1, ProductRepository_1, OrderRepository_1, Order_1, Utils, Order_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ImportProduct = (function (_super) {
@@ -33,6 +33,8 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             _this.batchId = null;
             _this.totalNumber = ko.observable(0);
             _this.totalPrice = ko.observable(0);
+            _this.productRepository = new ProductRepository_1.ProductRepository();
+            _this.orderRepository = new OrderRepository_1.OrderRepository();
             _this.addOrder = function () {
                 //Add Product
                 if (_this.batchId == null)
@@ -93,6 +95,34 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                 _this.cancelOrderAdding();
             };
             _this.save = function () {
+                var _loop_1 = function (i) {
+                    var order = _this.importOrders()[i];
+                    order.createdDate = new Date(Date.now());
+                    order.modifiedDate = order.createdDate;
+                    var product = order.product();
+                    var newRetailCost = ((product.RetailCost * product.Inventory) + (order.price() * order.quantity())) / (product.Inventory + order.quantity() * product.Times);
+                    var newWholesaleCost = newRetailCost * product.Times;
+                    product.Inventory += (order.quantity() * product.Times);
+                    product.RetailCost = newRetailCost;
+                    product.WholesaleCost = newWholesaleCost;
+                    product.ImportWholesalePrice = order.price();
+                    product.ImportRetailPrice = product.ImportWholesalePrice / product.Times;
+                    product.CreatedDate = new Date(product.CreatedDate);
+                    product.ModifiedDate = new Date(Date.now());
+                    _this.orderRepository.insert(order, function (transaction, resultSet) {
+                        _this.productRepository.update(product, function (transaction, resultSet) {
+                        }, function (transaction, sqlError) {
+                            alert("Faield to update Product: " + product.Id + '\r\n' + sqlError.message);
+                        });
+                    }, function (transaction, sqlError) {
+                        alert("Faield to inser new Order: " + order.id() + '\r\n' + sqlError.message);
+                    });
+                };
+                for (var i = 0; i < _this.importOrders().length; i++) {
+                    _loop_1(i);
+                }
+                _this.cancelOrders();
+                _this.navigator.showConfirmDialog("进货", "已添加成功。", false, true, null, null, null, '好');
             };
             _this.onDBError = function (transaction, sqlError) {
                 alert("Import Product Page: " + sqlError.message);

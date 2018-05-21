@@ -41,10 +41,14 @@ export class Navigator {
         $(':mobile-pagecontainer').pagecontainer("change", "#" + Consts.Pages.HomePage.Id, { showLoadMsg: true, transition: "flip" });
     }
 
-    public showConfirmDialog(header: string, content: string, confirm: () => void, cancel?: () => void) {
+    public showConfirmDialog(header: string, content: string, showConfirm: boolean, showCancel: boolean, confirm: () => void, cancel?: () => void, confirmButtonText?: string, cancelButtonText?: string) {
     Application.instance.confirmDialog({
         header: header,
         content: content,
+        showConfirm: showConfirm ? true : false,
+        showCancel: showCancel ? true : false,
+        confirmButtonText: confirmButtonText ? confirmButtonText : "是",
+        cancelButtonText: cancelButtonText ? cancelButtonText : "否",
         confirm: () => {
             if (confirm) {
                 confirm();
@@ -53,6 +57,7 @@ export class Navigator {
             Application.instance.confirmDialog(null);
         },
         cancel: () => {
+            // didn't bind this handler to cancel button click event since it works just by set cancel button as data-rel="back", so cancel handler actually useless here.
             if (cancel) {
                 cancel();
             }

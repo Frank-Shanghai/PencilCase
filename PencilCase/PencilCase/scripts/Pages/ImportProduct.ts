@@ -3,6 +3,7 @@ import { Navigator } from '../Navigator';
 import * as Consts from './Consts';
 import { Product } from '../Models/Product';
 import { ProductRepository } from '../Repositories/ProductRepository';
+import { OrderRepository } from '../Repositories/OrderRepository';
 import { Order } from '../Models/Order';
 import * as Utils from '../Utils';
 import { OrderTypes } from '../Models/Order';
@@ -28,6 +29,9 @@ export class ImportProduct extends PageBase {
     private batchId: string = null;
     private totalNumber: KnockoutObservable<number> = ko.observable(0);
     private totalPrice: KnockoutObservable<number> = ko.observable(0);
+
+    private productRepository = new ProductRepository();
+    private orderRepository = new OrderRepository();
 
     constructor() {
         super();
@@ -132,7 +136,35 @@ export class ImportProduct extends PageBase {
     }
 
     private save = () => {
+        for (let i = 0; i < this.importOrders().length; i++) {
+            let order = this.importOrders()[i];
+            order.createdDate = new Date(Date.now());
+            order.modifiedDate = order.createdDate;
+            let product = order.product();
+            let newRetailCost = ((product.RetailCost * product.Inventory) + (order.price() * order.quantity())) / (product.Inventory + order.quantity() * product.Times);
+            let newWholesaleCost = newRetailCost * product.Times;
 
+            product.Inventory += (order.quantity() * product.Times);
+            product.RetailCost = newRetailCost;
+            product.WholesaleCost = newWholesaleCost;
+            product.ImportWholesalePrice = order.price();
+            product.ImportRetailPrice = product.ImportWholesalePrice / product.Times;
+            product.CreatedDate = new Date(product.CreatedDate);
+            product.ModifiedDate = new Date(Date.now());
+
+            this.orderRepository.insert(order, (transaction: SqlTransaction, resultSet: SqlResultSet) => {
+                this.productRepository.update(product, (transaction: SqlTransaction, resultSet: SqlResultSet) => {
+                    
+                }, (transaction: SqlTransaction, sqlError: SqlError) => {
+                    alert("Faield to update Product: " + product.Id + '\r\n' + sqlError.message);
+                });
+            }, (transaction: SqlTransaction, sqlError: SqlError) => {
+                alert("Faield to inser new Order: " + order.id() + '\r\n' + sqlError.message);
+            });            
+        }
+
+        this.cancelOrders();
+        this.navigator.showConfirmDialog("进货", "已添加成功。", false, true, null, null, null, '好');
     }
 
     private onDBError = (transaction: SqlTransaction, sqlError: SqlError) => {

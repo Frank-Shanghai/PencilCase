@@ -52,7 +52,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
                         _this.doGoBack();
                     }, _this.onDBError);
                 };
-                _this.navigator.showConfirmDialog("删除产品", "是否确认删除？", doDelete);
+                _this.navigator.showConfirmDialog("删除产品", "是否确认删除？", true, true, doDelete);
             };
             _this.save = function () {
                 var product = new Product_1.Product();

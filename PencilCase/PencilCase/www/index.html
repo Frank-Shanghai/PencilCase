@@ -97,8 +97,8 @@
             <h3><span data-bind="text: header"></span></h3>
             <p><span data-bind="text: content"></span></p>
             <fieldset class="ui-grid-a">
-                <div class="ui-block-a"><a href="#" data-role="button" data-bind="click: confirm">是</a></div>
-                <div class="ui-block-b"><a href="#" data-role="button" data-rel="back">否</a></div>
+                <div class="ui-block-a"><a href="#" data-role="button" data-bind="click: confirm, visible: showConfirm"><span data-bind="text: confirmButtonText"></span></a></div>
+                <div class="ui-block-b"><a href="#" data-role="button" data-rel="back" data-bind="visible: showCancel"><span data-bind="text: cancelButtonText"></span></a></div>
             </fieldset>
         </div>
         <!-- /ko -->
@@ -166,13 +166,13 @@
                             <span style="font-weight: bold">最新进货价（按批发单位）：</span><span data-bind="text: originalProduct().ImportWholesalePrice + '元'"></span>
                         </p>
                         <p>
-                            <span style="font-weight: bold">最新进货价（按零售单位）：</span><span data-bind="text: originalProduct().ImportRetailPrice + '元'"></span>
+                            <span style="font-weight: bold">最新进货价（按零售单位）：</span><span data-bind="text: originalProduct().ImportRetailPrice.toFixed(2) + '元'"></span>
                         </p>
                         <p>
-                            <span style="font-weight: bold">最新成本价（按批发单位）：</span><span data-bind="text: originalProduct().WholesaleCost + '元'"></span>
+                            <span style="font-weight: bold">最新成本价（按批发单位）：</span><span data-bind="text: originalProduct().WholesaleCost.toFixed(2) + '元'"></span>
                         </p>
                         <p>
-                            <span style="font-weight: bold">最新成本价（按零售单位）：</span><span data-bind="text: originalProduct().RetailCost + '元'"></span>
+                            <span style="font-weight: bold">最新成本价（按零售单位）：</span><span data-bind="text: originalProduct().RetailCost.toFixed(2) + '元'"></span>
                         </p>
                     </form>
                 </div>
@@ -309,7 +309,9 @@
                                         <span style="font-weight: bold" data-bind="text: product().Name"></span>
                                         <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                         <span data-bind="text: price() + '元'"></span>
-                                        <span data-bind="text: '/' + product().WholesaleUnitName"></span>
+                                        <span data-bind="text: '/' + product().WholesaleUnitName + '/'"></span>
+                                        <span data-bind="text: product().Times"></span>
+                                        <span data-bind="text: product().RetailUnitName"></span>
                                     </div>
                                 </td>
                                 <th rowspan="2" style="width: 1em">
