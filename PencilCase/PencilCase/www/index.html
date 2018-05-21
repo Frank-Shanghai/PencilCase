@@ -32,7 +32,7 @@
     <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
     <div data-role="page" id="HomePage">
         <!-- ko with: homePage() -->
-        <div data-role="header" data-position="fixed">
+        <div data-role="header" data-position="fixed" data-tap-toggle="false">
             <h1>Pencil Case</h1>
         </div>
         <div role="main" class="ui-content">
@@ -47,7 +47,7 @@
                 <h1>正在加载数据……</h1>
             </div>
         </div>
-        <footer data-role="footer" data-position="fixed">
+        <footer data-role="footer" data-position="fixed" data-tap-toggle="false">
             <h4>@Copyright - Frank</h4>
         </footer>
         <!-- /ko -->
@@ -60,7 +60,7 @@
     <div data-role="page" id="ProductManagement">
         <!-- ko if: activePage().pageId === 'ProductManagement' -->
         <!-- ko with: activePage() -->
-        <div data-role="header" data-position="fixed">
+        <div data-role="header" data-position="fixed" data-tap-toggle="false">
             <a href="#HomePage" data-icon="home" data-bind="click: navigator.goHome">Home</a>
             <h1><span data-bind="text: title"></span></h1>
             <a href="#" data-icon="plus" class="ui-icon-plus" data-bind="click: addNewProduct">Add</a>
@@ -110,7 +110,7 @@
     <div data-role="page" id="ProductEditor">
         <!-- ko if: activePage().pageId === 'ProductEditor' -->
         <!-- ko with: activePage() -->
-        <div data-role="header" data-position="fixed">
+        <div data-role="header" data-position="fixed" data-tap-toggle="false">
             <a href="#ProductManagement" data-icon="back" data-bind="click: back">Back</a>
             <h1><span data-bind="text: title"></span></h1>
         </div>
@@ -225,7 +225,7 @@
                 </div>
             </div>
         </div>
-        <footer data-role="footer" data-position="fixed">
+        <footer data-role="footer" data-position="fixed" data-tap-toggle="false">
             <div data-role="navbar" data-grid="a">
                 <ul>
                     <li>
@@ -249,7 +249,7 @@
     <div data-role="page" id="Retail">
         <!-- ko if: activePage().pageId === 'Retail' -->
         <!-- ko with: activePage() -->
-        <div data-role="header">
+        <div data-role="header" data-position="fixed" data-tap-toggle="false">
             <a href="#HomePage" data-icon="home" data-bind="click: navigator.goHome">Home</a>
             <h1><span data-bind="text: title"></span></h1>
         </div>
@@ -265,7 +265,7 @@
     <div data-role="page" id="ImportProduct">
         <!-- ko if: activePage().pageId === 'ImportProduct' -->
         <!-- ko with: activePage() -->
-        <div data-role="header">
+        <div data-role="header" data-position="fixed" data-tap-toggle="false">
             <a href="#HomePage" data-icon="home" data-bind="click: navigator.goHome">Home</a>
             <h1><span data-bind="text: title"></span></h1>
         </div>
@@ -347,7 +347,7 @@
                 </ul>
             </div>
         </div>
-        <footer data-role="footer" data-position="fixed" data-bind="visible: importOrders().length > 0">
+        <footer data-role="footer" data-position="fixed" data-tap-toggle="false" data-bind="visible: importOrders().length > 0">
             <div style="padding: 5px; text-align: center; color: orangered">
                 <span>总量：</span><span data-bind="text: totalNumber"></span>
                 <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
