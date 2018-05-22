@@ -13,6 +13,7 @@
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
     <link rel="stylesheet" type="text/css" href="css/index.css">
     <link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.4.5.min.css">
+    <link rel="stylesheet" type="text/css" href="css/custom.css" />
 
     <script type="text/javascript" src="cordova.js"></script>
     <!-- The 'async' attribute is needed for RequireJS to work in a Windows app -->
@@ -30,7 +31,7 @@
 <body>
     <!-- ==============Home Page================= -->
     <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
-    <div data-role="page" id="HomePage" style="height: 100%;">
+    <div data-role="page" id="HomePage">
         <!-- ko with: homePage() -->
         <div data-role="header" data-position="fixed" data-tap-toggle="false">
             <h1>Pencil Case</h1>
@@ -57,7 +58,7 @@
     <!-- Try not bind UI stuff on Home Page like header and footer, because such UI binding will be applied until device ready,
         and at that time, static UI already loaded for a while, it is confusing for users becasue they can note that UI loaded at 2 different time point. -->
     <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
-    <div data-role="page" id="ProductManagement" style="height: 100%;">
+    <div data-role="page" id="ProductManagement">
         <!-- ko if: activePage().pageId === 'ProductManagement' -->
         <!-- ko with: activePage() -->
         <div data-role="header" data-position="fixed" data-tap-toggle="false">
@@ -107,7 +108,7 @@
 
     <!-- ==============Product Editor Page================= -->
     <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
-    <div data-role="page" id="ProductEditor" style="height: 100%;">
+    <div data-role="page" id="ProductEditor">
         <!-- ko if: activePage().pageId === 'ProductEditor' -->
         <!-- ko with: activePage() -->
         <div data-role="header" data-position="fixed" data-tap-toggle="false">
@@ -246,7 +247,7 @@
 
     <!-- ==============Retail Page================= -->
     <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
-    <div data-role="page" id="Retail" style="height: 100%;">
+    <div data-role="page" id="Retail">
         <!-- ko if: activePage().pageId === 'Retail' -->
         <!-- ko with: activePage() -->
         <div data-role="header" data-position="fixed" data-tap-toggle="false">
@@ -262,7 +263,7 @@
 
     <!-- ==============Import Product Page================= -->
     <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
-    <div data-role="page" id="ImportProduct" style="height: 100%;">
+    <div data-role="page" id="ImportProduct">
         <!-- ko if: activePage().pageId === 'ImportProduct' -->
         <!-- ko with: activePage() -->
         <div data-role="header" data-position="fixed" data-tap-toggle="false">
