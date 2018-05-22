@@ -26,6 +26,7 @@
     <script type="text/javascript" src="scripts/CustomBindings/SelectComponentInitialValueBinding.js"></script>
     <script type="text/javascript" src="scripts/CustomBindings/InitialSelectedTabBinding.js"></script>
     <script type="text/javascript" src="scripts/CustomBindings/SelectChangeBinding.js"></script>
+    <script type="text/javascript" src="scripts/CustomBindings/CenterPositionBinding.js"></script>
 </head>
 <body>
     <!-- ==============Home Page================= -->
@@ -93,7 +94,7 @@
     <div data-role="dialog" id="ConfirmDialog">
         <!-- ko if: confirmDialog -->
         <!-- ko with: confirmDialog() -->
-        <div data-role="content" class="ui-content ui-body-a">
+        <div data-role="content" class="ui-content ui-body-a" data-bind="centerPosition: { target: { self: false, relationship: 'parents', selector: 'div.ui-dialog-contain.ui-overlay-shadow'}, containerSelector: 'div#ConfirmDialog'}">
             <h3><span data-bind="text: header"></span></h3>
             <p><span data-bind="text: content"></span></p>
             <fieldset class="ui-grid-a">
