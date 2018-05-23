@@ -163,10 +163,16 @@
                             <span style="font-weight: bold">批发价：</span><span data-bind="text: originalProduct().WholesalePrice + '元'"></span>
                         </p>
                         <p>
-                            <span style="font-weight: bold">进货价（按批发单位）：</span><span data-bind="text: originalProduct().ImportWholesalePrice + '元'"></span>
+                            <span style="font-weight: bold">最新进货价（按批发单位）：</span><span data-bind="text: originalProduct().ImportWholesalePrice + '元'"></span>
                         </p>
                         <p>
-                            <span style="font-weight: bold">进货价（按零售单位）：</span><span data-bind="text: originalProduct().ImportRetailPrice + '元'"></span>
+                            <span style="font-weight: bold">最新进货价（按零售单位）：</span><span data-bind="text: originalProduct().ImportRetailPrice + '元'"></span>
+                        </p>
+                        <p>
+                            <span style="font-weight: bold">最新成本价（按批发单位）：</span><span data-bind="text: originalProduct().WholesaleCost + '元'"></span>
+                        </p>
+                        <p>
+                            <span style="font-weight: bold">最新成本价（按零售单位）：</span><span data-bind="text: originalProduct().RetailCost + '元'"></span>
                         </p>
                     </form>
                 </div>
@@ -186,7 +192,7 @@
                         <label style="font-weight: bold" for="productDescription">描述：</label>
                         <textarea name="productDescription" data-bind="value: description"></textarea>
                         <label style="font-weight: bold" for="productInventory">库存：</label>
-                        <input type="number" name="productInventory" data-bind="value: inventory, enabled: false" />
+                        <input type="number" name="productInventory" data-bind="value: inventory, enable: false" />
                         <label style="font-weight: bold">图片：</label>
                         <span data-bind="text: '暂不可用'"></span>
                     </form>
@@ -203,12 +209,18 @@
                         <input type="number" name="productTimes" data-bind="value: times" />
                         <label for="productWholesalePrice" style="font-weight: bold">批发价(元)：</label>
                         <input type="number" name="productWholesalePrice" data-bind="value: wholesalePrice" />
-                        <!-- 此处应为成本价，TODO: 决定是否允许编辑，应由进货价格和库存计算得出 -->
-                        <lable for="productImportRetailPrice" style="font-weight: bold">进货价(元)（按零售单位）：</lable>
+
+                        <!-- 编辑时不显示下面fields -->
+                        <!--<lable for="productImportRetailPrice" style="font-weight: bold">最新进货价(元)（按零售单位）：</lable>
                         <input type="number" name="productImportRetailPrice" data-bind="value: originalProduct().ImportRetailPrice, enable: false" />
+                        <lable for="productImportWholesalePrice" style="font-weight: bold">最新进货价(元)（按批发单位）：</lable>
+                        <input type="number" name="productImportWholesalePrice" data-bind="value: originalProduct().ImportWholesalePrice, enable: false" />-->
                         <!-- 此处应为成本价，TODO: 决定是否允许编辑，应由进货价格和库存计算得出 -->
-                        <lable for="productImportWholesalePrice" style="font-weight: bold">进货价(元)（按批发单位）：</lable>
-                        <input type="number" name="productImportWholesalePrice" data-bind="value: originalProduct().ImportWholesalePrice, enable: false" />
+                        <!--<lable for="productImportRetailPrice" style="font-weight: bold">成本价(元)（按零售单位）：</lable>
+                        <input type="number" name="productImportRetailPrice" data-bind="value: originalProduct().RetailCost, enable: false" />-->
+                        <!-- 此处应为成本价，TODO: 决定是否允许编辑，应由进货价格和库存计算得出 -->
+                        <!--<lable for="productImportWholesalePrice" style="font-weight: bold">成本价(元)（按批发单位）：</lable>
+                        <input type="number" name="productImportWholesalePrice" data-bind="value: originalProduct().WholesaleCost, enable: false" />-->
                     </form>
                 </div>
             </div>
@@ -260,67 +272,70 @@
         <div data-role="main" class="ui-content">
             <select id="importProductSelect" style="margin-left: unset; margin-right: unset" data-mini="true" data-native-menu="false" class="filterable-select" data-bind="selectChange: clearSelection, options: products, optionsText: 'Name', optionsValue: 'Id', value: selectedProductId"></select>
             <div data-bind="visible: productSelected" style="margin-top: 10px; margin-left: 3px;">
-                <label style="font-weight: bold; display: inline" for="Price">价格：</label>
-                <span name="Price" data-bind="text: selectedProduct() ? selectedProduct().WholesalePrice + '元/' + selectedProduct().WholesaleUnitName: ''"></span>
-            </div>
-            <div data-bind="visible: productSelected">
                 <table>
                     <tr>
-                        <td><span style="font-weight: bold; display: inline">数量：</span></td>
-                        <td><a href="#" data-bind="click: increaseQuantity" class="ui-btn ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-notext ui-btn-inline">Plus</a></td>
-                        <td><input type="number" style="width: 50px" data-bind="value: selectedProductQuantity" /></td>
-                        <td style="padding-left: 8px"><a href="#" data-bind="click: decreaseQuantity" class="ui-btn ui-shadow ui-corner-all ui-icon-minus ui-btn-icon-notext ui-btn-inline">Minus</a></td>
+                        <td><label style="font-weight: bold;">价格：</label></td>
+                        <td><input data-mini="true" type="number" style="width: 50px" data-bind="value: selectedProductImportPrice" /></td>
+                        <td><span data-bind="text: selectedProduct() ? '元/' + selectedProduct().WholesaleUnitName: ''"></span></td>
                     </tr>
                 </table>
             </div>
-            <div class="ui-grid-a" data-bind="visible: productSelected">
+            <div data-bind="visible: productSelected" style="margin-left: 3px;">
+                <table>
+                    <tr>
+                        <td><span style="font-weight: bold; display: inline">数量：</span></td>
+                        <td><a style="margin: 0" href="#" data-bind="click: decreaseQuantity" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-minus ui-btn-icon-notext ui-btn-inline">Minus</a></td>
+                        <td><input data-mini="true" type="number" style="width: 50px" data-bind="value: selectedProductQuantity" /></td>
+                        <td><a style="margin: 0" href="#" data-bind="click: increaseQuantity" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-notext ui-btn-inline">Plus</a></td>
+                    </tr>
+                </table>
+            </div>
+            <div style="margin-left: 3px;" class="ui-grid-a" data-bind="visible: productSelected">
                 <div class="ui-block-a">
-                    <button class="ui-btn ui-corner-all ui-shadow" href="#" data-bind="click: addProduct, enable: selectedProductQuantity() > 0">添加商品</button>
+                    <button class="ui-btn ui-mini ui-corner-all ui-shadow" href="#" data-bind="click: addOrder, enable: selectedProductQuantity() > 0">添加商品</button>
                 </div>
                 <div class="ui-block-b">
-                    <a data-role="button" class="ui-btn ui-corner-all ui-shadow" href="#" data-bind="click: cancelProductAdding">取消</a>
+                    <a data-role="button" class="ui-btn ui-mini ui-corner-all ui-shadow" href="#" data-bind="click: cancelOrderAdding">取消</a>
                 </div>
             </div>
             <hr style=" height:2px;border:none;border-top:2px dotted grey;" />
-            <div data-bind="visible: selectedProducts().length > 0" style="font-size: 0.8em">
-                <ul data-role="listview" data-inset="true" data-bind="foreach: selectedProducts, listview: selectedProducts">
+            <div data-bind="visible: importOrders().length > 0" style="font-size: 0.8em">
+                <ul data-role="listview" data-inset="true" data-bind="foreach: importOrders, listview: importOrders">
                     <li style="padding-right: 0">
                         <table style="width: 100%">
                             <tr>
                                 <td>
                                     <div>
-                                        <span style="font-weight: bold" data-bind="text: product.Name"></span>
+                                        <span style="font-weight: bold" data-bind="text: product().Name"></span>
                                         <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span data-bind="text: product.WholesalePrice + '元'"></span>
-                                        <span data-bind="text: '/' + product.WholesaleUnitName"></span>
-                                        
+                                        <span data-bind="text: price() + '元'"></span>
+                                        <span data-bind="text: '/' + product().WholesaleUnitName"></span>
                                     </div>
                                 </td>
                                 <th rowspan="2" style="width: 1em">
-                                    <a href="#" class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline"></a>
+                                    <a href="#" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline" data-bind="click: $parent.deleteOrder"></a>
                                 </th>
                             </tr>
                             <tr>
                                 <td>
                                     <div style="display:inline">
-
-
                                         <table style="vertical-align: -webkit-baseline-middle; margin-left: -10px; display: inline;">
                                             <tr>
                                                 <td>
-                                                    <a href="#" style="margin: 0" class="ui-btn ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-notext ui-btn-b ui-btn-inline" data-bind="click:  ()=>{quantity(quantity()+1);}">Plus</a>
+                                                    <a href="#" style="margin: 0" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-minus ui-btn-icon-notext ui-btn-inline" data-bind="click: $parent.decreaseOrderProductQuantity">Minus</a>
                                                 </td>
                                                 <td>
                                                     <input type="number" style="width: 30px; text-align: center" data-bind="value: quantity" />
                                                 </td>
                                                 <td>
-                                                    <a href="#" style="margin: 0" class="ui-btn ui-shadow ui-corner-all ui-icon-minus ui-btn-icon-notext ui-btn-b ui-btn-inline" data-bind="click: ()=>{quantity(quantity()-1);}">Minus</a>
+                                                    <a href="#" style="margin: 0" class="ui-btn ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-notext ui-btn-inline" data-bind="click: $parent.increaseOrderProductQuantity">Plus</a>
                                                 </td>
+
                                             </tr>
                                         </table>
                                         <span>&nbsp;&nbsp;</span>
                                         <span data-bind="text: '小计'"></span>
-                                        <span data-bind="text: total + '元'"></span>
+                                        <span data-bind="text: total() + '元'"></span>
                                     </div>
                                 </td>
                             </tr>
@@ -330,14 +345,19 @@
                 </ul>
             </div>
         </div>
-        <footer data-role="footer" data-position="fixed" data-bind="visible: selectedProducts().length > 0">
+        <footer data-role="footer" data-position="fixed" data-bind="visible: importOrders().length > 0">
+            <div style="padding: 5px; text-align: center; color: orangered">
+                <span>总量：</span><span data-bind="text: totalNumber"></span>
+                <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <span>总价：</span><span data-bind="text: totalPrice"></span>
+            </div>
             <div data-role="navbar" data-grid="a">
                 <ul>
                     <li>
-                        <a href="#" data-icon="check">结算</a>
+                        <a href="#" data-icon="check" data-bind="click: save, css: {'ui-btn-active': !(importOrders().length > 0)}">结算</a>
                     </li>
                     <li>
-                        <a href="#" data-icon="delete">取消</a>
+                        <a href="#" data-icon="delete" data-bind="click: cancelOrders, css: {'ui-btn-active': !(importOrders().length > 0)}">取消</a>
                     </li>
                 </ul>
             </div>

@@ -3,6 +3,9 @@ import { Navigator } from '../Navigator';
 import * as Consts from './Consts';
 import { Product } from '../Models/Product';
 import { ProductRepository } from '../Repositories/ProductRepository';
+import { Order } from '../Models/Order';
+import * as Utils from '../Utils';
+import { OrderTypes } from '../Models/Order';
 
 export class ImportProduct extends PageBase {
     private navigator: Navigator = Navigator.instance;
@@ -16,10 +19,15 @@ export class ImportProduct extends PageBase {
             return true;
         return false;
     });
+
     private selectedProductQuantity: KnockoutObservable<number> = ko.observable(1);
+    private selectedProductImportPrice: KnockoutObservable<number> = ko.observable(0);
     private clearSelection = ko.observable(false);
 
-    private selectedProducts = ko.observableArray([]);
+    private importOrders = ko.observableArray<Order>([]);
+    private batchId: string = null;
+    private totalNumber: KnockoutObservable<number> = ko.observable(0);
+    private totalPrice: KnockoutObservable<number> = ko.observable(0);
 
     constructor() {
         super();
@@ -28,6 +36,9 @@ export class ImportProduct extends PageBase {
         this.back = Navigator.instance.goHome;
         this.selectedProductId.subscribe((newValue: string) => {
             this.selectedProduct(this.dict[newValue]);
+            if (this.selectedProduct() && this.selectedProduct().Id !== this.selectOptions.Id) {
+                this.selectedProductImportPrice(this.selectedProduct().ImportWholesalePrice ? this.selectedProduct().ImportWholesalePrice : 0);
+            }
         });
     }
 
@@ -51,29 +62,31 @@ export class ImportProduct extends PageBase {
         }, this.onDBError);
     }
 
-    private addProduct = () => {
+    private addOrder = () => {
         //Add Product
+        if (this.batchId == null) this.batchId = Utils.guid();
         let isNew = true;
-        for (let i = 0; i < this.selectedProducts().length; i++) {
-            if (this.selectedProducts()[i].product.Id === this.selectedProduct().Id) {
-                this.selectedProducts()[i].quantity(this.selectedProducts()[i].quantity() + this.selectedProductQuantity());
+        for (let i = 0; i < this.importOrders().length; i++) {
+            if (this.importOrders()[i].product().Id === this.selectedProduct().Id && this.importOrders()[i].price() == this.selectedProductImportPrice()) {
+                this.importOrders()[i].quantity(this.importOrders()[i].quantity() + this.selectedProductQuantity());
+                this.totalPrice(this.totalPrice() + this.selectedProductQuantity() * this.selectedProductImportPrice())
                 isNew = false;
                 break;
             }
         }
 
         if (isNew) {
-            this.selectedProducts.push({
-                product: this.selectedProduct(),
-                quantity: ko.observable(this.selectedProductQuantity()),
-                total: 100
-            });
+            let order = new Order(Utils.guid(), this.batchId, this.selectedProduct(), OrderTypes.Import, this.selectedProductQuantity(), this.selectedProductImportPrice());
+            this.importOrders.push(order);
+            this.totalPrice(this.totalPrice() + order.total()); 
         }
 
-        this.cancelProductAdding();
+        this.totalNumber(this.totalNumber() + this.selectedProductQuantity());
+
+        this.cancelOrderAdding();
     }
 
-    private cancelProductAdding = () => {
+    private cancelOrderAdding = () => {
         this.selectedProductId(this.selectOptions.Id);
         this.clearSelection(true);
         this.selectedProductQuantity(1);
@@ -86,6 +99,40 @@ export class ImportProduct extends PageBase {
     private decreaseQuantity = () => {
         if (this.selectedProductQuantity() > 0)
             this.selectedProductQuantity(this.selectedProductQuantity() - 1);
+    }
+
+    private increaseOrderProductQuantity = (order: Order) => {
+        order.quantity(order.quantity() + 1);
+        this.totalNumber(this.totalNumber() + 1);
+        // Have the order.price() * 1 here, because the order.praice is string, need this * 1 to make it as a number
+        this.totalPrice(this.totalPrice() + order.price() * 1);
+    }
+
+    private decreaseOrderProductQuantity = (order: Order) => {
+        if (order.quantity() > 0) {
+            order.quantity(order.quantity() - 1);
+            this.totalNumber(this.totalNumber() - 1);
+            // Have the order.price() * 1 here, because the order.praice is string, need this * 1 to make it as a number
+            this.totalPrice(this.totalPrice() - order.price() * 1);
+        }
+    }
+
+    private deleteOrder = (order: Order) => {
+        this.importOrders.remove(order);
+        this.totalNumber(this.totalNumber() - order.quantity())
+        this.totalPrice(this.totalPrice() - order.total());
+    }
+
+    private cancelOrders = () => {
+        this.importOrders([]);
+        this.totalNumber(0);
+        this.totalPrice(0);
+        this.batchId = null;
+        this.cancelOrderAdding();
+    }
+
+    private save = () => {
+
     }
 
     private onDBError = (transaction: SqlTransaction, sqlError: SqlError) => {

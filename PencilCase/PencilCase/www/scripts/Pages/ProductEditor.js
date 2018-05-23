@@ -64,6 +64,8 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
                 product.WholesaleUnit = _this.wholesaleUnit();
                 product.ImportWholesalePrice = _this.originalProduct().ImportWholesalePrice;
                 product.ImportRetailPrice = _this.originalProduct().ImportRetailPrice;
+                product.WholesaleCost = _this.originalProduct().WholesaleCost;
+                product.RetailCost = _this.originalProduct().RetailCost;
                 product.Times = _this.times();
                 product.Inventory = _this.inventory();
                 product.Image = '暂不可用';

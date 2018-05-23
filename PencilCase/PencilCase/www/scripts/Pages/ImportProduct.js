@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Models/Product", "../Repositories/ProductRepository"], function (require, exports, PageBase_1, Navigator_1, Consts, Product_1, ProductRepository_1) {
+define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Models/Product", "../Repositories/ProductRepository", "../Models/Order", "../Utils", "../Models/Order"], function (require, exports, PageBase_1, Navigator_1, Consts, Product_1, ProductRepository_1, Order_1, Utils, Order_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ImportProduct = (function (_super) {
@@ -27,28 +27,34 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                 return false;
             });
             _this.selectedProductQuantity = ko.observable(1);
+            _this.selectedProductImportPrice = ko.observable(0);
             _this.clearSelection = ko.observable(false);
-            _this.selectedProducts = ko.observableArray([]);
-            _this.addProduct = function () {
+            _this.importOrders = ko.observableArray([]);
+            _this.batchId = null;
+            _this.totalNumber = ko.observable(0);
+            _this.totalPrice = ko.observable(0);
+            _this.addOrder = function () {
                 //Add Product
+                if (_this.batchId == null)
+                    _this.batchId = Utils.guid();
                 var isNew = true;
-                for (var i = 0; i < _this.selectedProducts().length; i++) {
-                    if (_this.selectedProducts()[i].product.Id === _this.selectedProduct().Id) {
-                        _this.selectedProducts()[i].quantity(_this.selectedProducts()[i].quantity() + _this.selectedProductQuantity());
+                for (var i = 0; i < _this.importOrders().length; i++) {
+                    if (_this.importOrders()[i].product().Id === _this.selectedProduct().Id && _this.importOrders()[i].price() == _this.selectedProductImportPrice()) {
+                        _this.importOrders()[i].quantity(_this.importOrders()[i].quantity() + _this.selectedProductQuantity());
+                        _this.totalPrice(_this.totalPrice() + _this.selectedProductQuantity() * _this.selectedProductImportPrice());
                         isNew = false;
                         break;
                     }
                 }
                 if (isNew) {
-                    _this.selectedProducts.push({
-                        product: _this.selectedProduct(),
-                        quantity: ko.observable(_this.selectedProductQuantity()),
-                        total: 100
-                    });
+                    var order = new Order_1.Order(Utils.guid(), _this.batchId, _this.selectedProduct(), Order_2.OrderTypes.Import, _this.selectedProductQuantity(), _this.selectedProductImportPrice());
+                    _this.importOrders.push(order);
+                    _this.totalPrice(_this.totalPrice() + order.total());
                 }
-                _this.cancelProductAdding();
+                _this.totalNumber(_this.totalNumber() + _this.selectedProductQuantity());
+                _this.cancelOrderAdding();
             };
-            _this.cancelProductAdding = function () {
+            _this.cancelOrderAdding = function () {
                 _this.selectedProductId(_this.selectOptions.Id);
                 _this.clearSelection(true);
                 _this.selectedProductQuantity(1);
@@ -60,6 +66,34 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                 if (_this.selectedProductQuantity() > 0)
                     _this.selectedProductQuantity(_this.selectedProductQuantity() - 1);
             };
+            _this.increaseOrderProductQuantity = function (order) {
+                order.quantity(order.quantity() + 1);
+                _this.totalNumber(_this.totalNumber() + 1);
+                // Have the order.price() * 1 here, because the order.praice is string, need this * 1 to make it as a number
+                _this.totalPrice(_this.totalPrice() + order.price() * 1);
+            };
+            _this.decreaseOrderProductQuantity = function (order) {
+                if (order.quantity() > 0) {
+                    order.quantity(order.quantity() - 1);
+                    _this.totalNumber(_this.totalNumber() - 1);
+                    // Have the order.price() * 1 here, because the order.praice is string, need this * 1 to make it as a number
+                    _this.totalPrice(_this.totalPrice() - order.price() * 1);
+                }
+            };
+            _this.deleteOrder = function (order) {
+                _this.importOrders.remove(order);
+                _this.totalNumber(_this.totalNumber() - order.quantity());
+                _this.totalPrice(_this.totalPrice() - order.total());
+            };
+            _this.cancelOrders = function () {
+                _this.importOrders([]);
+                _this.totalNumber(0);
+                _this.totalPrice(0);
+                _this.batchId = null;
+                _this.cancelOrderAdding();
+            };
+            _this.save = function () {
+            };
             _this.onDBError = function (transaction, sqlError) {
                 alert("Import Product Page: " + sqlError.message);
             };
@@ -68,6 +102,9 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             _this.back = Navigator_1.Navigator.instance.goHome;
             _this.selectedProductId.subscribe(function (newValue) {
                 _this.selectedProduct(_this.dict[newValue]);
+                if (_this.selectedProduct() && _this.selectedProduct().Id !== _this.selectOptions.Id) {
+                    _this.selectedProductImportPrice(_this.selectedProduct().ImportWholesalePrice ? _this.selectedProduct().ImportWholesalePrice : 0);
+                }
             });
             return _this;
         }

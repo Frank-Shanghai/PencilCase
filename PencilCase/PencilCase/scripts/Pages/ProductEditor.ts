@@ -120,6 +120,8 @@ export class ProductEditor extends PageBase {
         product.WholesaleUnit = this.wholesaleUnit();
         product.ImportWholesalePrice = this.originalProduct().ImportWholesalePrice;
         product.ImportRetailPrice = this.originalProduct().ImportRetailPrice;
+        product.WholesaleCost = this.originalProduct().WholesaleCost;
+        product.RetailCost = this.originalProduct().RetailCost;
         product.Times = this.times();
         product.Inventory = this.inventory();
         product.Image = '暂不可用';

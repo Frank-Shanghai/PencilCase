@@ -173,11 +173,11 @@ export class Application {
         if (db) {
             db.transaction((transaction) => {
                 // Uncomment the line below if need to re-create the table, like adding/removing/changing columns
-                //transaction.executeSql('drop table if exists UnitOfMeasure', [], null, onDBError);
+                //transaction.executeSql('drop table if exists UnitOfMeasure', [], null, this.onDBError);
                 transaction.executeSql('create table if not exists UnitOfMeasure (Id text primary key, Name text not null, Description text)', [], null, this.onDBError);
 
                 // Uncomment the line below if need to re-create the table, like adding/removing/changing columns
-                //transaction.executeSql('DROP TABLE IF EXISTS Product', [], null, onDBError);
+                //transaction.executeSql('DROP TABLE IF EXISTS Product', [], null, this.onDBError);
                 transaction.executeSql('CREATE TABLE IF NOT EXISTS Product (\
                                         Id text primary key,\
                                         Name text not null, \
@@ -188,6 +188,8 @@ export class Application {
                                         WholesaleUnit text,\
                                         ImportWholesalePrice real not  null,\
                                         ImportRetailPrice real not null,\
+                                        WholesaleCost real not  null,\
+                                        RetailCost real not null,\
                                         Times integer not null,\
                                         Inventory integer not null,\
                                         Image,\
@@ -206,7 +208,9 @@ export class Application {
                                         ProductId text not null, \
                                         Type int,\
                                         Unit text not null,\
+                                        Price real not null,\
                                         Quantity real,\
+                                        Total real not null,\
                                         CreatedDate datetime, \
                                         ModifiedDate datetime,\
                                         foreign key(Unit) references UnitOfMeasure(Id),\
@@ -239,14 +243,19 @@ export class Application {
 
                         let clearStatement = "delete from Product";
                         // 箱， 个
-                        let sqlStatement = "insert into Product values ('" + Utils.guid() + "', 'Product1', 'Product description ....', 1.5, '" + guidGe + "', 28, '" + guidXiang + "', 24, 1, 24, 9999, null, '4/25/2018', '4/25/2018')";
-                        let sqlStatement1 = "insert into Product values ('" + Utils.guid() + "', '可爱多', 'Product description ....', 6, '" + guidGe + "', 68, '" + guidXiang + "', 60, 5, 12, 9999, null, '4/25/2018', '4/25/2018')";
-                        let sqlStatement2 = "insert into Product values ('" + Utils.guid() + "', '东北大板', 'Product description ....', 6, '" + guidKuai + "', 68, '" + guidJian + "', 60, 5, 12, 9999, null, '4/25/2018', '4/25/2018')";
+                        let sqlStatement = "insert into Product values ('" + Utils.guid() + "', 'Product1', 'Product description ....', 1.5, '" + guidGe + "', 28, '" + guidXiang + "', 0, 0, 0, 0, 24, 0, null, '4/25/2018', '4/25/2018')";
+                        let sqlStatement1 = "insert into Product values ('" + Utils.guid() + "', '可爱多', 'Product description ....', 6, '" + guidGe + "', 68, '" + guidXiang + "', 0, 0, 0, 0, 12, 0, null, '4/25/2018', '4/25/2018')";
+                        let sqlStatement2 = "insert into Product values ('" + Utils.guid() + "', '东北大板', 'Product description ....', 6, '" + guidKuai + "', 68, '" + guidJian + "', 0, 0, 0, 0, 12, 0, null, '4/25/2018', '4/25/2018')";
+                        let sqlStatement3 = "insert into Product values ('" + Utils.guid() + "', '随变', 'Product description ....', 6, '" + guidGe + "', 68, '" + guidXiang + "', 0, 0, 0, 0, 12, 0, null, '4/25/2018', '4/25/2018')";
+                        let sqlStatement4 = "insert into Product values ('" + Utils.guid() + "', '光明', 'Product description ....', 6, '" + guidKuai + "', 68, '" + guidJian + "', 0, 0, 0, 0, 12, 0, null, '4/25/2018', '4/25/2018')";
 
                         transaction.executeSql(clearStatement, [], null, this.onDBError);
                         transaction.executeSql(sqlStatement, [], null, this.onDBError);
                         transaction.executeSql(sqlStatement1, [], null, this.onDBError);
                         transaction.executeSql(sqlStatement2, [], null, this.onDBError);
+                        transaction.executeSql(sqlStatement3, [], null, this.onDBError);
+                        transaction.executeSql(sqlStatement4, [], null, this.onDBError);
+
 
                     }
                 }, this.onDBError);
