@@ -1,7 +1,7 @@
 var InitialSelectedTabBinding = (function () {
     function InitialSelectedTabBinding() {
     }
-    InitialSelectedTabBinding.prototype.update = function (element, valueAccessor, allowBindingAccessor, viewModel, bindingContext) {
+    InitialSelectedTabBinding.prototype.init = function (element, valueAccessor, allowBindingAccessor, viewModel, bindingContext) {
         /*
         // value should be something like {condition: KnockoutObservable<boolean>, selector: string}
         // for condition, once its value set to true, re-set the default active tab by clicking the link (tab header)
@@ -10,10 +10,11 @@ var InitialSelectedTabBinding = (function () {
         var value = ko.unwrap(valueAccessor());
         var condition = value.condition;
         var selector = value.selector;
+        var conditionSubscription = null;
         if (ko.isObservable(condition)) {
             var linkElement_1 = $(element).find(selector).first();
             if (linkElement_1.length != 0) {
-                condition.subscribe(function (newValue) {
+                conditionSubscription = condition.subscribe(function (newValue) {
                     if (newValue === true) {
                         linkElement_1.click();
                     }
@@ -21,6 +22,10 @@ var InitialSelectedTabBinding = (function () {
                 linkElement_1.click();
             }
         }
+        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+            if (conditionSubscription)
+                conditionSubscription.dispose();
+        });
     };
     return InitialSelectedTabBinding;
 }());

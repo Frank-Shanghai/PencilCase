@@ -1,11 +1,16 @@
 ﻿class ListviewBinding implements KnockoutBindingHandler {
-    public update(element: any, valueAccessor: () => any, allowBindingAccessor: KnockoutAllBindingsAccessor, viewModel: any, bindingContext: KnockoutBindingContext) {
+    public init(element: any, valueAccessor: () => any, allowBindingAccessor: KnockoutAllBindingsAccessor, viewModel: any, bindingContext: KnockoutBindingContext) {
         var value = valueAccessor();
+        let subscription: KnockoutSubscription = null;
         if (ko.isObservable(value)) {
-            value.subscribe((newValue: any)=>{
+            subscription = value.subscribe((newValue: any)=>{
                 $(element).listview("refresh");
             });
         }
+
+        ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
+            if (subscription) subscription.dispose();
+        });
     }
 }
 

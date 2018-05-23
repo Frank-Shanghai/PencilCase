@@ -6,6 +6,7 @@ import { PageBase } from './Pages/PageBase';
 import { HomePage } from './Pages/HomePage';
 import { Retail } from './Pages/Retail';
 import { ImportProduct } from './Pages/ImportProduct';
+import { Wholesale } from './Pages/Wholesale';
 
 export class Navigator {
     // TODO: Pop up pages/dialogs handle 
@@ -133,6 +134,12 @@ export class Navigator {
             pageExisted = !(page == null);
             if (pageExisted == false)
                 page = new ImportProduct();
+            break;
+        case Consts.Pages.Whosale:
+            page = this.getExistedInstance(pageInfo);
+            pageExisted = !(page == null);
+            if (pageExisted == false)
+                page = new Wholesale();
             break;
     }
 
