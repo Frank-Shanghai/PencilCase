@@ -245,23 +245,7 @@
         <!-- /ko -->
         <!-- /ko -->
     </div>
-
-    <!-- ==============Retail Page================= -->
-    <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
-    <div data-role="page" id="Retail">
-        <!-- ko if: activePage().pageId === 'Retail' -->
-        <!-- ko with: activePage() -->
-        <div data-role="header" data-position="fixed" data-tap-toggle="false">
-            <a href="#HomePage" data-icon="home" data-bind="click: navigator.goHome">Home</a>
-            <h1><span data-bind="text: title"></span></h1>
-        </div>
-        <div data-role="main" class="ui-content">
-            <p>Retail Page</p>
-        </div>
-        <!-- /ko -->
-        <!-- /ko -->
-    </div>
-
+    
     <!-- ==============Import Product Page================= -->
     <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
     <div data-role="page" id="ImportProduct">
@@ -469,6 +453,111 @@
                     </li>
                     <li>
                         <a href="#" data-icon="delete" data-bind="click: cancelOrders, css: {'ui-btn-active': !(wholesaleOrders().length > 0)}">取消</a>
+                    </li>
+                </ul>
+            </div>
+        </footer>
+        <!-- /ko -->
+        <!-- /ko -->
+    </div>
+
+    <!-- ==============Retail Page================= -->
+    <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
+    <div data-role="page" id="Retail">
+        <!-- ko if: activePage().pageId === 'Retail' -->
+        <!-- ko with: activePage() -->
+        <div data-role="header" data-position="fixed" data-tap-toggle="false">
+            <a href="#HomePage" data-icon="home" data-bind="click: navigator.goHome">Home</a>
+            <h1><span data-bind="text: title"></span></h1>
+        </div>
+        <div data-role="main" class="ui-content">
+            <select id="retailSelect" style="margin-left: unset; margin-right: unset" data-mini="true" data-native-menu="false" class="filterable-select" data-bind="selectChange: clearSelection, options: products, optionsText: 'Name', optionsValue: 'Id', value: selectedProductId"></select>
+            <div data-bind="visible: productSelected" style="margin-top: 10px; margin-left: 3px;">
+                <table>
+                    <tr>
+                        <td><label style="font-weight: bold;">价格：</label></td>
+                        <td><input data-mini="true" type="number" style="width: 50px" data-bind="value: selectedProduct() ? selectedProduct().RetailPrice : 0, enable: false" /></td>
+                        <td><span data-bind="text: selectedProduct() ? '元/' + selectedProduct().RetailUnitName: ''"></span></td>
+                    </tr>
+                </table>
+            </div>
+            <div data-bind="visible: productSelected" style="margin-left: 3px;">
+                <table>
+                    <tr>
+                        <td><span style="font-weight: bold; display: inline">数量：</span></td>
+                        <td><a style="margin: 0" href="#" data-bind="click: decreaseQuantity" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-minus ui-btn-icon-notext ui-btn-inline">Minus</a></td>
+                        <td><input data-mini="true" type="number" style="width: 50px" data-bind="value: selectedProductQuantity" /></td>
+                        <td><a style="margin: 0" href="#" data-bind="click: increaseQuantity" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-notext ui-btn-inline">Plus</a></td>
+                    </tr>
+                </table>
+            </div>
+            <div style="margin-left: 3px;" class="ui-grid-a" data-bind="visible: productSelected">
+                <div class="ui-block-a">
+                    <button class="ui-btn ui-mini ui-corner-all ui-shadow" href="#" data-bind="click: addOrder, enable: selectedProductQuantity() > 0">添加商品</button>
+                </div>
+                <div class="ui-block-b">
+                    <a data-role="button" class="ui-btn ui-mini ui-corner-all ui-shadow" href="#" data-bind="click: cancelOrderAdding">取消</a>
+                </div>
+            </div>
+            <hr style=" height:2px;border:none;border-top:2px dotted grey;" />
+            <div data-bind="visible: retailOrders().length > 0" style="font-size: 0.8em">
+                <ul data-role="listview" data-inset="true" data-bind="foreach: retailOrders, listview: retailOrders">
+                    <li style="padding-right: 0">
+                        <table style="width: 100%">
+                            <tr>
+                                <td>
+                                    <div>
+                                        <span style="font-weight: bold" data-bind="text: product().Name"></span>
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span data-bind="text: product().RetailPrice + '元'"></span>
+                                        <span data-bind="text: '/' + product().RetailUnitName"></span>
+                                    </div>
+                                </td>
+                                <th rowspan="2" style="width: 1em">
+                                    <a href="#" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline" data-bind="click: $parent.deleteOrder"></a>
+                                </th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="display:inline">
+                                        <table style="vertical-align: -webkit-baseline-middle; margin-left: -10px; display: inline;">
+                                            <tr>
+                                                <td>
+                                                    <a href="#" style="margin: 0" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-minus ui-btn-icon-notext ui-btn-inline" data-bind="click: $parent.decreaseOrderProductQuantity">Minus</a>
+                                                </td>
+                                                <td>
+                                                    <input type="number" style="width: 30px; text-align: center" data-bind="value: quantity" />
+                                                </td>
+                                                <td>
+                                                    <a href="#" style="margin: 0" class="ui-btn ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-notext ui-btn-inline" data-bind="click: $parent.increaseOrderProductQuantity">Plus</a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <span>&nbsp;&nbsp;</span>
+                                        <span data-bind="text: '小计'"></span>
+                                        <span data-bind="text: total() + '元'"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <footer data-role="footer" data-position="fixed" data-tap-toggle="false" data-bind="visible: retailOrders().length > 0">
+            <div style="padding: 5px; text-align: center; color: orangered">
+                <span>总量：</span><span data-bind="text: totalNumber"></span>
+                <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <span>总价：</span><span data-bind="text: totalPrice"></span>
+            </div>
+            <div data-role="navbar" data-grid="a">
+                <ul>
+                    <li>
+                        <a href="#" data-icon="check" data-bind="click: save, css: {'ui-btn-active': !(retailOrders().length > 0)}">结算</a>
+                    </li>
+                    <li>
+                        <a href="#" data-icon="delete" data-bind="click: cancelOrders, css: {'ui-btn-active': !(retailOrders().length > 0)}">取消</a>
                     </li>
                 </ul>
             </div>
