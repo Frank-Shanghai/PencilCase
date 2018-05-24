@@ -19,6 +19,32 @@ define(["require", "exports", "../application"], function (require, exports, app
                     transaction.executeSql(sqlString, [], successCallback, errorCallback);
                 });
             };
+            this.updateWithFieldValues = function (keyValuePairs, productId, successCallback, errorCallback) {
+                if (keyValuePairs.length == 0)
+                    return;
+                var sqlString = "update Product set ";
+                var fieldValues = '';
+                for (var i = 0; i < keyValuePairs.length; i++) {
+                    switch (keyValuePairs[i].Type) {
+                        case "string":
+                        case "date":
+                            fieldValues = ' ' + keyValuePairs[i].Field + " = '" + keyValuePairs[i].Value + "',";
+                            sqlString += fieldValues;
+                            break;
+                        case "number":
+                            fieldValues = ' ' + keyValuePairs[i].Field + " = " + keyValuePairs[i].Value + ",";
+                            sqlString += fieldValues;
+                            break;
+                    }
+                }
+                //http://www.w3school.com.cn/jsref/jsref_substring.asp, explains why the secondn parameter is sqlString.length - 1
+                //sqlString = sqlString.substring(0, sqlString.length - 2);
+                sqlString = sqlString.substring(0, sqlString.length - 1);
+                sqlString += " where Id = '" + productId + "'";
+                _this.db.transaction(function (transaction) {
+                    transaction.executeSql(sqlString, [], successCallback, errorCallback);
+                });
+            };
             this.insert = function (product, successCallback, errorCallback) {
                 var sqlString = "insert into Product values ('" + product.Id + "','" + product.Name + "','" + product.Description + "'," + product.RetailPrice + ",'" + product.RetailUnit + "'," +
                     product.WholesalePrice + ",'" + product.WholesaleUnit + "'," + product.ImportWholesalePrice + "," + product.ImportRetailPrice + "," + product.WholesaleCost + "," + product.RetailCost + "," + product.Times + "," + product.Inventory + ",'" + product.Image + "','" +
