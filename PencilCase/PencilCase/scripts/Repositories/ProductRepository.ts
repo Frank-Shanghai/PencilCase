@@ -25,7 +25,7 @@ export class ProductRepository {
     public update = (product: Product, successCallback?: (transaction: SqlTransaction, resultSet: SqlResultSet) => void, errorCallback?: (transaction: SqlTransaction, sqlError: SqlError) => void) => {
         let sqlString = "update Product set Name = '" + product.Name + "', Description = '" + product.Description + "', RetailPrice = " + product.RetailPrice + ", RetailUnit = '" + product.RetailUnit + "', WholesalePrice = " +
             product.WholesalePrice + ", WholesaleUnit = '" + product.WholesaleUnit + "', ImportWholesalePrice = " + product.ImportWholesalePrice + ", ImportRetailPrice = " + product.ImportRetailPrice + ", WholesaleCost = " + product.WholesaleCost + ", RetailCost = " + product.RetailCost + ", Times = " + product.Times + ", Inventory = " + product.Inventory + ", Image = '" + product.Image + "', ModifiedDate = '" +
-            moment(product.ModifiedDate.toISOString()).format("YYYY-MM-DD") + "' where Id = '" + product.Id + "'";
+            moment((new Date(Date.now())).toISOString()).format("YYYY-MM-DD") + "' where Id = '" + product.Id + "'";
 
         this.db.transaction((transaction) => {
             transaction.executeSql(sqlString, [], successCallback, errorCallback);
@@ -50,9 +50,11 @@ export class ProductRepository {
             }
         }
 
+        sqlString += " ModifiedDate = '" + moment((new Date(Date.now())).toISOString()).format("YYYY-MM-DD") + "'";
         //http://www.w3school.com.cn/jsref/jsref_substring.asp, explains why the secondn parameter is sqlString.length - 1
         //sqlString = sqlString.substring(0, sqlString.length - 2);
-        sqlString = sqlString.substring(0, sqlString.length - 1);
+        //sqlString = sqlString.substring(0, sqlString.length - 1);
+        
         sqlString += " where Id = '" + productId + "'";
 
         this.db.transaction((transaction) => {

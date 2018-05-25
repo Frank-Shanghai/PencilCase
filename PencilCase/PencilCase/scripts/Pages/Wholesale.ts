@@ -139,13 +139,10 @@ export class Wholesale extends PageBase {
             order.modifiedDate = order.createdDate;
             let product = order.product();
 
-            product.Inventory -= (order.quantity() * product.Times);
-            product.CreatedDate = new Date(product.CreatedDate);
-            product.ModifiedDate = new Date(Date.now());
-
             this.orderRepository.insert(order, (transaction: SqlTransaction, resultSet: SqlResultSet) => {
-                this.productRepository.update(product, (transaction: SqlTransaction, resultSet: SqlResultSet) => {
-
+                this.productRepository.updateWithFieldValues([
+                    { Field: "Inventory", Type: "number", Value: "Inventory - " + (order.quantity() * product.Times) }
+                ], product.Id, (transaction: SqlTransaction, resultSet: SqlResultSet) => {
                 }, (transaction: SqlTransaction, sqlError: SqlError) => {
                     alert("Faield to update Product: " + product.Id + '\r\n' + sqlError.message);
                 });

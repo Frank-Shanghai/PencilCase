@@ -14,7 +14,7 @@ define(["require", "exports", "../application"], function (require, exports, app
             this.update = function (product, successCallback, errorCallback) {
                 var sqlString = "update Product set Name = '" + product.Name + "', Description = '" + product.Description + "', RetailPrice = " + product.RetailPrice + ", RetailUnit = '" + product.RetailUnit + "', WholesalePrice = " +
                     product.WholesalePrice + ", WholesaleUnit = '" + product.WholesaleUnit + "', ImportWholesalePrice = " + product.ImportWholesalePrice + ", ImportRetailPrice = " + product.ImportRetailPrice + ", WholesaleCost = " + product.WholesaleCost + ", RetailCost = " + product.RetailCost + ", Times = " + product.Times + ", Inventory = " + product.Inventory + ", Image = '" + product.Image + "', ModifiedDate = '" +
-                    moment(product.ModifiedDate.toISOString()).format("YYYY-MM-DD") + "' where Id = '" + product.Id + "'";
+                    moment((new Date(Date.now())).toISOString()).format("YYYY-MM-DD") + "' where Id = '" + product.Id + "'";
                 _this.db.transaction(function (transaction) {
                     transaction.executeSql(sqlString, [], successCallback, errorCallback);
                 });
@@ -37,9 +37,10 @@ define(["require", "exports", "../application"], function (require, exports, app
                             break;
                     }
                 }
+                sqlString += " ModifiedDate = '" + moment((new Date(Date.now())).toISOString()).format("YYYY-MM-DD") + "'";
                 //http://www.w3school.com.cn/jsref/jsref_substring.asp, explains why the secondn parameter is sqlString.length - 1
                 //sqlString = sqlString.substring(0, sqlString.length - 2);
-                sqlString = sqlString.substring(0, sqlString.length - 1);
+                //sqlString = sqlString.substring(0, sqlString.length - 1);
                 sqlString += " where Id = '" + productId + "'";
                 _this.db.transaction(function (transaction) {
                     transaction.executeSql(sqlString, [], successCallback, errorCallback);

@@ -100,11 +100,10 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                     order.createdDate = new Date(Date.now());
                     order.modifiedDate = order.createdDate;
                     var product = order.product();
-                    product.Inventory -= (order.quantity() * product.Times);
-                    product.CreatedDate = new Date(product.CreatedDate);
-                    product.ModifiedDate = new Date(Date.now());
                     _this.orderRepository.insert(order, function (transaction, resultSet) {
-                        _this.productRepository.update(product, function (transaction, resultSet) {
+                        _this.productRepository.updateWithFieldValues([
+                            { Field: "Inventory", Type: "number", Value: "Inventory - " + (order.quantity() * product.Times) }
+                        ], product.Id, function (transaction, resultSet) {
                         }, function (transaction, sqlError) {
                             alert("Faield to update Product: " + product.Id + '\r\n' + sqlError.message);
                         });

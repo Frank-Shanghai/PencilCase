@@ -102,15 +102,14 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                     var product = order.product();
                     var newRetailCost = ((product.RetailCost * product.Inventory) + (order.price() * order.quantity())) / (product.Inventory + order.quantity() * product.Times);
                     var newWholesaleCost = newRetailCost * product.Times;
-                    product.Inventory += (order.quantity() * product.Times);
-                    product.RetailCost = newRetailCost;
-                    product.WholesaleCost = newWholesaleCost;
-                    product.ImportWholesalePrice = order.price();
-                    product.ImportRetailPrice = product.ImportWholesalePrice / product.Times;
-                    product.CreatedDate = new Date(product.CreatedDate);
-                    product.ModifiedDate = new Date(Date.now());
                     _this.orderRepository.insert(order, function (transaction, resultSet) {
-                        _this.productRepository.update(product, function (transaction, resultSet) {
+                        _this.productRepository.updateWithFieldValues([
+                            { Field: "Inventory", Type: "number", Value: "Inventory + " + (order.quantity() * product.Times) },
+                            { Field: "RetailCost", Type: "number", Value: newRetailCost },
+                            { Field: "WholesaleCost", Type: "number", Value: newWholesaleCost },
+                            { Field: "ImportWholesalePrice", Type: "number", Value: order.price() },
+                            { Field: "ImportRetailPrice", Type: "number", Value: product.ImportWholesalePrice / product.Times },
+                        ], product.Id, function (transaction, resultSet) {
                         }, function (transaction, sqlError) {
                             alert("Faield to update Product: " + product.Id + '\r\n' + sqlError.message);
                         });
@@ -121,6 +120,9 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                 for (var i = 0; i < _this.importOrders().length; i++) {
                     _loop_1(i);
                 }
+                // 上面的数据库操作是异步处理，所以即使有插入错误，这里也会被调用。有后续PBI解决这个问题。
+                // 整个订单插入，库存修改应做成事务处理。
+                // 所以这里的批处理情况不适用于使用repository. 可以让repository 返回组合成的sql 语句，然后在这里用一个事务处理。
                 _this.cancelOrders();
                 _this.navigator.showConfirmDialog("进货", "已添加成功。", false, true, null, null, null, '好');
             };

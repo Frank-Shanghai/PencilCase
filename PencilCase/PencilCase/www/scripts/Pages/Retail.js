@@ -102,11 +102,8 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                     var product = order.product();
                     _this.orderRepository.insert(order, function (transaction, resultSet) {
                         _this.productRepository.updateWithFieldValues([
-                            { Field: "Inventory", Type: "number", Value: "Inventory - " + order.quantity() },
-                            { Field: "ModifiedDate", Type: "date", Value: new Date(Date.now()) }
+                            { Field: "Inventory", Type: "number", Value: "Inventory - " + order.quantity() }
                         ], product.Id, function (transaction, resultSet) {
-                            _this.cancelOrders();
-                            _this.navigator.showConfirmDialog("零售", "已成功生成订单。", false, true, null, null, null, '好');
                         }, function (transaction, sqlError) {
                             alert("Faield to update Product: " + product.Id + '\r\n' + sqlError.message);
                         });
@@ -117,6 +114,8 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                 for (var i = 0; i < _this.retailOrders().length; i++) {
                     _loop_1(i);
                 }
+                _this.cancelOrders();
+                _this.navigator.showConfirmDialog("零售", "已成功生成订单。", false, true, null, null, null, '好');
             };
             _this.onDBError = function (transaction, sqlError) {
                 alert("Retail Page: " + sqlError.message);

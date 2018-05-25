@@ -141,11 +141,8 @@ export class Retail extends PageBase {
 
             this.orderRepository.insert(order, (transaction: SqlTransaction, resultSet: SqlResultSet) => {
                 this.productRepository.updateWithFieldValues([
-                    { Field: "Inventory", Type: "number", Value: "Inventory - " + order.quantity() },
-                    { Field: "ModifiedDate", Type: "date", Value: new Date(Date.now())}
+                    { Field: "Inventory", Type: "number", Value: "Inventory - " + order.quantity() }
                 ], product.Id, (transaction: SqlTransaction, resultSet: SqlResultSet) => {
-                    this.cancelOrders();
-                    this.navigator.showConfirmDialog("零售", "已成功生成订单。", false, true, null, null, null, '好');
                 }, (transaction: SqlTransaction, sqlError: SqlError) => {
                     alert("Faield to update Product: " + product.Id + '\r\n' + sqlError.message);
                 });
@@ -153,6 +150,9 @@ export class Retail extends PageBase {
                 alert("Faield to inser new Order: " + order.id() + '\r\n' + sqlError.message);
             });
         }
+
+        this.cancelOrders();
+        this.navigator.showConfirmDialog("零售", "已成功生成订单。", false, true, null, null, null, '好');
     }
 
     private onDBError = (transaction: SqlTransaction, sqlError: SqlError) => {
