@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./DealPageBase", "./Consts"], function (require, exports, DealPageBase_1, Consts) {
+define(["require", "exports", "./DealPageBase", "./Consts", "../application"], function (require, exports, DealPageBase_1, Consts, application_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Wholesale = (function (_super) {
@@ -19,30 +19,36 @@ define(["require", "exports", "./DealPageBase", "./Consts"], function (require, 
                 _this.addOrderWithSpecifiedPrice(_this.selectedProduct().WholesalePrice);
             };
             _this.save = function () {
-                var _loop_1 = function (i) {
+                var sqlStatements = [];
+                for (var i = 0; i < _this.orders().length; i++) {
                     var order = _this.orders()[i];
                     order.createdDate = new Date(Date.now());
                     order.modifiedDate = order.createdDate;
                     var product = order.product();
-                    _this.orderRepository.insert(order, function (transaction, resultSet) {
-                        _this.productRepository.updateWithFieldValues([
-                            { Field: "Inventory", Type: "number", Value: "Inventory - " + (order.quantity() * product.Times) }
-                        ], product.Id, function (transaction, resultSet) {
-                        }, function (transaction, sqlError) {
-                            alert("Faield to update Product: " + product.Id + '\r\n' + sqlError.message);
-                        });
-                    }, function (transaction, sqlError) {
-                        alert("Faield to inser new Order: " + order.id() + '\r\n' + sqlError.message);
-                    });
-                };
-                for (var i = 0; i < _this.orders().length; i++) {
-                    _loop_1(i);
+                    sqlStatements.push(_this.orderRepository.insertSqlStatement(order));
+                    sqlStatements.push(_this.productRepository.updateWithFieldValuesSqlStatement([
+                        { Field: "Inventory", Type: "number", Value: "Inventory - " + (order.quantity() * product.Times) }
+                    ], product.Id));
                 }
-                _this.cancelOrders();
-                _this.navigator.showConfirmDialog("批发", "已成功生成订单。", false, true, null, null, null, '好');
+                var db = application_1.Application.instance.openDataBase();
+                db.transaction(function (transaction) {
+                    for (var i = 0; i < sqlStatements.length; i++) {
+                        transaction.executeSql(sqlStatements[i], [], null, _this.onDBError);
+                    }
+                }, function (error) {
+                    _this.onDBError(null, error);
+                }, function () {
+                    _this.cancelOrders();
+                    _this.navigator.showConfirmDialog("批发", "已成功生成订单。", false, true, null, null, null, '好');
+                });
             };
             _this.onDBError = function (transaction, sqlError) {
-                alert("Wholesale Page: " + sqlError.message);
+                if (transaction == null) {
+                    alert("Wholesale Page: Error happened, failed to complete the operation, all data is rolled back." + sqlError.message);
+                }
+                else {
+                    alert("Wholesale Page: " + sqlError.message);
+                }
             };
             _this.title = ko.observable("批发");
             _this.pageId = Consts.Pages.Whosale.Id;
