@@ -19,9 +19,9 @@ define(["require", "exports", "../application"], function (require, exports, app
                     transaction.executeSql(sqlString, [], successCallback, errorCallback);
                 });
             };
-            this.updateWithFieldValues = function (keyValuePairs, productId, successCallback, errorCallback) {
-                if (keyValuePairs.length == 0)
-                    return;
+            this.updateWithFieldValuesSqlStatement = function (keyValuePairs, productId) {
+                if (keyValuePairs.length === 0)
+                    return null;
                 var sqlString = "update Product set ";
                 var fieldValues = '';
                 for (var i = 0; i < keyValuePairs.length; i++) {
@@ -42,6 +42,12 @@ define(["require", "exports", "../application"], function (require, exports, app
                 //sqlString = sqlString.substring(0, sqlString.length - 2);
                 //sqlString = sqlString.substring(0, sqlString.length - 1);
                 sqlString += " where Id = '" + productId + "'";
+                return sqlString;
+            };
+            this.updateWithFieldValues = function (keyValuePairs, productId, successCallback, errorCallback) {
+                if (keyValuePairs.length == 0)
+                    return;
+                var sqlString = _this.updateWithFieldValuesSqlStatement(keyValuePairs, productId);
                 _this.db.transaction(function (transaction) {
                     transaction.executeSql(sqlString, [], successCallback, errorCallback);
                 });
