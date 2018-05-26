@@ -285,8 +285,8 @@
                 </div>
             </div>
             <hr style=" height:2px;border:none;border-top:2px dotted grey;" />
-            <div data-bind="visible: importOrders().length > 0" style="font-size: 0.8em">
-                <ul data-role="listview" data-inset="true" data-bind="foreach: importOrders, listview: importOrders">
+            <div data-bind="visible: orders().length > 0" style="font-size: 0.8em">
+                <ul data-role="listview" data-inset="true" data-bind="foreach: orders, listview: orders">
                     <li style="padding-right: 0">
                         <table style="width: 100%">
                             <tr>
@@ -333,7 +333,7 @@
                 </ul>
             </div>
         </div>
-        <footer data-role="footer" data-position="fixed" data-tap-toggle="false" data-bind="visible: importOrders().length > 0">
+        <footer data-role="footer" data-position="fixed" data-tap-toggle="false" data-bind="visible: orders().length > 0">
             <div style="padding: 5px; text-align: center; color: orangered">
                 <span>总量：</span><span data-bind="text: totalNumber"></span>
                 <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -342,10 +342,10 @@
             <div data-role="navbar" data-grid="a">
                 <ul>
                     <li>
-                        <a href="#" data-icon="check" data-bind="click: save, css: {'ui-btn-active': !(importOrders().length > 0)}">结算</a>
+                        <a href="#" data-icon="check" data-bind="click: save, css: {'ui-btn-active': !(orders().length > 0)}">结算</a>
                     </li>
                     <li>
-                        <a href="#" data-icon="delete" data-bind="click: cancelOrders, css: {'ui-btn-active': !(importOrders().length > 0)}">取消</a>
+                        <a href="#" data-icon="delete" data-bind="click: cancelOrders, css: {'ui-btn-active': !(orders().length > 0)}">取消</a>
                     </li>
                 </ul>
             </div>
@@ -393,8 +393,8 @@
                 </div>
             </div>
             <hr style=" height:2px;border:none;border-top:2px dotted grey;" />
-            <div data-bind="visible: wholesaleOrders().length > 0" style="font-size: 0.8em">
-                <ul data-role="listview" data-inset="true" data-bind="foreach: wholesaleOrders, listview: wholesaleOrders">
+            <div data-bind="visible: orders().length > 0" style="font-size: 0.8em">
+                <ul data-role="listview" data-inset="true" data-bind="foreach: orders, listview: orders">
                     <li style="padding-right: 0">
                         <table style="width: 100%">
                             <tr>
@@ -440,7 +440,7 @@
                 </ul>
             </div>
         </div>
-        <footer data-role="footer" data-position="fixed" data-tap-toggle="false" data-bind="visible: wholesaleOrders().length > 0">
+        <footer data-role="footer" data-position="fixed" data-tap-toggle="false" data-bind="visible: orders().length > 0">
             <div style="padding: 5px; text-align: center; color: orangered">
                 <span>总量：</span><span data-bind="text: totalNumber"></span>
                 <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -449,10 +449,10 @@
             <div data-role="navbar" data-grid="a">
                 <ul>
                     <li>
-                        <a href="#" data-icon="check" data-bind="click: save, css: {'ui-btn-active': !(wholesaleOrders().length > 0)}">结算</a>
+                        <a href="#" data-icon="check" data-bind="click: save, css: {'ui-btn-active': !(orders().length > 0)}">结算</a>
                     </li>
                     <li>
-                        <a href="#" data-icon="delete" data-bind="click: cancelOrders, css: {'ui-btn-active': !(wholesaleOrders().length > 0)}">取消</a>
+                        <a href="#" data-icon="delete" data-bind="click: cancelOrders, css: {'ui-btn-active': !(orders().length > 0)}">取消</a>
                     </li>
                 </ul>
             </div>
@@ -500,8 +500,8 @@
                 </div>
             </div>
             <hr style=" height:2px;border:none;border-top:2px dotted grey;" />
-            <div data-bind="visible: retailOrders().length > 0" style="font-size: 0.8em">
-                <ul data-role="listview" data-inset="true" data-bind="foreach: retailOrders, listview: retailOrders">
+            <div data-bind="visible: orders().length > 0" style="font-size: 0.8em">
+                <ul data-role="listview" data-inset="true" data-bind="foreach: orders, listview: orders">
                     <li style="padding-right: 0">
                         <table style="width: 100%">
                             <tr>
@@ -545,7 +545,7 @@
                 </ul>
             </div>
         </div>
-        <footer data-role="footer" data-position="fixed" data-tap-toggle="false" data-bind="visible: retailOrders().length > 0">
+        <footer data-role="footer" data-position="fixed" data-tap-toggle="false" data-bind="visible: orders().length > 0">
             <div style="padding: 5px; text-align: center; color: orangered">
                 <span>总量：</span><span data-bind="text: totalNumber"></span>
                 <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -554,10 +554,10 @@
             <div data-role="navbar" data-grid="a">
                 <ul>
                     <li>
-                        <a href="#" data-icon="check" data-bind="click: save, css: {'ui-btn-active': !(retailOrders().length > 0)}">结算</a>
+                        <a href="#" data-icon="check" data-bind="click: save, css: {'ui-btn-active': !(orders().length > 0)}">结算</a>
                     </li>
                     <li>
-                        <a href="#" data-icon="delete" data-bind="click: cancelOrders, css: {'ui-btn-active': !(retailOrders().length > 0)}">取消</a>
+                        <a href="#" data-icon="delete" data-bind="click: cancelOrders, css: {'ui-btn-active': !(orders().length > 0)}">取消</a>
                     </li>
                 </ul>
             </div>
