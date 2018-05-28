@@ -21,4 +21,14 @@ export class OrderRepository {
             transaction.executeSql(sqlString, [], successCallback, errorCallback);
         });
     }
+
+    public getBatchOrders = (successCallback?: (transaction: SqlTransaction, resultSet: SqlResultSet) => void, errorCallback?: (transaction: SqlTransaction, sqlError: SqlError) => void) => {
+        //let sqlString = "insert into Orders values ('" + ko.unwrap(order.id) + "','" + ko.unwrap(order.batchId) + "','" + ko.unwrap(order.productId) + "'," + ko.unwrap(order.type) + ",'" + ko.unwrap(order.unitId) + "'," +
+        //    ko.unwrap(order.price) + "," + ko.unwrap(order.quantity) + "," + ko.unwrap(order.total) + ",'" +
+        //    moment(order.createdDate.toISOString()).format("YYYY-MM-DD") + "','" + moment(order.modifiedDate.toISOString()).format("YYYY-MM-DD") + "')";
+
+        //this.db.transaction((transaction) => {
+        //    transaction.executeSql(sqlString, [], successCallback, errorCallback);
+        //});
+    }
 }
