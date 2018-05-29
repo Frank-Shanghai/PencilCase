@@ -36,7 +36,7 @@ define(["require", "exports", "./DealPageBase", "./Consts", "../Models/Order", "
                         { Field: "RetailCost", Type: "number", Value: newRetailCost },
                         { Field: "WholesaleCost", Type: "number", Value: newWholesaleCost },
                         { Field: "ImportWholesalePrice", Type: "number", Value: order.price() },
-                        { Field: "ImportRetailPrice", Type: "number", Value: product.ImportWholesalePrice / product.Times },
+                        { Field: "ImportRetailPrice", Type: "number", Value: order.price() / product.Times },
                     ], product.Id));
                 }
                 var db = application_1.Application.instance.openDataBase();

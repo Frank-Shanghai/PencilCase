@@ -73,7 +73,7 @@ export class DealPageBase extends PageBase {
         }
 
         if (isNew) {
-            let order = new Order(Utils.guid(), this.batchId, this.selectedProduct(), orderTypes, this.selectedProductQuantity(), price);
+            let order = new Order(Utils.guid(), this.batchId, this.selectedProduct(), type, this.selectedProductQuantity(), price);
             this.orders.push(order);
             this.totalPrice(this.totalPrice() + order.total());
         }

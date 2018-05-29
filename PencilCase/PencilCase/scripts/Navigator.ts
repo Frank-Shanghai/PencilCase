@@ -6,6 +6,8 @@ import { PageBase } from './Pages/PageBase';
 import { HomePage } from './Pages/HomePage';
 import { Retail } from './Pages/Retail';
 import { ImportProduct } from './Pages/ImportProduct';
+import { Orders } from './Pages/Orders';
+import { BatchOrderDetails } from './Pages/BatchOrderDetails';
 import { Wholesale } from './Pages/Wholesale';
 
 export class Navigator {
@@ -140,6 +142,18 @@ export class Navigator {
             pageExisted = !(page == null);
             if (pageExisted == false)
                 page = new Wholesale();
+            break;
+        case Consts.Pages.OrderManagement:
+            page = this.getExistedInstance(pageInfo);
+            pageExisted = !(page == null);
+            if (pageExisted == false)
+                page = new Orders();
+            break;
+        case Consts.Pages.BathOrderDetails:
+            page = this.getExistedInstance(pageInfo);
+            pageExisted = !(page == null);
+            if (pageExisted == false)
+                page = new BatchOrderDetails(data.parameters);
             break;
     }
 

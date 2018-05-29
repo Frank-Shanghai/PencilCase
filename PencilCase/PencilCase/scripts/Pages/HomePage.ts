@@ -41,4 +41,10 @@ export class HomePage extends PageBase {
             changeHash: true
         })
     }
+
+    private openOrderManagementPage = () => {
+        this.navigator.navigateTo(Consts.Pages.OrderManagement, {
+            changeHash: true
+        })
+    }
 }

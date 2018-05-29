@@ -3,56 +3,61 @@ import { Navigator } from '../Navigator';
 import * as Consts from './Consts';
 import { Order } from '../Models/Order';
 import { OrderTypes } from '../Models/Order';
+import { OrderRepository } from '../Repositories/OrderRepository';
 
 export class Orders extends PageBase {
-    //private navigator: Navigator = Navigator.instance;
-    //private batchOrders: KnockoutObservableArray<Product> = ko.observableArray([]);
-    //private productRepository: ProductRepository = new ProductRepository();
+    private navigator: Navigator = Navigator.instance;
+    private batchOrders: KnockoutObservableArray<IBatchOrder> = ko.observableArray([]);
 
-    //constructor() {
-    //    super();
-    //    this.title = ko.observable("Product Management");
-    //    this.pageId = Consts.Pages.ProductManagement.Id;
-    //    this.back = Navigator.instance.goHome;
-    //}
+    constructor() {
+        super();
+        this.title = ko.observable("Orders Management");
+        this.pageId = Consts.Pages.OrderManagement.Id;
+        this.back = Navigator.instance.goHome;
+    }
 
-    //public initialize() {
-    //    let productRepository: ProductRepository = new ProductRepository();
-    //    productRepository.getAll((transaction: SqlTransaction, resultSet: SqlResultSet) => {
-    //        this.products([]); // First, clear products collection
-    //        let rows = resultSet.rows;
-    //        for (let i = 0; i < rows.length; i++) {
-    //            this.products.push(new Product(rows.item(i)));
-    //        }
-    //    }, this.onDBError);
-    //}
+    public initialize() {
+        let orderRepository: OrderRepository = new OrderRepository();
+        orderRepository.getBatchOrders((transaction: SqlTransaction, resultSet: SqlResultSet) => {
+            this.batchOrders([]); // First, clear products collection
+            let rows = resultSet.rows;
+            for (let i = 0; i < rows.length; i++) {
+                this.batchOrders.push({
+                    BatchId: rows[i].BatchId,
+                    Type: rows[i].Type,
+                    Quantity: rows[i].Quantity,
+                    Total: rows[i].Total,
+                    CreatedDate: rows[i].CreatedDate
+                });
+            }
+        }, this.onDBError);
+    }
 
-    //private addNewProduct = () => {
-    //    this.navigator.navigateTo(Consts.Pages.ProductEditor, {
-    //        data: {
-    //            parameters: {
-    //                product: null
-    //            }
-    //        },
-    //        changeHash: true
-    //    });
-    //}
+    private getTypeName(type: OrderTypes) {
+        switch (type) {
+            case OrderTypes.Import:
+                return "进货";
+            case OrderTypes.Retail:
+                return "零售";
+            case OrderTypes.Wholesale:
+                return "批发";
+        }
+    }
 
-    //private showDetails = (product: Product) => {
-    //    this.navigator.navigateTo(Consts.Pages.ProductEditor, {
-    //        data: {
-    //            parameters: {
-    //                product: product
-    //            }
-    //        },
-    //        changeHash: true
-    //    });
-    //}
+    private showDetails = (batchOrder: IBatchOrder) => {
+        this.navigator.navigateTo(Consts.Pages.BathOrderDetails, {
+            data: {
+                parameters: {
+                    batchOrder: batchOrder
+                }
+            },
+            changeHash: true
+        });
+    }
 
-    //private onDBError = (transaction: SqlTransaction, sqlError: SqlError) => {
-    //    alert("Product Management Page: " + sqlError.message);
-    //}
-
+    private onDBError = (transaction: SqlTransaction, sqlError: SqlError) => {
+        alert("Order Management Page: " + sqlError.message);
+    }
 }
 
 interface IBatchOrder {

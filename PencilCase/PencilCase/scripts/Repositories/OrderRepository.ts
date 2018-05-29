@@ -29,4 +29,13 @@ export class OrderRepository {
             transaction.executeSql(sqlString, [], successCallback, errorCallback);
         });
     }
+
+    public getOrdersByBatchId = (batchId: string, successCallback?: (transaction: SqlTransaction, resultSet: SqlResultSet) => void, errorCallback?: (transaction: SqlTransaction, sqlError: SqlError) => void) => {
+        let sqlString = "select * from Orders where BatchId = '" + batchId + "'";
+
+        this.db.transaction((transaction) => {
+            transaction.executeSql(sqlString, [], successCallback, errorCallback);
+        });
+    }
+
 }

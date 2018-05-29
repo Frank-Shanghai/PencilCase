@@ -22,6 +22,12 @@ define(["require", "exports", "../application"], function (require, exports, app
                     transaction.executeSql(sqlString, [], successCallback, errorCallback);
                 });
             };
+            this.getOrdersByBatchId = function (batchId, successCallback, errorCallback) {
+                var sqlString = "select * from Orders where BatchId = '" + batchId + "'";
+                _this.db.transaction(function (transaction) {
+                    transaction.executeSql(sqlString, [], successCallback, errorCallback);
+                });
+            };
             this.db = application_1.Application.instance.openDataBase();
         }
         return OrderRepository;
