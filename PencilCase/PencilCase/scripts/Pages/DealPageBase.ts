@@ -59,7 +59,7 @@ export class DealPageBase extends PageBase {
         }, this.onDBError);
     }
 
-    protected addOrderWithSpecifiedPrice = (price: number) => {
+    protected addOrderWithSpecifiedPrice = (price: number, type: OrderTypes) => {
         if (this.batchId == null) this.batchId = Utils.guid();
         let isNew = true;
         for (let i = 0; i < this.orders().length; i++) {
@@ -73,7 +73,7 @@ export class DealPageBase extends PageBase {
         }
 
         if (isNew) {
-            let order = new Order(Utils.guid(), this.batchId, this.selectedProduct(), OrderTypes.Import, this.selectedProductQuantity(), price);
+            let order = new Order(Utils.guid(), this.batchId, this.selectedProduct(), orderTypes, this.selectedProductQuantity(), price);
             this.orders.push(order);
             this.totalPrice(this.totalPrice() + order.total());
         }

@@ -2,6 +2,7 @@
 import { Navigator } from '../Navigator';
 import * as Consts from './Consts';
 import { Order } from '../Models/Order';
+import { OrderTypes } from '../Models/Order';
 
 export class Orders extends PageBase {
     //private navigator: Navigator = Navigator.instance;
@@ -52,4 +53,13 @@ export class Orders extends PageBase {
     //    alert("Product Management Page: " + sqlError.message);
     //}
 
+}
+
+interface IBatchOrder {
+    //select BatchId, Type, Sum(Quantity) as Quantity, Sum(Total) as Total, CreatedDate from Orders group by BatchId, Type, CreatedDate
+    BatchId: string;
+    Type: OrderTypes;
+    Quantity: number;
+    Total: number;
+    CreatedDate: string;
 }

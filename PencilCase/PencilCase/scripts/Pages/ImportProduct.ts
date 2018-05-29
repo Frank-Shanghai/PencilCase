@@ -22,15 +22,17 @@ export class ImportProduct extends DealPageBase {
     }
 
     protected addOrder = () => {
-        this.addOrderWithSpecifiedPrice(this.selectedProductImportPrice());
+        this.addOrderWithSpecifiedPrice(this.selectedProductImportPrice(), OrderTypes.Import);
     }
 
     protected save = () => {
         let sqlStatements: Array<string> = [];
+        // Make sure the orders in this batch have the same created date, it's necessary for grouping purpose
+        let createdDate = new Date(Date.now());
 
         for (let i = 0; i < this.orders().length; i++) {
             let order = this.orders()[i];
-            order.createdDate = new Date(Date.now());
+            order.createdDate = createdDate;
             order.modifiedDate = order.createdDate;
             let product = order.product();
             let newRetailCost = ((product.RetailCost * product.Inventory) + (order.price() * order.quantity())) / (product.Inventory + order.quantity() * product.Times);
