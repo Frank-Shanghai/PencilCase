@@ -241,6 +241,7 @@ define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], fun
             this.homePage = ko.observable(homePage);
         };
         Application.prototype.initialize = function () {
+            FastClick.attach(document.body);
             document.addEventListener('deviceready', this.onDeviceReady, false);
         };
         return Application;
