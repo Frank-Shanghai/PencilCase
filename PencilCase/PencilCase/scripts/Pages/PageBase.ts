@@ -11,7 +11,7 @@
     public isPermanent: boolean;
     public back: () => void = null;
 
-    constructor() {
+    constructor(public parameters?: any) {
         this.initialize();
     }
 

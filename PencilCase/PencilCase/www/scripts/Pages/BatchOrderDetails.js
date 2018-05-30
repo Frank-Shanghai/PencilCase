@@ -8,14 +8,13 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Models/Order", "../Repositories/OrderRepository"], function (require, exports, PageBase_1, Navigator_1, Consts, Order_1, OrderRepository_1) {
+define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Models/Order", "../Repositories/OrderRepository", "../Repositories/ProductRepository"], function (require, exports, PageBase_1, Navigator_1, Consts, Order_1, OrderRepository_1, ProductRepository_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var BatchOrderDetails = (function (_super) {
         __extends(BatchOrderDetails, _super);
         function BatchOrderDetails(parameters) {
-            var _this = _super.call(this) || this;
-            _this.parameters = parameters;
+            var _this = _super.call(this, parameters) || this;
             _this.navigator = Navigator_1.Navigator.instance;
             _this.orders = ko.observableArray([]);
             _this.onDBError = function (transaction, sqlError) {
@@ -33,11 +32,19 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
         BatchOrderDetails.prototype.initialize = function () {
             var _this = this;
             var orderRepository = new OrderRepository_1.OrderRepository();
-            orderRepository.getOrdersByBatchId(this.parameters.batchOrder.Id, function (transaction, resultSet) {
+            var productRepository = new ProductRepository_1.ProductRepository();
+            orderRepository.getOrdersByBatchId(this.parameters.batchOrder.BatchId, function (transaction, resultSet) {
                 _this.orders([]); // First, clear products collection
                 var rows = resultSet.rows;
+                var _loop_1 = function (i) {
+                    var order = rows[i];
+                    productRepository.getProductById(order.ProductId, function (transaction, resultSet) {
+                        $.extend(order, { Product: resultSet.rows[0] });
+                        _this.orders.push(order);
+                    }, _this.onDBError);
+                };
                 for (var i = 0; i < rows.length; i++) {
-                    _this.orders.push(rows[i]);
+                    _loop_1(i);
                 }
             }, this.onDBError);
         };

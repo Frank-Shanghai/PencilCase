@@ -621,39 +621,34 @@
             <h1><span data-bind="text: title"></span></h1>
         </div>
         <div data-role="main" class="ui-content">
-            <div data-bind="visible: orders().length > 0" style="font-size: 0.8em">
+            <h4 class="ui-bar ui-bar-a ui-corner-all" style="margin-top: 0.1em; margin-bottom: -0.7em;">
+                <span data-bind="text: getTypeName(parameters.batchOrder.Type)"></span>
+                <span>&nbsp;&nbsp;</span>
+                <span style="font-style: italic; font-size:0.8em" data-bind="text: parameters.batchOrder.CreatedDate"></span>
+            </h4>
+            <div data-bind="visible: orders().length > 0" style="font-size: 0.9em">
                 <ul data-role="listview" data-inset="true" data-bind="foreach: orders, listview: orders">
                     <li style="padding-right: 0">
                         <table style="width: 100%">
                             <tr>
                                 <td>
                                     <div>
-                                        <span style="font-weight: bold" data-bind="text: product().Name"></span>
+                                        <span style="font-weight: bold" data-bind="text: Product.Name"></span>
                                         <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span data-bind="text: product().RetailPrice + '元'"></span>
-                                        <span data-bind="text: '/' + product().RetailUnitName"></span>
                                     </div>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
                                     <div style="display:inline">
-                                        <table style="vertical-align: -webkit-baseline-middle; margin-left: -10px; display: inline;">
-                                            <tr>
-                                                <td>
-                                                    <a href="#" style="margin: 0" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-minus ui-btn-icon-notext ui-btn-inline" data-bind="click: $parent.decreaseOrderProductQuantity">Minus</a>
-                                                </td>
-                                                <td>
-                                                    <input type="number" style="width: 30px; text-align: center" data-bind="value: quantity" />
-                                                </td>
-                                                <td>
-                                                    <a href="#" style="margin: 0" class="ui-btn ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-notext ui-btn-inline" data-bind="click: $parent.increaseOrderProductQuantity">Plus</a>
-                                                </td>
-                                            </tr>
-                                        </table>
+                                        <span data-bind="text: Price + '元'"></span>
+                                        <span data-bind="text: '/' + ((Type == 1) ? Product.RetailUnitName : Product.WholesaleUnitName)"></span>
+                                        <span>&nbsp;&nbsp;</span>
+                                        <span data-bind="text: '数量：'"></span>
+                                        <span data-bind="text: Quantity"></span>
                                         <span>&nbsp;&nbsp;</span>
                                         <span data-bind="text: '小计'"></span>
-                                        <span data-bind="text: total() + '元'"></span>
+                                        <span data-bind="text: Total + '元'"></span>
                                     </div>
                                 </td>
                             </tr>
@@ -663,11 +658,11 @@
             </div>
         </div>
         <footer data-role="footer" data-position="fixed" data-tap-toggle="false" data-bind="visible: orders().length > 0">
-            <!--<div style="padding: 5px; text-align: center; color: orangered">
-                <span>总量：</span><span data-bind="text: totalNumber"></span>
+            <div style="padding: 5px; text-align: center; color: orangered">
+                <span>总量：</span><span data-bind="text: parameters.batchOrder.Quantity"></span>
                 <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                <span>总价：</span><span data-bind="text: totalPrice"></span>
-            </div>-->
+                <span>总价：</span><span data-bind="text: parameters.batchOrder.Total"></span>
+            </div>
         </footer>
         <!-- /ko -->
         <!-- /ko -->

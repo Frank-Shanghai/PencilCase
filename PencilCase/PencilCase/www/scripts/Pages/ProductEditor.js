@@ -14,8 +14,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
     var ProductEditor = (function (_super) {
         __extends(ProductEditor, _super);
         function ProductEditor(parameters) {
-            var _this = _super.call(this) || this;
-            _this.parameters = parameters;
+            var _this = _super.call(this, parameters) || this;
             _this.navigator = Navigator_1.Navigator.instance;
             _this.repository = new ProductRepository_1.ProductRepository();
             _this.isInEditingMode = ko.observable(false);
