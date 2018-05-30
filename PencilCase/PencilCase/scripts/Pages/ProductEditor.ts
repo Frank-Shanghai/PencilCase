@@ -25,8 +25,8 @@ export class ProductEditor extends PageBase {
 
     private isNewProduct = false;
 
-    constructor(private parameters?: any) {
-        super();
+    constructor(parameters?: any) {
+        super(parameters);
         this.title = ko.observable("Product Editor");
         this.pageId = Consts.Pages.ProductEditor.Id;
         this.back = () => {

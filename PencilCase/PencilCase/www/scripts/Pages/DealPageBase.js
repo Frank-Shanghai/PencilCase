@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./PageBase", "../Navigator", "../Models/Product", "../Repositories/ProductRepository", "../Repositories/OrderRepository", "../Models/Order", "../Utils", "../Models/Order"], function (require, exports, PageBase_1, Navigator_1, Product_1, ProductRepository_1, OrderRepository_1, Order_1, Utils, Order_2) {
+define(["require", "exports", "./PageBase", "../Navigator", "../Models/Product", "../Repositories/ProductRepository", "../Repositories/OrderRepository", "../Models/Order", "../Utils"], function (require, exports, PageBase_1, Navigator_1, Product_1, ProductRepository_1, OrderRepository_1, Order_1, Utils) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var DealPageBase = (function (_super) {
@@ -34,7 +34,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Models/Product",
             _this.totalPrice = ko.observable(0);
             _this.productRepository = new ProductRepository_1.ProductRepository();
             _this.orderRepository = new OrderRepository_1.OrderRepository();
-            _this.addOrderWithSpecifiedPrice = function (price) {
+            _this.addOrderWithSpecifiedPrice = function (price, type) {
                 if (_this.batchId == null)
                     _this.batchId = Utils.guid();
                 var isNew = true;
@@ -48,7 +48,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Models/Product",
                     }
                 }
                 if (isNew) {
-                    var order = new Order_1.Order(Utils.guid(), _this.batchId, _this.selectedProduct(), Order_2.OrderTypes.Import, _this.selectedProductQuantity(), price);
+                    var order = new Order_1.Order(Utils.guid(), _this.batchId, _this.selectedProduct(), type, _this.selectedProductQuantity(), price);
                     _this.orders.push(order);
                     _this.totalPrice(_this.totalPrice() + order.total());
                 }

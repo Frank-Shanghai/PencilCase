@@ -17,14 +17,17 @@ export class Retail extends DealPageBase {
     }
 
     protected addOrder = () => {
-        this.addOrderWithSpecifiedPrice(this.selectedProduct().RetailPrice);
+        this.addOrderWithSpecifiedPrice(this.selectedProduct().RetailPrice, OrderTypes.Retail);
     }
 
     protected save = () => {
         let sqlStatements: Array<string> = [];
+        // Make sure the orders in this batch have the same created date, it's necessary for grouping purpose
+        let createdDate = new Date(Date.now());
+
         for (let i = 0; i < this.orders().length; i++) {
             let order = this.orders()[i];
-            order.createdDate = new Date(Date.now());
+            order.createdDate = createdDate;
             order.modifiedDate = order.createdDate;
             let product = order.product();
 

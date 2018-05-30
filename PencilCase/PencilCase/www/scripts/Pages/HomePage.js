@@ -36,6 +36,11 @@ define(["require", "exports", "./PageBase", "./Consts", "../Navigator"], functio
                     changeHash: true
                 });
             };
+            _this.openOrderManagementPage = function () {
+                _this.navigator.navigateTo(Consts.Pages.OrderManagement, {
+                    changeHash: true
+                });
+            };
             _this.pageId = Consts.Pages.HomePage.Id;
             _this.isPermanent = Consts.Pages.HomePage.IsPermanent;
             _this.navigator = Navigator_1.Navigator.instance;

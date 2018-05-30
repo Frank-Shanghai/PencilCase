@@ -2,7 +2,8 @@ define(["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var PageBase = (function () {
-        function PageBase() {
+        function PageBase(parameters) {
+            this.parameters = parameters;
             this.back = null;
             this.initialize();
         }

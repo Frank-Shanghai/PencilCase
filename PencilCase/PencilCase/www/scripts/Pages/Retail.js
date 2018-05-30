@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./DealPageBase", "./Consts", "../application"], function (require, exports, DealPageBase_1, Consts, application_1) {
+define(["require", "exports", "./DealPageBase", "./Consts", "../Models/Order", "../application"], function (require, exports, DealPageBase_1, Consts, Order_1, application_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Retail = (function (_super) {
@@ -16,13 +16,15 @@ define(["require", "exports", "./DealPageBase", "./Consts", "../application"], f
         function Retail() {
             var _this = _super.call(this) || this;
             _this.addOrder = function () {
-                _this.addOrderWithSpecifiedPrice(_this.selectedProduct().RetailPrice);
+                _this.addOrderWithSpecifiedPrice(_this.selectedProduct().RetailPrice, Order_1.OrderTypes.Retail);
             };
             _this.save = function () {
                 var sqlStatements = [];
+                // Make sure the orders in this batch have the same created date, it's necessary for grouping purpose
+                var createdDate = new Date(Date.now());
                 for (var i = 0; i < _this.orders().length; i++) {
                     var order = _this.orders()[i];
-                    order.createdDate = new Date(Date.now());
+                    order.createdDate = createdDate;
                     order.modifiedDate = order.createdDate;
                     var product = order.product();
                     sqlStatements.push(_this.orderRepository.insertSqlStatement(order));

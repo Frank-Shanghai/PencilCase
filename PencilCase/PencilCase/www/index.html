@@ -44,6 +44,7 @@
                 <a href="#ProductManagement" class="ui-btn ui-corner-all" data-bind="click: openProductManagementPage">Product Management</a>
                 <a href="#ImportProduct" class="ui-btn ui-corner-all" data-bind="click: openImportProductPage">进货</a>
                 <a href="#DataAnalyse" class="ui-btn ui-corner-all">Data Analyse</a>
+                <a href="#OrderManagement" class="ui-btn ui-corner-all" data-bind="click: openOrderManagementPage">Order Management</a>
             </div>
             <div data-bind="visible: !$parent.isDataLoaded()">
                 <h1>正在加载数据……</h1>
@@ -245,7 +246,7 @@
         <!-- /ko -->
         <!-- /ko -->
     </div>
-    
+
     <!-- ==============Import Product Page================= -->
     <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
     <div data-role="page" id="ImportProduct">
@@ -409,7 +410,7 @@
                                     </div>
                                 </td>
                                 <th rowspan="2" style="width: 1em">
-                                    <a href="#" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline" data-bind="click: $parent.deleteOrder"></a>
+                                    <a href="#" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline" data-bind="click: $parent.showDetails"></a>
                                 </th>
                             </tr>
                             <tr>
@@ -565,6 +566,108 @@
         <!-- /ko -->
         <!-- /ko -->
     </div>
+
+
+    <!-- ==============Order Management Page================= -->
+    <!-- Try not bind UI stuff on Home Page like header and footer, because such UI binding will be applied until device ready,
+        and at that time, static UI already loaded for a while, it is confusing for users becasue they can note that UI loaded at 2 different time point. -->
+    <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
+    <div data-role="page" id="OrderManagement">
+        <!-- ko if: activePage().pageId === 'OrderManagement' -->
+        <!-- ko with: activePage() -->
+        <div data-role="header" data-position="fixed" data-tap-toggle="false">
+            <a href="#HomePage" data-icon="home" data-bind="click: navigator.goHome">Home</a>
+            <h1><span data-bind="text: title"></span></h1>
+        </div>
+        <div data-role="main" class="ui-content">
+            <ul data-role="listview" data-inset="true" data-bind="foreach: batchOrders, listview: batchOrders">
+                <li style="padding-right: 0">
+                    <a style="font-weight: normal" href="#" data-bind="click: $parent.showDetails">
+                        <table style="width: 100%">
+                            <tr>
+                                <td>
+                                    <div>
+                                        <span style="font-weight: bold" data-bind="text: $parent.getTypeName(Type)"></span>
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span style="font-style: italic; font-size:0.8em" data-bind="text: CreatedDate"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="display:inline; font-size: 0.8em">
+                                        <span data-bind="text: '总量：' + Quantity"></span>
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span data-bind="text: '总价：￥' + Total"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->
+    </div>
+
+    <!-- ==============Batch Order Detail Page================= -->
+    <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
+    <div data-role="page" id="BatchOrderDetails">
+        <!-- ko if: activePage().pageId === 'BatchOrderDetails' -->
+        <!-- ko with: activePage() -->
+        <div data-role="header" data-position="fixed" data-tap-toggle="false">
+            <a href="#OrderManagement" data-icon="back" data-bind="click: back">Back</a>
+            <h1><span data-bind="text: title"></span></h1>
+        </div>
+        <div data-role="main" class="ui-content">
+            <h4 class="ui-bar ui-bar-a ui-corner-all" style="margin-top: 0.1em; margin-bottom: -0.7em;">
+                <span data-bind="text: getTypeName(parameters.batchOrder.Type)"></span>
+                <span>&nbsp;&nbsp;</span>
+                <span style="font-style: italic; font-size:0.8em" data-bind="text: parameters.batchOrder.CreatedDate"></span>
+            </h4>
+            <div data-bind="visible: orders().length > 0" style="font-size: 0.9em">
+                <ul data-role="listview" data-inset="true" data-bind="foreach: orders, listview: orders">
+                    <li style="padding-right: 0">
+                        <table style="width: 100%">
+                            <tr>
+                                <td>
+                                    <div>
+                                        <span style="font-weight: bold" data-bind="text: Product.Name"></span>
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="display:inline">
+                                        <span data-bind="text: Price + '元'"></span>
+                                        <span data-bind="text: '/' + ((Type == 1) ? Product.RetailUnitName : Product.WholesaleUnitName)"></span>
+                                        <span>&nbsp;&nbsp;</span>
+                                        <span data-bind="text: '数量：'"></span>
+                                        <span data-bind="text: Quantity"></span>
+                                        <span>&nbsp;&nbsp;</span>
+                                        <span data-bind="text: '小计'"></span>
+                                        <span data-bind="text: Total + '元'"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <footer data-role="footer" data-position="fixed" data-tap-toggle="false" data-bind="visible: orders().length > 0">
+            <div style="padding: 5px; text-align: center; color: orangered">
+                <span>总量：</span><span data-bind="text: parameters.batchOrder.Quantity"></span>
+                <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <span>总价：</span><span data-bind="text: parameters.batchOrder.Total"></span>
+            </div>
+        </footer>
+        <!-- /ko -->
+        <!-- /ko -->
+    </div>
+
 
 </body>
 </html>

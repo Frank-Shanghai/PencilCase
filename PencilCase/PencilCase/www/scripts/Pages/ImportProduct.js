@@ -8,7 +8,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./DealPageBase", "./Consts", "../application"], function (require, exports, DealPageBase_1, Consts, application_1) {
+define(["require", "exports", "./DealPageBase", "./Consts", "../Models/Order", "../application"], function (require, exports, DealPageBase_1, Consts, Order_1, application_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ImportProduct = (function (_super) {
@@ -17,13 +17,15 @@ define(["require", "exports", "./DealPageBase", "./Consts", "../application"], f
             var _this = _super.call(this) || this;
             _this.selectedProductImportPrice = ko.observable(0);
             _this.addOrder = function () {
-                _this.addOrderWithSpecifiedPrice(_this.selectedProductImportPrice());
+                _this.addOrderWithSpecifiedPrice(_this.selectedProductImportPrice(), Order_1.OrderTypes.Import);
             };
             _this.save = function () {
                 var sqlStatements = [];
+                // Make sure the orders in this batch have the same created date, it's necessary for grouping purpose
+                var createdDate = new Date(Date.now());
                 for (var i = 0; i < _this.orders().length; i++) {
                     var order = _this.orders()[i];
-                    order.createdDate = new Date(Date.now());
+                    order.createdDate = createdDate;
                     order.modifiedDate = order.createdDate;
                     var product = order.product();
                     var newRetailCost = ((product.RetailCost * product.Inventory) + (order.price() * order.quantity())) / (product.Inventory + order.quantity() * product.Times);
@@ -34,7 +36,7 @@ define(["require", "exports", "./DealPageBase", "./Consts", "../application"], f
                         { Field: "RetailCost", Type: "number", Value: newRetailCost },
                         { Field: "WholesaleCost", Type: "number", Value: newWholesaleCost },
                         { Field: "ImportWholesalePrice", Type: "number", Value: order.price() },
-                        { Field: "ImportRetailPrice", Type: "number", Value: product.ImportWholesalePrice / product.Times },
+                        { Field: "ImportRetailPrice", Type: "number", Value: order.price() / product.Times },
                     ], product.Id));
                 }
                 var db = application_1.Application.instance.openDataBase();
