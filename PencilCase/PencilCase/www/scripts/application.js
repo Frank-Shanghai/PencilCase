@@ -24,7 +24,6 @@ define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], fun
                 }
             };
             this.onDeviceReady = function () {
-                FastClick.attach(document.body);
                 document.addEventListener('pause', _this.onPause, false);
                 document.addEventListener('resume', _this.onResume, false);
                 document.addEventListener('backbutton', function (evt) {
