@@ -54,7 +54,6 @@ export class Application {
     }
 
     private onDeviceReady = (): void => {
-        let firstPageUrl = window.location.href;
         document.addEventListener('pause', this.onPause, false);
         document.addEventListener('resume', this.onResume, false);
         document.addEventListener('backbutton', function (evt) {
