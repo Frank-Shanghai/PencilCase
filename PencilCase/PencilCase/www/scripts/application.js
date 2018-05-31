@@ -24,7 +24,7 @@ define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], fun
                 }
             };
             this.onDeviceReady = function () {
-                var firstPageUrl = window.location.href;
+                FastClick.attach(document.body);
                 document.addEventListener('pause', _this.onPause, false);
                 document.addEventListener('resume', _this.onResume, false);
                 document.addEventListener('backbutton', function (evt) {
@@ -241,7 +241,6 @@ define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], fun
             this.homePage = ko.observable(homePage);
         };
         Application.prototype.initialize = function () {
-            FastClick.attach(document.body);
             document.addEventListener('deviceready', this.onDeviceReady, false);
         };
         return Application;

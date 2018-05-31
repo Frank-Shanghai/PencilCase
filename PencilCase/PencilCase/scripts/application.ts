@@ -50,13 +50,11 @@ export class Application {
     }
 
     public initialize(): void {
-        FastClick.attach(document.body);
         document.addEventListener('deviceready', this.onDeviceReady, false);
     }
 
     private onDeviceReady = (): void => {
-        let firstPageUrl = window.location.href;
-
+        FastClick.attach(document.body);
         document.addEventListener('pause', this.onPause, false);
         document.addEventListener('resume', this.onResume, false);
         document.addEventListener('backbutton', function (evt) {
