@@ -15,6 +15,7 @@ define(["require", "exports"], function (require, exports) {
         DataAnalysis: { Id: "DataAnalysis", IsPermanent: false },
         OrderManagement: { Id: "OrderManagement", IsPermanent: false },
         BathOrderDetails: { Id: "BatchOrderDetails", IsPermanent: false },
+        DataAnalyse: { Id: "DataAnalyse", IsPermanent: false },
         ConfirmDialog: { Id: "ConfirmDialog", IsPermanent: false }
     };
 });

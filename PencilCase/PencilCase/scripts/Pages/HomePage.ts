@@ -47,4 +47,11 @@ export class HomePage extends PageBase {
             changeHash: true
         })
     }
+
+    private openDataAnalysePage = () => {
+        this.navigator.navigateTo(Consts.Pages.DataAnalyse, {
+            changeHash: true
+        })
+    }
+
 }
