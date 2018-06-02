@@ -1,4 +1,4 @@
-define(["require", "exports", "./application", "./Pages/Consts", "./Pages/ProductManagement", "./Pages/ProductEditor", "./Pages/HomePage", "./Pages/Retail", "./Pages/ImportProduct", "./Pages/Orders", "./Pages/BatchOrderDetails", "./Pages/Wholesale"], function (require, exports, application_1, Consts, ProductManagement_1, ProductEditor_1, HomePage_1, Retail_1, ImportProduct_1, Orders_1, BatchOrderDetails_1, Wholesale_1) {
+define(["require", "exports", "./application", "./Pages/Consts", "./Pages/ProductManagement", "./Pages/ProductEditor", "./Pages/HomePage", "./Pages/Retail", "./Pages/ImportProduct", "./Pages/Orders", "./Pages/BatchOrderDetails", "./Pages/Wholesale", "./Pages/DataAnalyse"], function (require, exports, application_1, Consts, ProductManagement_1, ProductEditor_1, HomePage_1, Retail_1, ImportProduct_1, Orders_1, BatchOrderDetails_1, Wholesale_1, DataAnalyse_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Navigator = (function () {
@@ -136,6 +136,12 @@ define(["require", "exports", "./application", "./Pages/Consts", "./Pages/Produc
                     pageExisted = !(page == null);
                     if (pageExisted == false)
                         page = new BatchOrderDetails_1.BatchOrderDetails(data.parameters);
+                    break;
+                case Consts.Pages.DataAnalyse:
+                    page = this.getExistedInstance(pageInfo);
+                    pageExisted = !(page == null);
+                    if (pageExisted == false)
+                        page = new DataAnalyse_1.DataAnalyse();
                     break;
             }
             if (pageExisted == false && pageInfo.IsPermanent === true)

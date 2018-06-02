@@ -20,6 +20,7 @@
     <script type="text/javascript" src="scripts/knockout-3.4.2.js"></script>
     <script type="text/javascript" src="scripts/jquery-1.8.0.min.js"></script>
     <script type="text/javascript" src="scripts/jquery.mobile-1.4.5.min.js"></script>
+    <script type="text/javascript" src="scripts/Chart.min.js"></script>
     <script type="text/javascript" src="scripts/moment.min.js"></script>
     <script type="text/javascript" data-main="scripts/startup" src="lib/require.2.1.8.js" async></script>
     <script type="text/javascript" src="scripts/CustomBindings/Bindings.js"></script>
@@ -43,7 +44,7 @@
                 <a href="#Wholesale" class="ui-btn ui-corner-all" data-bind="click: openWholesalePage">Wholesale</a>
                 <a href="#ProductManagement" class="ui-btn ui-corner-all" data-bind="click: openProductManagementPage">Product Management</a>
                 <a href="#ImportProduct" class="ui-btn ui-corner-all" data-bind="click: openImportProductPage">进货</a>
-                <a href="#DataAnalyse" class="ui-btn ui-corner-all">Data Analyse</a>
+                <a href="#DataAnalyse" class="ui-btn ui-corner-all" data-bind="click: openDataAnalysePage">Data Analyse</a>
                 <a href="#OrderManagement" class="ui-btn ui-corner-all" data-bind="click: openOrderManagementPage">Order Management</a>
             </div>
             <div data-bind="visible: !$parent.isDataLoaded()">
@@ -668,6 +669,21 @@
         <!-- /ko -->
     </div>
 
-
+    <!-- ==============Data Analyse Page================= -->
+    <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
+    <div data-role="page" id="DataAnalyse">
+        <!-- ko if: activePage().pageId === 'DataAnalyse' -->
+        <!-- ko with: activePage() -->
+        <div data-role="header" data-position="fixed" data-tap-toggle="false">
+            <a href="#HomePage" data-icon="home" data-bind="click: navigator.goHome">Home</a>
+            <h1><span data-bind="text: title"></span></h1>
+        </div>
+        <div data-role="main" class="ui-content">
+            <a href="#" class="ui-btn ui-corner-all" data-bind="click: showTodayChart">Today</a>
+            <canvas id="myChart" width="400" height="400"></canvas>
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->
+    </div>
 </body>
 </html>

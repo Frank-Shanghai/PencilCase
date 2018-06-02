@@ -9,6 +9,7 @@ import { ImportProduct } from './Pages/ImportProduct';
 import { Orders } from './Pages/Orders';
 import { BatchOrderDetails } from './Pages/BatchOrderDetails';
 import { Wholesale } from './Pages/Wholesale';
+import { DataAnalyse } from './Pages/DataAnalyse';
 
 export class Navigator {
     // TODO: Pop up pages/dialogs handle 
@@ -154,6 +155,12 @@ export class Navigator {
             pageExisted = !(page == null);
             if (pageExisted == false)
                 page = new BatchOrderDetails(data.parameters);
+            break;
+        case Consts.Pages.DataAnalyse:
+            page = this.getExistedInstance(pageInfo);
+            pageExisted = !(page == null);
+            if (pageExisted == false)
+                page = new DataAnalyse();
             break;
     }
 
