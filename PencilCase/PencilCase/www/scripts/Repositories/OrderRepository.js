@@ -1,4 +1,4 @@
-define(["require", "exports", "../application"], function (require, exports, application_1) {
+define(["require", "exports", "../application", "../Models/Order"], function (require, exports, application_1, Order_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var OrderRepository = (function () {
@@ -30,6 +30,17 @@ define(["require", "exports", "../application"], function (require, exports, app
             };
             this.db = application_1.Application.instance.openDataBase();
         }
+        OrderRepository.prototype.getOrdersForDataAnalyse = function (type) {
+            var sqlString = "select ProductId, Type, Sum(Quantity) as Quantity, Sum(Total) as Total from Orders group by ProductId, Type where Type = ";
+            switch (type) {
+                case Order_1.OrderTypes.Retail:
+                    sqlString += "1";
+                    break;
+                case Order_1.OrderTypes.Wholesale:
+                    sqlString += "2";
+                    break;
+            }
+        };
         return OrderRepository;
     }());
     exports.OrderRepository = OrderRepository;

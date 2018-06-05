@@ -1,5 +1,6 @@
 ﻿import { Application } from '../application';
 import { Order } from '../Models/Order';
+import { OrderTypes } from '../Models/Order';
 
 export class OrderRepository {
     private db: Database;
@@ -36,6 +37,18 @@ export class OrderRepository {
         this.db.transaction((transaction) => {
             transaction.executeSql(sqlString, [], successCallback, errorCallback);
         });
+    }
+
+    public getOrdersForDataAnalyse(type: OrderTypes) {
+        let sqlString = "select ProductId, Type, Sum(Quantity) as Quantity, Sum(Total) as Total from Orders group by ProductId, Type where Type = ";
+        switch (type) {
+            case OrderTypes.Retail:
+                sqlString += "1";
+                break;
+            case OrderTypes.Wholesale:
+                sqlString += "2";
+                break;
+        }
     }
 
 }

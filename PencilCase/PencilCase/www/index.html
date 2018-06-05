@@ -22,6 +22,7 @@
     <script type="text/javascript" src="scripts/jquery.mobile-1.4.5.min.js"></script>
     <script type="text/javascript" src="scripts/Chart.min.js"></script>
     <script type="text/javascript" src="scripts/moment.min.js"></script>
+    <script type="text/javascript" src="scripts/palette.js"></script>
     <script type="text/javascript" data-main="scripts/startup" src="lib/require.2.1.8.js" async></script>
     <script type="text/javascript" src="scripts/CustomBindings/Bindings.js"></script>
     <script type="text/javascript" src="scripts/CustomBindings/ListviewBinding.js"></script>
@@ -675,12 +676,61 @@
         <!-- ko if: activePage().pageId === 'DataAnalyse' -->
         <!-- ko with: activePage() -->
         <div data-role="header" data-position="fixed" data-tap-toggle="false">
-            <a href="#HomePage" data-icon="home" data-bind="click: navigator.goHome">Home</a>
+            <a href="#" data-icon="back" data-bind="click: back">Back</a>
             <h1><span data-bind="text: title"></span></h1>
         </div>
         <div data-role="main" class="ui-content">
-            <a href="#" class="ui-btn ui-corner-all" data-bind="click: showTodayChart">Today</a>
-            <canvas id="myChart" width="400" height="400"></canvas>
+            <div class="ui-grid-a" data-bind="visible: !isChartVisible()">
+                <div class="ui-block-a">
+                    <a href="#" data-role="button" data-bind="click: showTodayChart">Today</a>
+                </div>
+                <div class="ui-block-b">
+                    <a href="#" data-role="button" data-bind="click: showWeekChart">Week</a>
+                </div>
+                <div class="ui-block-a">
+                    <a href="#" data-role="button" data-bind="click: showMonthChart">Month</a>
+                </div>
+                <div class="ui-block-b">
+                    <a href="#" data-role="button" data-bind="click: showCustomChart">Custom</a>
+                </div>
+            </div>
+
+            <h4 data-bind="visible: isChartVisible" class="ui-bar ui-bar-a" style="margin: 0 3px -0.1em">
+                <span>Today</span>
+            </h4>
+            <div data-role="tabs" id="chartTabs" data-bind="visible: isChartVisible">
+                <div data-role="navbar">
+                    <ul>
+                        <li><a href="#Qantity" data-ajax="false" class="ui-btn-active">Quantity</a></li>
+                        <li><a href="#Total" data-ajax="false">Total</a></li>
+                        <li><a href="#Profit" data-ajax="false">Profit</a></li>
+                    </ul>
+                </div>
+                <div id="Qantity" class="ui-body-d ui-content">
+                    <select data-mini="true">
+                        <option value="1">Retail</option>
+                        <option value="2">Wholesale</option>
+                        <option value="3">Both</option>
+                    </select>
+                    <canvas id="myChart" width="400" height="400"></canvas>
+                </div>
+                <div id="Total" class="ui-body-d ui-content">
+                    <select data-mini="true">
+                        <option value="1">Retail</option>
+                        <option value="2">Wholesale</option>
+                        <option value="3">Both</option>
+                    </select>
+                    <span>Total</span>
+                </div>
+                <div id="Profit" class="ui-body-d ui-content">
+                    <select data-mini="true">
+                        <option value="1">Retail</option>
+                        <option value="2">Wholesale</option>
+                        <option value="3">Both</option>
+                    </select>
+                    <span>Profit</span>
+                </div>
+            </div>
         </div>
         <!-- /ko -->
         <!-- /ko -->

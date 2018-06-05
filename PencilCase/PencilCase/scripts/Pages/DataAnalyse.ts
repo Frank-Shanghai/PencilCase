@@ -1,15 +1,25 @@
 ﻿import { PageBase } from './PageBase';
 import { Navigator } from '../Navigator';
 import * as Consts from './Consts';
+declare var palette: any;
 
 export class DataAnalyse extends PageBase {
     private navigator: Navigator = Navigator.instance;
+    private isChartVisible: KnockoutObservable<boolean> = ko.observable(false);
 
     constructor() {
         super();
         this.title = ko.observable("Data Analyse");
         this.pageId = Consts.Pages.DataAnalyse.Id;
-        this.back = Navigator.instance.goHome;
+    }
+
+    public back = () => {
+        if (this.isChartVisible()) {
+            this.isChartVisible(false);
+        }
+        else {
+            this.navigator.goHome();
+        }
     }
 
     private onDBError = (transaction: SqlTransaction, sqlError: SqlError) => {
@@ -17,6 +27,7 @@ export class DataAnalyse extends PageBase {
     }
 
     public showTodayChart() {
+        this.isChartVisible(true);
         var ctx = (<any>(document.getElementById("myChart"))).getContext("2d");
         var myChart = new Chart(ctx, {
             type: 'pie',
@@ -25,34 +36,15 @@ export class DataAnalyse extends PageBase {
                 datasets: [{
                     label: '# of Votes',
                     data: [12, 19, 3, 5, 2, 3],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255,99,132,1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
+                    backgroundColor: palette('tol', 6).map(function (hex) {
+                        return '#' + hex;
+                    })
                 }]
-            },
-            //options: {
-            //    scales: {
-            //        yAxes: [{
-            //            ticks: {
-            //                beginAtZero: true
-            //            }
-            //        }]
-            //    }
-            //}
+            }
         });
     }
+
+    public showWeekChart() { }
+    public showMonthChart() { }
+    public showCustomChart() { }
 }

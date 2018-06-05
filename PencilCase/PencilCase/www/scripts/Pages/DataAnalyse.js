@@ -16,15 +16,24 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts"], functio
         function DataAnalyse() {
             var _this = _super.call(this) || this;
             _this.navigator = Navigator_1.Navigator.instance;
+            _this.isChartVisible = ko.observable(false);
+            _this.back = function () {
+                if (_this.isChartVisible()) {
+                    _this.isChartVisible(false);
+                }
+                else {
+                    _this.navigator.goHome();
+                }
+            };
             _this.onDBError = function (transaction, sqlError) {
                 alert("Data Analyse Page: " + sqlError.message);
             };
             _this.title = ko.observable("Data Analyse");
             _this.pageId = Consts.Pages.DataAnalyse.Id;
-            _this.back = Navigator_1.Navigator.instance.goHome;
             return _this;
         }
         DataAnalyse.prototype.showTodayChart = function () {
+            this.isChartVisible(true);
             var ctx = (document.getElementById("myChart")).getContext("2d");
             var myChart = new Chart(ctx, {
                 type: 'pie',
@@ -33,27 +42,16 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts"], functio
                     datasets: [{
                             label: '# of Votes',
                             data: [12, 19, 3, 5, 2, 3],
-                            backgroundColor: [
-                                'rgba(255, 99, 132, 0.2)',
-                                'rgba(54, 162, 235, 0.2)',
-                                'rgba(255, 206, 86, 0.2)',
-                                'rgba(75, 192, 192, 0.2)',
-                                'rgba(153, 102, 255, 0.2)',
-                                'rgba(255, 159, 64, 0.2)'
-                            ],
-                            borderColor: [
-                                'rgba(255,99,132,1)',
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(153, 102, 255, 1)',
-                                'rgba(255, 159, 64, 1)'
-                            ],
-                            borderWidth: 1
+                            backgroundColor: palette('tol', 6).map(function (hex) {
+                                return '#' + hex;
+                            })
                         }]
-                },
+                }
             });
         };
+        DataAnalyse.prototype.showWeekChart = function () { };
+        DataAnalyse.prototype.showMonthChart = function () { };
+        DataAnalyse.prototype.showCustomChart = function () { };
         return DataAnalyse;
     }(PageBase_1.PageBase));
     exports.DataAnalyse = DataAnalyse;
