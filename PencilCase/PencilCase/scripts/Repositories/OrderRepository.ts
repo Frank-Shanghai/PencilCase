@@ -39,16 +39,23 @@ export class OrderRepository {
         });
     }
 
-    public getOrdersForDataAnalyse(type: OrderTypes) {
-        let sqlString = "select ProductId, Type, Sum(Quantity) as Quantity, Sum(Total) as Total from Orders group by ProductId, Type where Type = ";
+    public getOrdersForDataAnalyse(timeSpanString: string, type?: OrderTypes, successCallback?: (transaction: SqlTransaction, resultSet: SqlResultSet) => void, errorCallback?: (transaction: SqlTransaction, sqlError: SqlError) => void) {
+        let conditions = " where ";
+        conditions += timeSpanString;
         switch (type) {
             case OrderTypes.Retail:
-                sqlString += "1";
+                conditions += " and Type = 1";
                 break;
             case OrderTypes.Wholesale:
-                sqlString += "2";
+                conditions += " and Type = 2";
                 break;
         }
+
+        let sqlString = "select ProductId, Type, Sum(Quantity) as Quantity, Sum(Total) as Total from Orders" + conditions + " group by ProductId, Type";
+
+        this.db.transaction((transaction) => {
+            transaction.executeSql(sqlString, [], successCallback, errorCallback);
+        });
     }
 
 }

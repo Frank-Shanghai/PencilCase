@@ -707,12 +707,9 @@
                     </ul>
                 </div>
                 <div id="Qantity" class="ui-body-d ui-content">
-                    <select data-mini="true">
-                        <option value="1">Retail</option>
-                        <option value="2">Wholesale</option>
-                        <option value="3">Both</option>
-                    </select>
-                    <canvas id="myChart" width="400" height="400"></canvas>
+                    <select data-mini="true" data-native-menu="false" data-bind="options: todaySaleTypeOptinos, optionsText: 'text', optionsValue: 'value', value: selectedTodaySaleType"></select>
+                    <span style="font-size: 0.8em; color:blue" data-bind="text: '* 此处数量单位为零售单位，便于比较。', visible: selectedTodaySaleType().toString() != '1'"></span>
+                    <canvas id="todayChart" width="400" height="400"></canvas>
                 </div>
                 <div id="Total" class="ui-body-d ui-content">
                     <select data-mini="true">

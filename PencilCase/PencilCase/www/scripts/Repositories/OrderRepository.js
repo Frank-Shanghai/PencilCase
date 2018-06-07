@@ -30,16 +30,21 @@ define(["require", "exports", "../application", "../Models/Order"], function (re
             };
             this.db = application_1.Application.instance.openDataBase();
         }
-        OrderRepository.prototype.getOrdersForDataAnalyse = function (type) {
-            var sqlString = "select ProductId, Type, Sum(Quantity) as Quantity, Sum(Total) as Total from Orders group by ProductId, Type where Type = ";
+        OrderRepository.prototype.getOrdersForDataAnalyse = function (timeSpanString, type, successCallback, errorCallback) {
+            var conditions = " where ";
+            conditions += timeSpanString;
             switch (type) {
                 case Order_1.OrderTypes.Retail:
-                    sqlString += "1";
+                    conditions += " and Type = 1";
                     break;
                 case Order_1.OrderTypes.Wholesale:
-                    sqlString += "2";
+                    conditions += " and Type = 2";
                     break;
             }
+            var sqlString = "select ProductId, Type, Sum(Quantity) as Quantity, Sum(Total) as Total from Orders" + conditions + " group by ProductId, Type";
+            this.db.transaction(function (transaction) {
+                transaction.executeSql(sqlString, [], successCallback, errorCallback);
+            });
         };
         return OrderRepository;
     }());
