@@ -17,12 +17,13 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             var _this = _super.call(this) || this;
             _this.navigator = Navigator_1.Navigator.instance;
             _this.isChartVisible = ko.observable(false);
-            _this.todaySaleTypeOptinos = [
+            _this.chartDataType = ko.observable("Quantity");
+            _this.quantitySaleTypeOptinos = [
                 { text: "Retail", value: Order_1.OrderTypes.Retail },
                 { text: "Wholesale", value: Order_1.OrderTypes.Wholesale },
                 { text: "Both", value: -1 }
             ];
-            _this.selectedTodaySaleType = ko.observable(Order_1.OrderTypes.Retail);
+            _this.selectedQuantitySaleType = ko.observable(Order_1.OrderTypes.Retail);
             _this.orderRepository = new OrderRepository_1.OrderRepository();
             _this.productRepository = new ProductRepository_1.ProductRepository();
             _this.back = function () {
@@ -36,22 +37,77 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             _this.onDBError = function (transaction, sqlError) {
                 alert("Data Analyse Page: " + sqlError.message);
             };
+            _this.setChartDataType = function (dataType) {
+                switch (dataType) {
+                    case "Quantity":
+                        if (_this.chartDataType() !== "Quantity") {
+                            _this.chartDataType("Quantity");
+                            _this.showQuantityChart();
+                        }
+                        break;
+                    case "Total":
+                        if (_this.chartDataType() !== "Total") {
+                            _this.chartDataType("Total");
+                            _this.showTotalChart();
+                        }
+                        break;
+                    case "Profit":
+                        if (_this.chartDataType() !== "Profit") {
+                            _this.chartDataType("Profit");
+                            _this.showProfitChart();
+                        }
+                        break;
+                }
+            };
             _this.title = ko.observable("Data Analyse");
             _this.pageId = Consts.Pages.DataAnalyse.Id;
-            _this.selectedTodaySaleType.subscribe(function (newValue) {
-                _this.showTodayChart();
+            _this.selectedQuantitySaleType.subscribe(function (newValue) {
+                _this.showQuantityChart();
             });
             return _this;
         }
         DataAnalyse.prototype.showTodayChart = function () {
+            this.chartTimespanOption = ChartTimespanOptions.Today;
+            this.showQuantityChart();
+        };
+        DataAnalyse.prototype.showWeekChart = function () {
+            this.chartTimespanOption = ChartTimespanOptions.Week;
+            this.showQuantityChart();
+        };
+        DataAnalyse.prototype.showMonthChart = function () {
+            this.chartTimespanOption = ChartTimespanOptions.Month;
+            this.showQuantityChart();
+        };
+        DataAnalyse.prototype.showCustomChart = function () {
+            //this.chartTimespanOption = ChartTimespanOptions.Today;
+            //this.showQuantityChart();
+        };
+        DataAnalyse.prototype.showTotalChart = function () {
+            alert("total chart");
+        };
+        DataAnalyse.prototype.showProfitChart = function () {
+            alert("profict chart");
+        };
+        DataAnalyse.prototype.showQuantityChart = function () {
             var _this = this;
+            this.chartDataType("Quantity");
             this.isChartVisible(true);
-            this.chartOption = ChartOptions.Today;
-            var timeSpanString = " CreatedDate >= '" + moment(new Date(Date.now())).format("YYYY-MM-DD") + "' ";
+            var timeSpanString = '';
+            switch (this.chartTimespanOption) {
+                case ChartTimespanOptions.Today:
+                    timeSpanString = " CreatedDate >= '" + moment(new Date(Date.now())).format("YYYY-MM-DD") + "' ";
+                    break;
+                case ChartTimespanOptions.Week:
+                    timeSpanString = " CreatedDate >= '" + moment(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' and CreatedDate < '" + moment(new Date(Date.now() + 1 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' ";
+                    break;
+                case ChartTimespanOptions.Month:
+                    timeSpanString = " CreatedDate >= '" + moment(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' and CreatedDate < '" + moment(new Date(Date.now() + 1 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' ";
+                    break;
+            }
             var labels = [];
             var data = [];
-            if (this.selectedTodaySaleType() != -1) {
-                this.orderRepository.getOrdersForDataAnalyse(timeSpanString, this.selectedTodaySaleType(), function (transaction, orderSet) {
+            if (this.selectedQuantitySaleType() != -1) {
+                this.orderRepository.getOrdersForDataAnalyse(timeSpanString, this.selectedQuantitySaleType(), function (transaction, orderSet) {
                     if (orderSet.rows.length > 0) {
                         var rows_1 = orderSet.rows;
                         var _loop_1 = function (i) {
@@ -144,7 +200,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                 }, this.onDBError);
             }
             var initializeChart = function () {
-                var ctx = (document.getElementById("todayChart")).getContext("2d");
+                var ctx = (document.getElementById("dataChart")).getContext("2d");
                 //Why have to make the todayChart as a class scoped variable
                 //https://github.com/chartjs/Chart.js/issues/350
                 if (_this.todayChart)
@@ -164,18 +220,15 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                 });
             };
         };
-        DataAnalyse.prototype.showWeekChart = function () { };
-        DataAnalyse.prototype.showMonthChart = function () { };
-        DataAnalyse.prototype.showCustomChart = function () { };
         return DataAnalyse;
     }(PageBase_1.PageBase));
     exports.DataAnalyse = DataAnalyse;
-    var ChartOptions;
-    (function (ChartOptions) {
-        ChartOptions[ChartOptions["Today"] = 1] = "Today";
-        ChartOptions[ChartOptions["Week"] = 2] = "Week";
-        ChartOptions[ChartOptions["Month"] = 3] = "Month";
-        ChartOptions[ChartOptions["CustomTime"] = 4] = "CustomTime";
-    })(ChartOptions || (ChartOptions = {}));
+    var ChartTimespanOptions;
+    (function (ChartTimespanOptions) {
+        ChartTimespanOptions[ChartTimespanOptions["Today"] = 1] = "Today";
+        ChartTimespanOptions[ChartTimespanOptions["Week"] = 2] = "Week";
+        ChartTimespanOptions[ChartTimespanOptions["Month"] = 3] = "Month";
+        ChartTimespanOptions[ChartTimespanOptions["CustomTime"] = 4] = "CustomTime";
+    })(ChartTimespanOptions || (ChartTimespanOptions = {}));
 });
 //# sourceMappingURL=DataAnalyse.js.map

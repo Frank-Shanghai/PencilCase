@@ -10,13 +10,14 @@ declare var palette: any;
 export class DataAnalyse extends PageBase {
     private navigator: Navigator = Navigator.instance;
     private isChartVisible: KnockoutObservable<boolean> = ko.observable(false);
-    private chartOption: ChartOptions;
-    private todaySaleTypeOptinos = [
+    private chartTimespanOption: ChartTimespanOptions;
+    private chartDataType: KnockoutObservable<string> = ko.observable("Quantity");
+    private quantitySaleTypeOptinos = [
         { text: "Retail", value: OrderTypes.Retail },
         { text: "Wholesale", value: OrderTypes.Wholesale },
         { text: "Both", value: -1 }
     ];
-    private selectedTodaySaleType: KnockoutObservable<any> = ko.observable(OrderTypes.Retail);
+    private selectedQuantitySaleType: KnockoutObservable<any> = ko.observable(OrderTypes.Retail);
 
     private orderRepository = new OrderRepository();
     private productRepository = new ProductRepository();
@@ -28,8 +29,8 @@ export class DataAnalyse extends PageBase {
         this.title = ko.observable("Data Analyse");
         this.pageId = Consts.Pages.DataAnalyse.Id;
 
-        this.selectedTodaySaleType.subscribe((newValue: any) => {
-            this.showTodayChart();
+        this.selectedQuantitySaleType.subscribe((newValue: any) => {
+            this.showQuantityChart();
         });
     }
 
@@ -46,15 +47,82 @@ export class DataAnalyse extends PageBase {
         alert("Data Analyse Page: " + sqlError.message);
     }
 
-    public showTodayChart() {
+    private setChartDataType = (dataType: string) => {
+        switch (dataType) {
+            case "Quantity":
+                if (this.chartDataType() !== "Quantity") {
+                    this.chartDataType("Quantity");
+                    this.showQuantityChart();
+                }
+                break;
+            case "Total":
+                if (this.chartDataType() !== "Total") {
+                    this.chartDataType("Total");
+                    this.showTotalChart();
+                }
+
+                break;
+            case "Profit":
+                if (this.chartDataType() !== "Profit") {
+                    this.chartDataType("Profit");
+                    this.showProfitChart();
+                }
+
+                break;
+        }
+    }
+
+    private showTodayChart() {        
+        this.chartTimespanOption = ChartTimespanOptions.Today;
+        this.showQuantityChart();
+    }
+
+    public showWeekChart() {
+        this.chartTimespanOption = ChartTimespanOptions.Week;
+        this.showQuantityChart();
+
+    }
+
+    public showMonthChart() {
+        this.chartTimespanOption = ChartTimespanOptions.Month;
+        this.showQuantityChart();
+
+    }
+    public showCustomChart() {
+        //this.chartTimespanOption = ChartTimespanOptions.Today;
+        //this.showQuantityChart();
+    }
+
+
+    private showTotalChart() {
+        alert("total chart");
+    }
+
+    private showProfitChart() {
+        alert("profict chart");
+    }
+
+    public showQuantityChart() {
+        this.chartDataType("Quantity");
         this.isChartVisible(true);
-        this.chartOption = ChartOptions.Today;
-        let timeSpanString = " CreatedDate >= '" + moment(new Date(Date.now())).format("YYYY-MM-DD") + "' ";
+
+        let timeSpanString = '';
+        switch (this.chartTimespanOption) {
+            case ChartTimespanOptions.Today:
+                timeSpanString = " CreatedDate >= '" + moment(new Date(Date.now())).format("YYYY-MM-DD") + "' ";
+                break;
+            case ChartTimespanOptions.Week:
+                timeSpanString = " CreatedDate >= '" + moment(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' and CreatedDate < '" + moment(new Date(Date.now() + 1 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' ";
+                break;
+            case ChartTimespanOptions.Month:
+                timeSpanString = " CreatedDate >= '" + moment(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' and CreatedDate < '" + moment(new Date(Date.now() + 1 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' ";
+                break;
+        }        
 
         let labels = [];
         let data = [];
-        if (this.selectedTodaySaleType() != -1) {
-            this.orderRepository.getOrdersForDataAnalyse(timeSpanString, this.selectedTodaySaleType(), (transaction: SqlTransaction, orderSet: SqlResultSet) => {
+        if (this.selectedQuantitySaleType() != -1) {
+            this.orderRepository.getOrdersForDataAnalyse(timeSpanString, this.selectedQuantitySaleType(), (transaction: SqlTransaction, orderSet: SqlResultSet) => {
                 if (orderSet.rows.length > 0) {
                     let rows = orderSet.rows;
                     for (let i = 0; i < rows.length; i++) {
@@ -147,7 +215,7 @@ export class DataAnalyse extends PageBase {
         }
 
         let initializeChart = () => {
-            var ctx = (<any>(document.getElementById("todayChart"))).getContext("2d");
+            var ctx = (<any>(document.getElementById("dataChart"))).getContext("2d");
 
             //Why have to make the todayChart as a class scoped variable
             //https://github.com/chartjs/Chart.js/issues/350
@@ -170,12 +238,9 @@ export class DataAnalyse extends PageBase {
         }
     }
 
-    public showWeekChart() { }
-    public showMonthChart() { }
-    public showCustomChart() { }
 }
 
-enum ChartOptions {
+enum ChartTimespanOptions {
     Today = 1,
     Week,
     Month,
