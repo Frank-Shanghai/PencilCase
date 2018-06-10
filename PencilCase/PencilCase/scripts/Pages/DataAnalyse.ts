@@ -43,11 +43,20 @@ export class DataAnalyse extends PageBase {
                     break;
             }
         });
+
+        $('input[name="daterange"]').daterangepicker({
+            opens: 'left'
+        }, function (start, end, label) {
+            alert("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        });
     }
 
     public back = () => {
         if (this.isChartVisible()) {
             this.isChartVisible(false);
+
+            // To hide custom datetime picker
+            this.chartPageTitle(null);
         }
         else {
             this.navigator.goHome();
@@ -83,6 +92,7 @@ export class DataAnalyse extends PageBase {
     private showTodayChart() {
         this.chartTimespanOption = ChartTimespanOptions.Today;
         this.chartPageTitle("Today");
+
         this.showQuantityChart();
     }
 
@@ -98,7 +108,14 @@ export class DataAnalyse extends PageBase {
         this.showQuantityChart();
     }
     public showCustomChart() {
-        //this.chartTimespanOption = ChartTimespanOptions.Today;
+        this.chartTimespanOption = ChartTimespanOptions.CustomTime;
+        this.chartPageTitle("Custom");
+        $('input[name="daterange"]').daterangepicker({
+            opens: 'left'
+        }, function (start, end, label) {
+            alert("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        });
+
         //this.showQuantityChart();
     }
 

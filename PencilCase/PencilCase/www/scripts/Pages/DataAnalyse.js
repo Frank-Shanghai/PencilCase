@@ -30,6 +30,8 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             _this.back = function () {
                 if (_this.isChartVisible()) {
                     _this.isChartVisible(false);
+                    // To hide custom datetime picker
+                    _this.chartPageTitle(null);
                 }
                 else {
                     _this.navigator.goHome();
@@ -92,6 +94,11 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                         break;
                 }
             });
+            $('input[name="daterange"]').daterangepicker({
+                opens: 'left'
+            }, function (start, end, label) {
+                alert("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+            });
             return _this;
         }
         DataAnalyse.prototype.showTodayChart = function () {
@@ -110,7 +117,13 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             this.showQuantityChart();
         };
         DataAnalyse.prototype.showCustomChart = function () {
-            //this.chartTimespanOption = ChartTimespanOptions.Today;
+            this.chartTimespanOption = ChartTimespanOptions.CustomTime;
+            this.chartPageTitle("Custom");
+            $('input[name="daterange"]').daterangepicker({
+                opens: 'left'
+            }, function (start, end, label) {
+                alert("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+            });
             //this.showQuantityChart();
         };
         DataAnalyse.prototype.showTotalChart = function () {
