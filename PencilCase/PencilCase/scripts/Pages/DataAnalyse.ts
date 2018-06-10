@@ -22,7 +22,8 @@ export class DataAnalyse extends PageBase {
     private orderRepository = new OrderRepository();
     private productRepository = new ProductRepository();
 
-    private todayChart;
+    private chartComponent;
+    private chartPageTitle = ko.observable('');
 
     constructor() {
         super();
@@ -30,7 +31,17 @@ export class DataAnalyse extends PageBase {
         this.pageId = Consts.Pages.DataAnalyse.Id;
 
         this.selectedQuantitySaleType.subscribe((newValue: any) => {
-            this.showQuantityChart();
+            switch (this.chartDataType()) {
+                case "Quantity":
+                    this.showQuantityChart();
+                    break;
+                case "Total":
+                    this.showTotalChart();
+                    break;
+                case "Profit":
+                    this.showProfitChart();
+                    break;
+            }
         });
     }
 
@@ -51,20 +62,17 @@ export class DataAnalyse extends PageBase {
         switch (dataType) {
             case "Quantity":
                 if (this.chartDataType() !== "Quantity") {
-                    this.chartDataType("Quantity");
                     this.showQuantityChart();
                 }
                 break;
             case "Total":
                 if (this.chartDataType() !== "Total") {
-                    this.chartDataType("Total");
                     this.showTotalChart();
                 }
 
                 break;
             case "Profit":
                 if (this.chartDataType() !== "Profit") {
-                    this.chartDataType("Profit");
                     this.showProfitChart();
                 }
 
@@ -72,57 +80,168 @@ export class DataAnalyse extends PageBase {
         }
     }
 
-    private showTodayChart() {        
+    private showTodayChart() {
         this.chartTimespanOption = ChartTimespanOptions.Today;
+        this.chartPageTitle("Today");
         this.showQuantityChart();
     }
 
     public showWeekChart() {
         this.chartTimespanOption = ChartTimespanOptions.Week;
+        this.chartPageTitle("Week");
         this.showQuantityChart();
-
     }
 
     public showMonthChart() {
         this.chartTimespanOption = ChartTimespanOptions.Month;
+        this.chartPageTitle("Month");
         this.showQuantityChart();
-
     }
     public showCustomChart() {
         //this.chartTimespanOption = ChartTimespanOptions.Today;
         //this.showQuantityChart();
     }
 
-
     private showTotalChart() {
-        alert("total chart");
+        this.chartDataType("Total");
+        this.isChartVisible(true);
+        let timeSpanString = this.getTimespanStringByOption(this.chartTimespanOption);
+
+        let labels = [];
+        let data = [];
+        this.orderRepository.getOrdersForDataAnalyse(timeSpanString, this.selectedQuantitySaleType() != -1, this.selectedQuantitySaleType(), (transaction: SqlTransaction, orderSet: SqlResultSet) => {
+            if (orderSet.rows.length > 0) {
+                let rows = orderSet.rows;
+                for (let i = 0; i < rows.length; i++) {
+                    let order = rows[i];
+                    this.productRepository.getProductById(order.ProductId, (transaction: SqlTransaction, productSet: SqlResultSet) => {
+                        if (productSet.rows.length > 0) {
+                            labels.push(productSet.rows[0].Name);
+                        }
+                        else {
+                            labels.push("unknown" + i);
+                        }
+
+                        data.push(order.Total);
+
+                        if (rows.length - 1 == i) {
+                            this.initializeChart(labels, data);
+                        }
+                    }, this.onDBError);
+                }
+            }
+        }, this.onDBError);
     }
 
     private showProfitChart() {
-        alert("profict chart");
+        this.chartDataType("Profit");
+        this.isChartVisible(true);
+        let timeSpanString = this.getTimespanStringByOption(this.chartTimespanOption);
+
+        let labels = [];
+        let data = [];
+        if (this.selectedQuantitySaleType() != -1) {
+            this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, this.selectedQuantitySaleType(), (transaction: SqlTransaction, orderSet: SqlResultSet) => {
+                if (orderSet.rows.length > 0) {
+                    let rows = orderSet.rows;
+                    for (let i = 0; i < rows.length; i++) {
+                        let order = rows[i];
+                        this.productRepository.getProductById(order.ProductId, (transaction: SqlTransaction, productSet: SqlResultSet) => {
+                            if (productSet.rows.length > 0) {
+                                labels.push(productSet.rows[0].Name);
+                            }
+                            else {
+                                labels.push("unknown" + i);
+                            }
+
+                            //wholesale
+                            if (order.Type == 2) {
+                                data.push(Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost));
+                            }
+                            else {
+                                data.push(Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].RetailCost));
+                            }
+
+                            if (rows.length - 1 == i) {
+                                this.initializeChart(labels, data);
+                            }
+                        }, this.onDBError);
+                    }
+                }
+            }, this.onDBError);
+        }
+        else {
+            this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, OrderTypes.Retail, (transaction: SqlTransaction, orderSet: SqlResultSet) => {
+                if (orderSet.rows.length > 0) {
+                    let rows = orderSet.rows;
+                    for (let i = 0; i < rows.length; i++) {
+                        let order = rows[i];
+                        this.productRepository.getProductById(order.ProductId, (transaction: SqlTransaction, productSet: SqlResultSet) => {
+                            if (productSet.rows.length > 0) {
+                                labels.push(productSet.rows[0].Name);
+                            }
+                            else {
+                                labels.push("unknown" + i);
+                            }
+
+                            //retail
+                            data.push(Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].RetailCost));
+
+                            if (rows.length - 1 == i) {
+                                this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, OrderTypes.Wholesale, (transaction: SqlTransaction, orderSet: SqlResultSet) => {
+                                    if (orderSet.rows.length > 0) {
+                                        let rows = orderSet.rows;
+                                        for (let i = 0; i < rows.length; i++) {
+                                            let order = rows[i];
+                                            this.productRepository.getProductById(order.ProductId, (transaction: SqlTransaction, productSet: SqlResultSet) => {
+                                                let productExisted = false;
+                                                let index = -1;
+                                                if (productSet.rows.length > 0) {
+                                                    index = labels.indexOf(productSet.rows[0].Name);
+                                                    if (index < 0) {
+                                                        labels.push(productSet.rows[0].Name);
+                                                    }
+                                                    else {
+                                                        productExisted = true;
+                                                    }
+                                                }
+                                                else {
+                                                    labels.push("unknown" + i);
+                                                }
+
+                                                //wholesale
+                                                if (productExisted === true) {
+                                                    data[index] = data[index] + (Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost));
+                                                }
+                                                else {                                                    
+                                                    data.push(Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost));
+                                                }
+
+                                                if (rows.length - 1 == i) {
+                                                    this.initializeChart(labels, data);
+                                                }
+                                            }, this.onDBError);
+                                        }
+                                    }
+                                }, this.onDBError);
+
+                            }
+                        }, this.onDBError);
+                    }
+                }
+            }, this.onDBError);
+        }
     }
 
     public showQuantityChart() {
         this.chartDataType("Quantity");
         this.isChartVisible(true);
-
-        let timeSpanString = '';
-        switch (this.chartTimespanOption) {
-            case ChartTimespanOptions.Today:
-                timeSpanString = " CreatedDate >= '" + moment(new Date(Date.now())).format("YYYY-MM-DD") + "' ";
-                break;
-            case ChartTimespanOptions.Week:
-                timeSpanString = " CreatedDate >= '" + moment(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' and CreatedDate < '" + moment(new Date(Date.now() + 1 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' ";
-                break;
-            case ChartTimespanOptions.Month:
-                timeSpanString = " CreatedDate >= '" + moment(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' and CreatedDate < '" + moment(new Date(Date.now() + 1 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' ";
-                break;
-        }        
+        let timeSpanString = this.getTimespanStringByOption(this.chartTimespanOption);
 
         let labels = [];
         let data = [];
         if (this.selectedQuantitySaleType() != -1) {
-            this.orderRepository.getOrdersForDataAnalyse(timeSpanString, this.selectedQuantitySaleType(), (transaction: SqlTransaction, orderSet: SqlResultSet) => {
+            this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, this.selectedQuantitySaleType(), (transaction: SqlTransaction, orderSet: SqlResultSet) => {
                 if (orderSet.rows.length > 0) {
                     let rows = orderSet.rows;
                     for (let i = 0; i < rows.length; i++) {
@@ -144,7 +263,7 @@ export class DataAnalyse extends PageBase {
                             }
 
                             if (rows.length - 1 == i) {
-                                initializeChart();
+                                this.initializeChart(labels, data);
                             }
                         }, this.onDBError);
                     }
@@ -152,7 +271,7 @@ export class DataAnalyse extends PageBase {
             }, this.onDBError);
         }
         else {
-            this.orderRepository.getOrdersForDataAnalyse(timeSpanString, OrderTypes.Retail, (transaction: SqlTransaction, orderSet: SqlResultSet) => {
+            this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, OrderTypes.Retail, (transaction: SqlTransaction, orderSet: SqlResultSet) => {
                 if (orderSet.rows.length > 0) {
                     let rows = orderSet.rows;
                     for (let i = 0; i < rows.length; i++) {
@@ -169,7 +288,7 @@ export class DataAnalyse extends PageBase {
                             data.push(order.Quantity);
 
                             if (rows.length - 1 == i) {
-                                this.orderRepository.getOrdersForDataAnalyse(timeSpanString, OrderTypes.Wholesale, (transaction: SqlTransaction, orderSet: SqlResultSet) => {
+                                this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, OrderTypes.Wholesale, (transaction: SqlTransaction, orderSet: SqlResultSet) => {
                                     if (orderSet.rows.length > 0) {
                                         let rows = orderSet.rows;
                                         for (let i = 0; i < rows.length; i++) {
@@ -199,7 +318,7 @@ export class DataAnalyse extends PageBase {
                                                 }
 
                                                 if (rows.length - 1 == i) {
-                                                    initializeChart();
+                                                    this.initializeChart(labels, data);
                                                 }
                                             }, this.onDBError);
                                         }
@@ -213,29 +332,46 @@ export class DataAnalyse extends PageBase {
             }, this.onDBError);
 
         }
+    }
 
-        let initializeChart = () => {
-            var ctx = (<any>(document.getElementById("dataChart"))).getContext("2d");
+    private initializeChart = (labels: Array<any>, data: Array<any>) => {
+        var ctx = (<any>(document.getElementById("dataChart"))).getContext("2d");
 
-            //Why have to make the todayChart as a class scoped variable
-            //https://github.com/chartjs/Chart.js/issues/350
-            if (this.todayChart)
-                this.todayChart.destroy();
+        //Why have to make the todayChart as a class scoped variable
+        //https://github.com/chartjs/Chart.js/issues/350
+        if (this.chartComponent)
+            this.chartComponent.destroy();
 
-            this.todayChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Retail Quantity',
-                        data: data,
-                        backgroundColor: palette('tol', data.length).map(function (hex) {
-                            return '#' + hex;
-                        })
-                    }]
-                }
-            });
+        this.chartComponent = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Retail Quantity',
+                    data: data,
+                    backgroundColor: palette('tol', data.length).map(function (hex) {
+                        return '#' + hex;
+                    })
+                }]
+            }
+        });
+    }
+
+    private getTimespanStringByOption(option: ChartTimespanOptions) {
+        let timeSpanString = '';
+        switch (option) {
+            case ChartTimespanOptions.Today:
+                timeSpanString = " CreatedDate >= '" + moment(new Date(Date.now())).format("YYYY-MM-DD") + "' ";
+                break;
+            case ChartTimespanOptions.Week:
+                timeSpanString = " CreatedDate >= '" + moment(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' and CreatedDate < '" + moment(new Date(Date.now() + 1 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' ";
+                break;
+            case ChartTimespanOptions.Month:
+                timeSpanString = " CreatedDate >= '" + moment(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' and CreatedDate < '" + moment(new Date(Date.now() + 1 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' ";
+                break;
         }
+
+        return timeSpanString;
     }
 
 }

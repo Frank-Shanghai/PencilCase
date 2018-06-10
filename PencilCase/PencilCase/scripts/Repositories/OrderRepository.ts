@@ -39,7 +39,7 @@ export class OrderRepository {
         });
     }
 
-    public getOrdersForDataAnalyse(timeSpanString: string, type?: OrderTypes, successCallback?: (transaction: SqlTransaction, resultSet: SqlResultSet) => void, errorCallback?: (transaction: SqlTransaction, sqlError: SqlError) => void) {
+    public getOrdersForDataAnalyse(timeSpanString: string, groupByType?: boolean, type?: OrderTypes, successCallback?: (transaction: SqlTransaction, resultSet: SqlResultSet) => void, errorCallback?: (transaction: SqlTransaction, sqlError: SqlError) => void) {
         let conditions = " where ";
         conditions += timeSpanString;
         switch (type) {
@@ -51,7 +51,14 @@ export class OrderRepository {
                 break;
         }
 
-        let sqlString = "select ProductId, Type, Sum(Quantity) as Quantity, Sum(Total) as Total from Orders" + conditions + " group by ProductId, Type";
+        let sqlString = '';
+        if (groupByType == true) {
+            sqlString = "select ProductId, Type, Sum(Quantity) as Quantity, Sum(Total) as Total from Orders" + conditions + " group by ProductId, Type";
+        }
+        else {
+            conditions += " and Type != 3";// exculde import orders
+            sqlString = "select ProductId, Sum(Quantity) as Quantity, Sum(Total) as Total from Orders" + conditions + " group by ProductId";
+        }
 
         this.db.transaction((transaction) => {
             transaction.executeSql(sqlString, [], successCallback, errorCallback);
