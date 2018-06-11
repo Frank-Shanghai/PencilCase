@@ -29,23 +29,15 @@ export class DataAnalyse extends PageBase {
     private customEndDate: string = '';
     private isDatePickersInitialized = false;
 
+    private isEmptyData: KnockoutObservable<boolean> = ko.observable(false);
+
     constructor() {
         super();
         this.title = ko.observable("Data Analyse");
         this.pageId = Consts.Pages.DataAnalyse.Id;
 
         this.selectedQuantitySaleType.subscribe((newValue: any) => {
-            switch (this.chartDataType()) {
-                case "Quantity":
-                    this.showQuantityChart();
-                    break;
-                case "Total":
-                    this.showTotalChart();
-                    break;
-                case "Profit":
-                    this.showProfitChart();
-                    break;
-            }
+            this.refreshChart();
         });
 
         $('input[name="daterange"]').daterangepicker({
@@ -53,6 +45,20 @@ export class DataAnalyse extends PageBase {
         }, function (start, end, label) {
             alert("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
         });
+    }
+
+    private refreshChart() {
+        switch (this.chartDataType()) {
+            case "Quantity":
+                this.showQuantityChart();
+                break;
+            case "Total":
+                this.showTotalChart();
+                break;
+            case "Profit":
+                this.showProfitChart();
+                break;
+        }
     }
 
     public back = () => {
@@ -139,13 +145,13 @@ export class DataAnalyse extends PageBase {
         if (this.isDatePickersInitialized === false) {
             $('input[name="startDate"]').daterangepicker($.extend(datePickerOptions, {
                 startDate: moment(new Date(this.customStartDate)).format("MM/DD/YYYY")
-            }), function (start, end, label) {
+            }), (start, end, label) => {
                 this.customStartDate = start.format('YYYY-MM-DD');
             });
 
             $('input[name="endDate"]').daterangepicker($.extend(datePickerOptions, {
                 startDate: moment(new Date(this.customEndDate)).format("MM/DD/YYYY")
-            }), function (start, end, label) {
+            }), (start, end, label) => {
                 this.customEndDate = start.format('YYYY-MM-DD');
             });
 
@@ -164,6 +170,7 @@ export class DataAnalyse extends PageBase {
         let data = [];
         this.orderRepository.getOrdersForDataAnalyse(timeSpanString, this.selectedQuantitySaleType() != -1, this.selectedQuantitySaleType(), (transaction: SqlTransaction, orderSet: SqlResultSet) => {
             if (orderSet.rows.length > 0) {
+                this.isEmptyData(false);
                 let rows = orderSet.rows;
                 for (let i = 0; i < rows.length; i++) {
                     let order = rows[i];
@@ -183,6 +190,9 @@ export class DataAnalyse extends PageBase {
                     }, this.onDBError);
                 }
             }
+            else {
+                this.isEmptyData(true);
+            }
         }, this.onDBError);
     }
 
@@ -196,6 +206,7 @@ export class DataAnalyse extends PageBase {
         if (this.selectedQuantitySaleType() != -1) {
             this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, this.selectedQuantitySaleType(), (transaction: SqlTransaction, orderSet: SqlResultSet) => {
                 if (orderSet.rows.length > 0) {
+                    this.isEmptyData(false);
                     let rows = orderSet.rows;
                     for (let i = 0; i < rows.length; i++) {
                         let order = rows[i];
@@ -220,6 +231,9 @@ export class DataAnalyse extends PageBase {
                             }
                         }, this.onDBError);
                     }
+                }
+                else {
+                    this.isEmptyData(true);
                 }
             }, this.onDBError);
         }
@@ -296,6 +310,7 @@ export class DataAnalyse extends PageBase {
         if (this.selectedQuantitySaleType() != -1) {
             this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, this.selectedQuantitySaleType(), (transaction: SqlTransaction, orderSet: SqlResultSet) => {
                 if (orderSet.rows.length > 0) {
+                    this.isEmptyData(false);
                     let rows = orderSet.rows;
                     for (let i = 0; i < rows.length; i++) {
                         let order = rows[i];
@@ -320,6 +335,9 @@ export class DataAnalyse extends PageBase {
                             }
                         }, this.onDBError);
                     }
+                }
+                else {
+                    this.isEmptyData(true);
                 }
             }, this.onDBError);
         }

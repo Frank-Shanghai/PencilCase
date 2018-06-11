@@ -30,6 +30,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             _this.customStartDate = '';
             _this.customEndDate = '';
             _this.isDatePickersInitialized = false;
+            _this.isEmptyData = ko.observable(false);
             _this.back = function () {
                 if (_this.isChartVisible()) {
                     _this.isChartVisible(false);
@@ -87,17 +88,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             _this.title = ko.observable("Data Analyse");
             _this.pageId = Consts.Pages.DataAnalyse.Id;
             _this.selectedQuantitySaleType.subscribe(function (newValue) {
-                switch (_this.chartDataType()) {
-                    case "Quantity":
-                        _this.showQuantityChart();
-                        break;
-                    case "Total":
-                        _this.showTotalChart();
-                        break;
-                    case "Profit":
-                        _this.showProfitChart();
-                        break;
-                }
+                _this.refreshChart();
             });
             $('input[name="daterange"]').daterangepicker({
                 opens: 'left'
@@ -106,6 +97,19 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             });
             return _this;
         }
+        DataAnalyse.prototype.refreshChart = function () {
+            switch (this.chartDataType()) {
+                case "Quantity":
+                    this.showQuantityChart();
+                    break;
+                case "Total":
+                    this.showTotalChart();
+                    break;
+                case "Profit":
+                    this.showProfitChart();
+                    break;
+            }
+        };
         DataAnalyse.prototype.showTodayChart = function () {
             this.chartTimespanOption = ChartTimespanOptions.Today;
             this.chartPageTitle("Today");
@@ -122,6 +126,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             this.showQuantityChart();
         };
         DataAnalyse.prototype.showCustomChart = function () {
+            var _this = this;
             this.chartTimespanOption = ChartTimespanOptions.CustomTime;
             this.chartPageTitle("Custom");
             this.customStartDate = moment(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD");
@@ -145,12 +150,12 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                 $('input[name="startDate"]').daterangepicker($.extend(datePickerOptions, {
                     startDate: moment(new Date(this.customStartDate)).format("MM/DD/YYYY")
                 }), function (start, end, label) {
-                    this.customStartDate = start.format('YYYY-MM-DD');
+                    _this.customStartDate = start.format('YYYY-MM-DD');
                 });
                 $('input[name="endDate"]').daterangepicker($.extend(datePickerOptions, {
                     startDate: moment(new Date(this.customEndDate)).format("MM/DD/YYYY")
                 }), function (start, end, label) {
-                    this.customEndDate = start.format('YYYY-MM-DD');
+                    _this.customEndDate = start.format('YYYY-MM-DD');
                 });
                 this.isDatePickersInitialized = true;
             }
@@ -165,6 +170,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             var data = [];
             this.orderRepository.getOrdersForDataAnalyse(timeSpanString, this.selectedQuantitySaleType() != -1, this.selectedQuantitySaleType(), function (transaction, orderSet) {
                 if (orderSet.rows.length > 0) {
+                    _this.isEmptyData(false);
                     var rows_1 = orderSet.rows;
                     var _loop_1 = function (i) {
                         var order = rows_1[i];
@@ -185,6 +191,9 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                         _loop_1(i);
                     }
                 }
+                else {
+                    _this.isEmptyData(true);
+                }
             }, this.onDBError);
         };
         DataAnalyse.prototype.showProfitChart = function () {
@@ -197,6 +206,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             if (this.selectedQuantitySaleType() != -1) {
                 this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, this.selectedQuantitySaleType(), function (transaction, orderSet) {
                     if (orderSet.rows.length > 0) {
+                        _this.isEmptyData(false);
                         var rows_2 = orderSet.rows;
                         var _loop_2 = function (i) {
                             var order = rows_2[i];
@@ -222,6 +232,9 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                         for (var i = 0; i < rows_2.length; i++) {
                             _loop_2(i);
                         }
+                    }
+                    else {
+                        _this.isEmptyData(true);
                     }
                 }, this.onDBError);
             }
@@ -298,6 +311,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             if (this.selectedQuantitySaleType() != -1) {
                 this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, this.selectedQuantitySaleType(), function (transaction, orderSet) {
                     if (orderSet.rows.length > 0) {
+                        _this.isEmptyData(false);
                         var rows_5 = orderSet.rows;
                         var _loop_5 = function (i) {
                             var order = rows_5[i];
@@ -323,6 +337,9 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                         for (var i = 0; i < rows_5.length; i++) {
                             _loop_5(i);
                         }
+                    }
+                    else {
+                        _this.isEmptyData(true);
                     }
                 }, this.onDBError);
             }
