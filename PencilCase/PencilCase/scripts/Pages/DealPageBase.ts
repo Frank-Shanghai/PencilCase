@@ -65,8 +65,8 @@ export class DealPageBase extends PageBase {
         for (let i = 0; i < this.orders().length; i++) {
             if (this.orders()[i].product().Id === this.selectedProduct().Id) {
                 // order.total is a ko.computed observable, so, when quantity changed, the total will be updated automatically
-                this.orders()[i].quantity(this.orders()[i].quantity() + this.selectedProductQuantity());
-                this.totalPrice(this.totalPrice() + this.selectedProductQuantity() * price)
+                this.orders()[i].quantity(Number(this.orders()[i].quantity()) + Number(this.selectedProductQuantity()));
+                this.totalPrice(Number(this.totalPrice()) + Number(this.selectedProductQuantity() * price));
                 isNew = false;
                 break;
             }
@@ -75,10 +75,10 @@ export class DealPageBase extends PageBase {
         if (isNew) {
             let order = new Order(Utils.guid(), this.batchId, this.selectedProduct(), type, this.selectedProductQuantity(), price);
             this.orders.push(order);
-            this.totalPrice(this.totalPrice() + order.total());
+            this.totalPrice(Number(this.totalPrice()) + Number(order.total()));
         }
 
-        this.totalNumber(this.totalNumber() + this.selectedProductQuantity());
+        this.totalNumber(Number(this.totalNumber()) + Number(this.selectedProductQuantity()));
 
         this.cancelOrderAdding();
     }
@@ -92,34 +92,33 @@ export class DealPageBase extends PageBase {
     }
 
     protected increaseQuantity = () => {
-        this.selectedProductQuantity(this.selectedProductQuantity() + 1);
+        this.selectedProductQuantity(Number(this.selectedProductQuantity()) + 1);
     }
 
     protected decreaseQuantity = () => {
-        if (this.selectedProductQuantity() > 0)
-            this.selectedProductQuantity(this.selectedProductQuantity() - 1);
+        if (Number(this.selectedProductQuantity()) > 0)
+            this.selectedProductQuantity(Number(this.selectedProductQuantity()) - 1);
     }
 
     protected increaseOrderProductQuantity = (order: Order) => {
-        order.quantity(order.quantity() + 1);
-        this.totalNumber(this.totalNumber() + 1);
-        // Have the order.price() * 1 here, because the order.praice is string, need this * 1 to make it as a number
-        this.totalPrice(this.totalPrice() + order.price() * 1);
+        order.quantity(Number(order.quantity()) + 1);
+        this.totalNumber(Number(this.totalNumber()) + 1);
+        this.totalPrice(Number(this.totalPrice()) + Number(order.price()));
     }
 
     protected decreaseOrderProductQuantity = (order: Order) => {
-        if (order.quantity() > 0) {
-            order.quantity(order.quantity() - 1);
-            this.totalNumber(this.totalNumber() - 1);
+        if (Number(order.quantity()) > 0) {
+            order.quantity(Number(order.quantity()) - 1);
+            this.totalNumber(Number(this.totalNumber()) - 1);
             // Have the order.price() * 1 here, because the order.praice is string, need this * 1 to make it as a number
-            this.totalPrice(this.totalPrice() - order.price() * 1);
+            this.totalPrice(Number(this.totalPrice()) - Number(order.price()));
         }
     }
 
     protected deleteOrder = (order: Order) => {
         this.orders.remove(order);
-        this.totalNumber(this.totalNumber() - order.quantity())
-        this.totalPrice(this.totalPrice() - order.total());
+        this.totalNumber(Number(this.totalNumber()) - Number(order.quantity()))
+        this.totalPrice(Number(this.totalPrice()) - Number(order.total()));
     }
 
     protected cancelOrders = () => {

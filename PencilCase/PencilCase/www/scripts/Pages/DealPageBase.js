@@ -41,8 +41,8 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Models/Product",
                 for (var i = 0; i < _this.orders().length; i++) {
                     if (_this.orders()[i].product().Id === _this.selectedProduct().Id) {
                         // order.total is a ko.computed observable, so, when quantity changed, the total will be updated automatically
-                        _this.orders()[i].quantity(_this.orders()[i].quantity() + _this.selectedProductQuantity());
-                        _this.totalPrice(_this.totalPrice() + _this.selectedProductQuantity() * price);
+                        _this.orders()[i].quantity(Number(_this.orders()[i].quantity()) + Number(_this.selectedProductQuantity()));
+                        _this.totalPrice(Number(_this.totalPrice()) + Number(_this.selectedProductQuantity() * price));
                         isNew = false;
                         break;
                     }
@@ -50,9 +50,9 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Models/Product",
                 if (isNew) {
                     var order = new Order_1.Order(Utils.guid(), _this.batchId, _this.selectedProduct(), type, _this.selectedProductQuantity(), price);
                     _this.orders.push(order);
-                    _this.totalPrice(_this.totalPrice() + order.total());
+                    _this.totalPrice(Number(_this.totalPrice()) + Number(order.total()));
                 }
-                _this.totalNumber(_this.totalNumber() + _this.selectedProductQuantity());
+                _this.totalNumber(Number(_this.totalNumber()) + Number(_this.selectedProductQuantity()));
                 _this.cancelOrderAdding();
             };
             _this.cancelOrderAdding = function () {
@@ -61,30 +61,29 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Models/Product",
                 _this.selectedProductQuantity(1);
             };
             _this.increaseQuantity = function () {
-                _this.selectedProductQuantity(_this.selectedProductQuantity() + 1);
+                _this.selectedProductQuantity(Number(_this.selectedProductQuantity()) + 1);
             };
             _this.decreaseQuantity = function () {
-                if (_this.selectedProductQuantity() > 0)
-                    _this.selectedProductQuantity(_this.selectedProductQuantity() - 1);
+                if (Number(_this.selectedProductQuantity()) > 0)
+                    _this.selectedProductQuantity(Number(_this.selectedProductQuantity()) - 1);
             };
             _this.increaseOrderProductQuantity = function (order) {
-                order.quantity(order.quantity() + 1);
-                _this.totalNumber(_this.totalNumber() + 1);
-                // Have the order.price() * 1 here, because the order.praice is string, need this * 1 to make it as a number
-                _this.totalPrice(_this.totalPrice() + order.price() * 1);
+                order.quantity(Number(order.quantity()) + 1);
+                _this.totalNumber(Number(_this.totalNumber()) + 1);
+                _this.totalPrice(Number(_this.totalPrice()) + Number(order.price()));
             };
             _this.decreaseOrderProductQuantity = function (order) {
-                if (order.quantity() > 0) {
-                    order.quantity(order.quantity() - 1);
-                    _this.totalNumber(_this.totalNumber() - 1);
+                if (Number(order.quantity()) > 0) {
+                    order.quantity(Number(order.quantity()) - 1);
+                    _this.totalNumber(Number(_this.totalNumber()) - 1);
                     // Have the order.price() * 1 here, because the order.praice is string, need this * 1 to make it as a number
-                    _this.totalPrice(_this.totalPrice() - order.price() * 1);
+                    _this.totalPrice(Number(_this.totalPrice()) - Number(order.price()));
                 }
             };
             _this.deleteOrder = function (order) {
                 _this.orders.remove(order);
-                _this.totalNumber(_this.totalNumber() - order.quantity());
-                _this.totalPrice(_this.totalPrice() - order.total());
+                _this.totalNumber(Number(_this.totalNumber()) - Number(order.quantity()));
+                _this.totalPrice(Number(_this.totalPrice()) - Number(order.total()));
             };
             _this.cancelOrders = function () {
                 _this.orders([]);
