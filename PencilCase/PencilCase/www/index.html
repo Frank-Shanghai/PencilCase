@@ -700,16 +700,21 @@
                 <h4 data-bind="visible: isChartVisible" class="ui-bar ui-bar-a" style="margin-bottom: -0.1em; margin-top: 0">
                     <span data-bind="text: chartPageTitle"></span>
                 </h4>
-                <div class="ui-body ui-body-a" style="padding: 0 0.2em" data-bind="visible: chartPageTitle() == 'Custom'">
-                    <table  style="font-size: 0.8em" >
+                <div class="ui-body ui-body-a" style="padding: 0 0.2em;" data-bind="visible: chartPageTitle() == 'Custom'">
+                    <table>
                         <tr>
-                            <td style="padding-left: 15px">日期：</td>
+                            <td style="padding-left: 15px"><span style="font-size: 0.8em">从：</span></td>
                             <td>
-                                <input type="text" name="daterange" value="01/01/2018 - 01/15/2018" />
+                                <input type="text" name="startDate" style="font-size: 0.8em" />
                             </td>
                         </tr>
-                    </table>
-                    
+                        <tr>
+                            <td style="padding-left: 15px"><span style="font-size: 0.8em">到：</span></td>
+                            <td>
+                                <input type="text" name="endDate"  style="font-size: 0.8em" />
+                            </td>
+                        </tr>
+                    </table>                    
                 </div>
             </div>
             <div data-bind="visible: isChartVisible">

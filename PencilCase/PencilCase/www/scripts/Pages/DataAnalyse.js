@@ -27,9 +27,14 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             _this.orderRepository = new OrderRepository_1.OrderRepository();
             _this.productRepository = new ProductRepository_1.ProductRepository();
             _this.chartPageTitle = ko.observable('');
+            _this.customStartDate = '';
+            _this.customEndDate = '';
+            _this.isDatePickersInitialized = false;
             _this.back = function () {
                 if (_this.isChartVisible()) {
                     _this.isChartVisible(false);
+                    _this.customStartDate = '';
+                    _this.customEndDate = '';
                     // To hide custom datetime picker
                     _this.chartPageTitle(null);
                 }
@@ -119,12 +124,37 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
         DataAnalyse.prototype.showCustomChart = function () {
             this.chartTimespanOption = ChartTimespanOptions.CustomTime;
             this.chartPageTitle("Custom");
-            $('input[name="daterange"]').daterangepicker({
-                opens: 'left'
-            }, function (start, end, label) {
-                alert("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-            });
-            //this.showQuantityChart();
+            this.customStartDate = moment(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD");
+            this.customEndDate = moment(new Date(Date.now())).format("YYYY-MM-DD");
+            var datePickerOptions = {
+                format: 'YYYY-MM-DD',
+                singleDatePicker: true,
+                showDropdowns: true,
+                autoUpdateInput: true,
+                locale: {
+                    applyLabel: '确定',
+                    cancelLabel: '取消',
+                    daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
+                    monthNames: ['一月', '二月', '三月', '四月', '五月', '六月',
+                        '七月', '八月', '九月', '十月', '十一月', '十二月'],
+                    firstDay: 1
+                },
+                opens: "center"
+            };
+            if (this.isDatePickersInitialized === false) {
+                $('input[name="startDate"]').daterangepicker($.extend(datePickerOptions, {
+                    startDate: moment(new Date(this.customStartDate)).format("MM/DD/YYYY")
+                }), function (start, end, label) {
+                    this.customStartDate = start.format('YYYY-MM-DD');
+                });
+                $('input[name="endDate"]').daterangepicker($.extend(datePickerOptions, {
+                    startDate: moment(new Date(this.customEndDate)).format("MM/DD/YYYY")
+                }), function (start, end, label) {
+                    this.customEndDate = start.format('YYYY-MM-DD');
+                });
+                this.isDatePickersInitialized = true;
+            }
+            this.showQuantityChart();
         };
         DataAnalyse.prototype.showTotalChart = function () {
             var _this = this;
@@ -370,6 +400,11 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                     break;
                 case ChartTimespanOptions.Month:
                     timeSpanString = " CreatedDate >= '" + moment(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' and CreatedDate < '" + moment(new Date(Date.now() + 1 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' ";
+                    break;
+                case ChartTimespanOptions.CustomTime:
+                    if (this.customStartDate && this.customEndDate) {
+                        timeSpanString = "CreatedDate >= '" + this.customStartDate + "' and CreatedDate < '" + moment(new Date(new Date(this.customEndDate).getTime() + 1 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' ";
+                    }
                     break;
             }
             return timeSpanString;

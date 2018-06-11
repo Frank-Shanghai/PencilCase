@@ -25,6 +25,10 @@ export class DataAnalyse extends PageBase {
     private chartComponent;
     private chartPageTitle = ko.observable('');
 
+    private customStartDate: string = '';
+    private customEndDate: string = '';
+    private isDatePickersInitialized = false;
+
     constructor() {
         super();
         this.title = ko.observable("Data Analyse");
@@ -54,6 +58,9 @@ export class DataAnalyse extends PageBase {
     public back = () => {
         if (this.isChartVisible()) {
             this.isChartVisible(false);
+
+            this.customStartDate = '';
+            this.customEndDate = '';
 
             // To hide custom datetime picker
             this.chartPageTitle(null);
@@ -110,13 +117,42 @@ export class DataAnalyse extends PageBase {
     public showCustomChart() {
         this.chartTimespanOption = ChartTimespanOptions.CustomTime;
         this.chartPageTitle("Custom");
-        $('input[name="daterange"]').daterangepicker({
-            opens: 'left'
-        }, function (start, end, label) {
-            alert("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-        });
+        this.customStartDate = moment(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD");
+        this.customEndDate = moment(new Date(Date.now())).format("YYYY-MM-DD");
 
-        //this.showQuantityChart();
+        let datePickerOptions = {
+            format: 'YYYY-MM-DD',
+            singleDatePicker: true,
+            showDropdowns: true,
+            autoUpdateInput: true,
+            locale: {
+                applyLabel: '确定',
+                cancelLabel: '取消',
+                daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
+                monthNames: ['一月', '二月', '三月', '四月', '五月', '六月',
+                    '七月', '八月', '九月', '十月', '十一月', '十二月'],
+                firstDay: 1
+            },
+            opens: "center"
+        };
+
+        if (this.isDatePickersInitialized === false) {
+            $('input[name="startDate"]').daterangepicker($.extend(datePickerOptions, {
+                startDate: moment(new Date(this.customStartDate)).format("MM/DD/YYYY")
+            }), function (start, end, label) {
+                this.customStartDate = start.format('YYYY-MM-DD');
+            });
+
+            $('input[name="endDate"]').daterangepicker($.extend(datePickerOptions, {
+                startDate: moment(new Date(this.customEndDate)).format("MM/DD/YYYY")
+            }), function (start, end, label) {
+                this.customEndDate = start.format('YYYY-MM-DD');
+            });
+
+            this.isDatePickersInitialized = true;
+        }
+
+        this.showQuantityChart();
     }
 
     private showTotalChart() {
@@ -230,7 +266,7 @@ export class DataAnalyse extends PageBase {
                                                 if (productExisted === true) {
                                                     data[index] = data[index] + (Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost));
                                                 }
-                                                else {                                                    
+                                                else {
                                                     data.push(Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost));
                                                 }
 
@@ -385,6 +421,11 @@ export class DataAnalyse extends PageBase {
                 break;
             case ChartTimespanOptions.Month:
                 timeSpanString = " CreatedDate >= '" + moment(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' and CreatedDate < '" + moment(new Date(Date.now() + 1 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' ";
+                break;
+            case ChartTimespanOptions.CustomTime:
+                if (this.customStartDate && this.customEndDate) {
+                    timeSpanString = "CreatedDate >= '" + this.customStartDate + "' and CreatedDate < '" + moment(new Date(new Date(this.customEndDate).getTime() + 1 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' ";
+                }
                 break;
         }
 
