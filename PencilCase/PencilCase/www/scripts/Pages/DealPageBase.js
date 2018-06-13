@@ -47,6 +47,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Models/Product",
             _this.productRepository = new ProductRepository_1.ProductRepository();
             _this.orderRepository = new OrderRepository_1.OrderRepository();
             _this.orderQuantitySubscriptions = [];
+            _this.invalidOrderCount = ko.observable(0);
             _this.addOrderWithSpecifiedPrice = function (price, type) {
                 if (_this.batchId == null)
                     _this.batchId = Utils.guid();
@@ -66,6 +67,16 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Models/Product",
                     // Use the custom ko observable function subscribeChanged, refer to the file top code for more details about implementation
                     //https://stackoverflow.com/questions/12822954/get-previous-value-of-an-observable-in-subscribe-of-same-observable
                     _this.orderQuantitySubscriptions.push(order_1.quantity.subscribeChanged(function (newValue, oldValue) {
+                        if (newValue < 0) {
+                            if (oldValue >= 0) {
+                                _this.invalidOrderCount(_this.invalidOrderCount() + 1);
+                            }
+                        }
+                        if (newValue >= 0) {
+                            if (oldValue < 0) {
+                                _this.invalidOrderCount(_this.invalidOrderCount() - 1);
+                            }
+                        }
                         _this.totalNumber(Number(_this.totalNumber()) - Number(oldValue) + Number(newValue));
                         _this.totalPrice(Number(_this.totalPrice()) - Number(oldValue * order_1.price()) + Number(newValue * order_1.price()));
                     }, null, order_1));
@@ -104,6 +115,8 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Models/Product",
             };
             _this.deleteOrder = function (order) {
                 _this.orders.remove(order);
+                if (order.quantity() < 0)
+                    _this.invalidOrderCount(_this.invalidOrderCount() - 1);
                 _this.totalNumber(Number(_this.totalNumber()) - Number(order.quantity()));
                 _this.totalPrice(Number(_this.totalPrice()) - Number(order.total()));
             };
@@ -113,6 +126,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Models/Product",
                 _this.totalPrice(0);
                 _this.batchId = null;
                 _this.cancelOrderAdding();
+                _this.invalidOrderCount(0);
             };
             _this.back = Navigator_1.Navigator.instance.goHome;
             return _this;

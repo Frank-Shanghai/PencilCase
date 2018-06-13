@@ -273,14 +273,14 @@
                     <tr>
                         <td><span style="font-weight: bold; display: inline">数量：</span></td>
                         <td><a style="margin: 0" href="#" data-bind="click: decreaseQuantity" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-minus ui-btn-icon-notext ui-btn-inline">Minus</a></td>
-                        <td><input data-mini="true" type="number" style="width: 50px" data-bind="value: selectedProductQuantity" /></td>
+                        <td><input data-mini="true" type="number" style="width: 50px" data-bind="textInput: selectedProductQuantity" /></td>
                         <td><a style="margin: 0" href="#" data-bind="click: increaseQuantity" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-notext ui-btn-inline">Plus</a></td>
                     </tr>
                 </table>
             </div>
             <div style="margin-left: 3px;" class="ui-grid-a" data-bind="visible: productSelected">
                 <div class="ui-block-a">
-                    <button class="ui-btn ui-mini ui-corner-all ui-shadow" href="#" data-bind="click: addOrder, enable: selectedProductQuantity() > 0">添加商品</button>
+                    <a data-role="button" class="ui-btn ui-mini ui-corner-all ui-shadow" href="#" data-bind="click: addOrder, css:{ 'ui-state-disabled': selectedProductQuantity() <= 0}">添加商品</a>
                 </div>
                 <div class="ui-block-b">
                     <a data-role="button" class="ui-btn ui-mini ui-corner-all ui-shadow" href="#" data-bind="click: cancelOrderAdding">取消</a>
@@ -318,7 +318,7 @@
                                                     <!-- Use textInput binding instead of value binding to make the data changed immediatly, but not on losing focus. -->
                                                     <!-- http://knockoutjs.com/documentation/textinput-binding.html -->
                                                     <!--<input type="number" style="width: 30px; text-align: center" data-bind="value: quantity" />-->
-                                                    <input type="number" style="width: 30px; text-align: center" data-bind="textInput: quantity" />
+                                                    <input type="number" style="width: 30px; text-align: center" data-bind="textInput: quantity, css: {'textbox-validation-error': quantity() < 0}" />
                                                 </td>
                                                 <td>
                                                     <a href="#" style="margin: 0" class="ui-btn ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-notext ui-btn-inline" data-bind="click: $parent.increaseOrderProductQuantity">Plus</a>
@@ -347,7 +347,7 @@
             <div data-role="navbar" data-grid="a">
                 <ul>
                     <li>
-                        <a href="#" data-icon="check" data-bind="click: save, css: {'ui-btn-active': !(orders().length > 0)}">结算</a>
+                        <a href="#" data-icon="check" data-bind="click: save, css: {'ui-btn-active': !(orders().length > 0), 'ui-state-disabled': invalidOrderCount() > 0}">结算</a>
                     </li>
                     <li>
                         <a href="#" data-icon="delete" data-bind="click: cancelOrders, css: {'ui-btn-active': !(orders().length > 0)}">取消</a>
@@ -384,14 +384,14 @@
                     <tr>
                         <td><span style="font-weight: bold; display: inline">数量：</span></td>
                         <td><a style="margin: 0" href="#" data-bind="click: decreaseQuantity" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-minus ui-btn-icon-notext ui-btn-inline">Minus</a></td>
-                        <td><input data-mini="true" type="number" style="width: 50px" data-bind="value: selectedProductQuantity" /></td>
+                        <td><input data-mini="true" type="number" style="width: 50px" data-bind="textInput: selectedProductQuantity" /></td>
                         <td><a style="margin: 0" href="#" data-bind="click: increaseQuantity" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-notext ui-btn-inline">Plus</a></td>
                     </tr>
                 </table>
             </div>
             <div style="margin-left: 3px;" class="ui-grid-a" data-bind="visible: productSelected">
                 <div class="ui-block-a">
-                    <button class="ui-btn ui-mini ui-corner-all ui-shadow" href="#" data-bind="click: addOrder, enable: selectedProductQuantity() > 0">添加商品</button>
+                    <a data-role="button" class="ui-btn ui-mini ui-corner-all ui-shadow" href="#" data-bind="click: addOrder, css:{ 'ui-state-disabled': selectedProductQuantity() <= 0}">添加商品</a>
                 </div>
                 <div class="ui-block-b">
                     <a data-role="button" class="ui-btn ui-mini ui-corner-all ui-shadow" href="#" data-bind="click: cancelOrderAdding">取消</a>
@@ -414,7 +414,7 @@
                                     </div>
                                 </td>
                                 <th rowspan="2" style="width: 1em">
-                                    <a href="#" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline" data-bind="click: $parent.showDetails"></a>
+                                    <a href="#" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline" data-bind="click: $parent.deleteOrder"></a>
                                 </th>
                             </tr>
                             <tr>
@@ -429,7 +429,7 @@
                                                     <!-- Use textInput binding instead of value binding to make the data changed immediatly, but not on losing focus. -->
                                                     <!-- http://knockoutjs.com/documentation/textinput-binding.html -->
                                                     <!--<input type="number" style="width: 30px; text-align: center" data-bind="value: quantity" />-->
-                                                    <input type="number" style="width: 30px; text-align: center" data-bind="textInput: quantity" />
+                                                    <input type="number" style="width: 30px; text-align: center" data-bind="textInput: quantity, css: {'textbox-validation-error': quantity() < 0}" />
                                                 </td>
                                                 <td>
                                                     <a href="#" style="margin: 0" class="ui-btn ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-notext ui-btn-inline" data-bind="click: $parent.increaseOrderProductQuantity">Plus</a>
@@ -457,7 +457,7 @@
             <div data-role="navbar" data-grid="a">
                 <ul>
                     <li>
-                        <a href="#" data-icon="check" data-bind="click: save, css: {'ui-btn-active': !(orders().length > 0)}">结算</a>
+                        <a href="#" data-icon="check" data-bind="click: save, css: {'ui-btn-active': !(orders().length > 0), 'ui-state-disabled': invalidOrderCount() > 0}">结算</a>
                     </li>
                     <li>
                         <a href="#" data-icon="delete" data-bind="click: cancelOrders, css: {'ui-btn-active': !(orders().length > 0)}">取消</a>
@@ -494,14 +494,14 @@
                     <tr>
                         <td><span style="font-weight: bold; display: inline">数量：</span></td>
                         <td><a style="margin: 0" href="#" data-bind="click: decreaseQuantity" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-minus ui-btn-icon-notext ui-btn-inline">Minus</a></td>
-                        <td><input data-mini="true" type="number" style="width: 50px" data-bind="value: selectedProductQuantity" /></td>
+                        <td><input data-mini="true" type="number" style="width: 50px" data-bind="textInput: selectedProductQuantity" /></td>
                         <td><a style="margin: 0" href="#" data-bind="click: increaseQuantity" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-notext ui-btn-inline">Plus</a></td>
                     </tr>
                 </table>
             </div>
             <div style="margin-left: 3px;" class="ui-grid-a" data-bind="visible: productSelected">
                 <div class="ui-block-a">
-                    <button class="ui-btn ui-mini ui-corner-all ui-shadow" href="#" data-bind="click: addOrder, enable: selectedProductQuantity() > 0">添加商品</button>
+                    <a data-role="button" class="ui-btn ui-mini ui-corner-all ui-shadow" href="#" data-bind="click: addOrder, css:{ 'ui-state-disabled': selectedProductQuantity() <= 0}">添加商品</a>
                 </div>
                 <div class="ui-block-b">
                     <a data-role="button" class="ui-btn ui-mini ui-corner-all ui-shadow" href="#" data-bind="click: cancelOrderAdding">取消</a>
@@ -537,7 +537,7 @@
                                                     <!-- Use textInput binding instead of value binding to make the data changed immediatly, but not on losing focus. -->
                                                     <!-- http://knockoutjs.com/documentation/textinput-binding.html -->
                                                     <!--<input type="number" style="width: 30px; text-align: center" data-bind="value: quantity" />-->
-                                                    <input type="number" style="width: 30px; text-align: center" data-bind="textInput: quantity" />
+                                                    <input type="number" style="width: 30px; text-align: center" data-bind="textInput: quantity, css: {'textbox-validation-error': quantity() < 0}" />
                                                 </td>
                                                 <td>
                                                     <a href="#" style="margin: 0" class="ui-btn ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-notext ui-btn-inline" data-bind="click: $parent.increaseOrderProductQuantity">Plus</a>
@@ -565,7 +565,7 @@
             <div data-role="navbar" data-grid="a">
                 <ul>
                     <li>
-                        <a href="#" data-icon="check" data-bind="click: save, css: {'ui-btn-active': !(orders().length > 0)}">结算</a>
+                        <a href="#" data-icon="check" data-bind="click: save, css: {'ui-btn-active': !(orders().length > 0), 'ui-state-disabled': invalidOrderCount() > 0}">结算</a>
                     </li>
                     <li>
                         <a href="#" data-icon="delete" data-bind="click: cancelOrders, css: {'ui-btn-active': !(orders().length > 0)}">取消</a>

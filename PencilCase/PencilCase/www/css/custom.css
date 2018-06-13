@@ -1,3 +1,7 @@
 ﻿.ui-mobile, .ui-mobile body {
     height: unset;
 }
+
+.textbox-validation-error {
+    border-color: red;
+}
