@@ -1,4 +1,4 @@
-define(["require", "exports", "../application"], function (require, exports, application_1) {
+define(["require", "exports", "../application", "../Models/Order"], function (require, exports, application_1, Order_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var OrderRepository = (function () {
@@ -30,6 +30,29 @@ define(["require", "exports", "../application"], function (require, exports, app
             };
             this.db = application_1.Application.instance.openDataBase();
         }
+        OrderRepository.prototype.getOrdersForDataAnalyse = function (timeSpanString, groupByType, type, successCallback, errorCallback) {
+            var conditions = " where ";
+            conditions += timeSpanString;
+            switch (type) {
+                case Order_1.OrderTypes.Retail:
+                    conditions += " and Type = 1";
+                    break;
+                case Order_1.OrderTypes.Wholesale:
+                    conditions += " and Type = 2";
+                    break;
+            }
+            var sqlString = '';
+            if (groupByType == true) {
+                sqlString = "select ProductId, Type, Sum(Quantity) as Quantity, Sum(Total) as Total from Orders" + conditions + " group by ProductId, Type";
+            }
+            else {
+                conditions += " and Type != 3"; // exculde import orders
+                sqlString = "select ProductId, Sum(Quantity) as Quantity, Sum(Total) as Total from Orders" + conditions + " group by ProductId";
+            }
+            this.db.transaction(function (transaction) {
+                transaction.executeSql(sqlString, [], successCallback, errorCallback);
+            });
+        };
         return OrderRepository;
     }());
     exports.OrderRepository = OrderRepository;

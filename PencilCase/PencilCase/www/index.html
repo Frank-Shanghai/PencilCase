@@ -13,6 +13,7 @@
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
     <link rel="stylesheet" type="text/css" href="css/index.css">
     <link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.4.5.min.css">
+    <link rel="stylesheet" type="text/css" href="css/daterangepicker.css" />
     <link rel="stylesheet" type="text/css" href="css/custom.css" />
 
     <script type="text/javascript" src="cordova.js"></script>
@@ -22,6 +23,8 @@
     <script type="text/javascript" src="scripts/jquery.mobile-1.4.5.min.js"></script>
     <script type="text/javascript" src="scripts/Chart.min.js"></script>
     <script type="text/javascript" src="scripts/moment.min.js"></script>
+    <script type="text/javascript" src="scripts/daterangepicker.js"></script>
+    <script type="text/javascript" src="scripts/palette.js"></script>
     <script type="text/javascript" data-main="scripts/startup" src="lib/require.2.1.8.js" async></script>
     <script type="text/javascript" src="scripts/CustomBindings/Bindings.js"></script>
     <script type="text/javascript" src="scripts/CustomBindings/ListviewBinding.js"></script>
@@ -684,12 +687,60 @@
         <!-- ko if: activePage().pageId === 'DataAnalyse' -->
         <!-- ko with: activePage() -->
         <div data-role="header" data-position="fixed" data-tap-toggle="false">
-            <a href="#HomePage" data-icon="home" data-bind="click: navigator.goHome">Home</a>
+            <a href="#" data-icon="back" data-bind="click: back">Back</a>
             <h1><span data-bind="text: title"></span></h1>
         </div>
         <div data-role="main" class="ui-content">
-            <a href="#" class="ui-btn ui-corner-all" data-bind="click: showTodayChart">Today</a>
-            <canvas id="myChart" width="400" height="400"></canvas>
+            <div class="ui-grid-a" data-bind="visible: !isChartVisible()">
+                <div class="ui-block-a">
+                    <a href="#" data-role="button" data-bind="click: showTodayChart">Today</a>
+                </div>
+                <div class="ui-block-b">
+                    <a href="#" data-role="button" data-bind="click: showWeekChart">Week</a>
+                </div>
+                <div class="ui-block-a">
+                    <a href="#" data-role="button" data-bind="click: showMonthChart">Month</a>
+                </div>
+                <div class="ui-block-b">
+                    <a href="#" data-role="button" data-bind="click: showCustomChart">Custom</a>
+                </div>
+            </div>
+            <div>
+                <h4 data-bind="visible: isChartVisible" class="ui-bar ui-bar-a" style="margin-bottom: -0.1em; margin-top: 0">
+                    <span data-bind="text: chartPageTitle"></span>
+                </h4>
+                <div class="ui-body ui-body-a" style="padding: 0 0.2em;" data-bind="visible: chartPageTitle() == 'Custom'">
+                    <table>
+                        <tr>
+                            <td>
+                                <input type="text" name="startDate" style="font-size: 0.8em" />                                
+                            </td>
+                            <td><span style="padding:0 5px">~</span></td>
+                            <td>
+                                <input type="text" name="endDate" style="font-size: 0.8em" />
+                            </td>
+                            <td>
+                                <a href="#" class="ui-btn ui-icon-refresh ui-btn-icon-notext ui-corner-all" data-bind="click: refreshChart"></a>
+                            </td>
+                        </tr>
+                    </table>                    
+                </div>
+            </div>
+            <div data-bind="visible: isChartVisible">
+                <div data-role="navbar" data-bind="initialSelectedTab: {condition: isChartVisible, selector: 'a#quantityTab'}">
+                    <ul>
+                        <li><a href="#" id="quantityTab" data-ajax="false" class="ui-btn-active" data-bind="click: ()=>{setChartDataType('Quantity');}">Quantity</a></li>
+                        <li><a href="#" data-ajax="false" data-bind="click: ()=>{setChartDataType('Total');}">Total</a></li>
+                        <li><a href="#" data-ajax="false" data-bind="click: ()=>{setChartDataType('Profit');}">Profit</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <select data-mini="true" data-native-menu="false" data-bind="options: quantitySaleTypeOptinos, optionsText: 'text', optionsValue: 'value', value: selectedQuantitySaleType"></select>
+                    <span style="font-size: 0.8em; color:blue" data-bind="text: '* 此处数量单位为零售单位，便于比较。', visible: (chartDataType() == 'Quantity' && selectedQuantitySaleType().toString() != '1') && (!isEmptyData())"></span>
+                    <canvas id="dataChart" width="400" height="400" data-bind="visible: !isEmptyData()"></canvas>
+                    <span data-bind="visible: isEmptyData">无数据！</span>
+                </div>
+            </div>
         </div>
         <!-- /ko -->
         <!-- /ko -->

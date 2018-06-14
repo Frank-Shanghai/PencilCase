@@ -12,15 +12,18 @@ var InitialSelectedTabBinding = (function () {
         var selector = value.selector;
         var conditionSubscription = null;
         if (ko.isObservable(condition)) {
-            var linkElement_1 = $(element).find(selector).first();
-            if (linkElement_1.length != 0) {
-                conditionSubscription = condition.subscribe(function (newValue) {
-                    if (newValue === true) {
-                        linkElement_1.click();
-                    }
-                });
-                linkElement_1.click();
-            }
+            var handler_1 = function () {
+                var linkElement = $(element).find(selector).first();
+                if (linkElement.length != 0) {
+                    linkElement.click();
+                }
+            };
+            conditionSubscription = condition.subscribe(function (newValue) {
+                if (newValue === true) {
+                    handler_1();
+                }
+            });
+            handler_1();
         }
         ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
             if (conditionSubscription)

@@ -11,15 +11,20 @@
         let conditionSubscription: KnockoutSubscription = null;
 
         if (ko.isObservable(condition)) {
-            let linkElement = $(element).find(selector).first();
-            if (linkElement.length != 0) {
-                conditionSubscription = condition.subscribe((newValue: any) => {
-                    if (newValue === true) {
-                        linkElement.click();
-                    }
-                });
-                linkElement.click();
+            let handler = () => {
+                let linkElement = $(element).find(selector).first();
+                if (linkElement.length != 0) {
+                    linkElement.click();
+                }
             }
+
+            conditionSubscription = condition.subscribe((newValue: any) => {
+                if (newValue === true) {
+                    handler();
+                }
+            });
+
+            handler();
         }
 
         ko.utils.domNodeDisposal.addDisposeCallback(element, () => {

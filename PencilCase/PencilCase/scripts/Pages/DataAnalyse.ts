@@ -1,58 +1,460 @@
 ﻿import { PageBase } from './PageBase';
 import { Navigator } from '../Navigator';
 import * as Consts from './Consts';
+import { OrderTypes } from '../Models/Order';
+import { OrderRepository } from '../Repositories/OrderRepository';
+import { ProductRepository } from '../Repositories/ProductRepository';
+
+declare var palette: any;
 
 export class DataAnalyse extends PageBase {
     private navigator: Navigator = Navigator.instance;
+    private isChartVisible: KnockoutObservable<boolean> = ko.observable(false);
+    private chartTimespanOption: ChartTimespanOptions;
+    private chartDataType: KnockoutObservable<string> = ko.observable("Quantity");
+    private quantitySaleTypeOptinos = [
+        { text: "Retail", value: OrderTypes.Retail },
+        { text: "Wholesale", value: OrderTypes.Wholesale },
+        { text: "Both", value: -1 }
+    ];
+    private selectedQuantitySaleType: KnockoutObservable<any> = ko.observable(OrderTypes.Retail);
+
+    private orderRepository = new OrderRepository();
+    private productRepository = new ProductRepository();
+
+    private chartComponent;
+    private chartPageTitle = ko.observable('');
+
+    private customStartDate: string = '';
+    private customEndDate: string = '';
+    private isDatePickersInitialized = false;
+
+    private isEmptyData: KnockoutObservable<boolean> = ko.observable(false);
 
     constructor() {
         super();
         this.title = ko.observable("Data Analyse");
         this.pageId = Consts.Pages.DataAnalyse.Id;
-        this.back = Navigator.instance.goHome;
+
+        this.selectedQuantitySaleType.subscribe((newValue: any) => {
+            this.refreshChart();
+        });
+
+        $('input[name="daterange"]').daterangepicker({
+            opens: 'left'
+        }, function (start, end, label) {
+            alert("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        });
+    }
+
+    private refreshChart() {
+        switch (this.chartDataType()) {
+            case "Quantity":
+                this.showQuantityChart();
+                break;
+            case "Total":
+                this.showTotalChart();
+                break;
+            case "Profit":
+                this.showProfitChart();
+                break;
+        }
+    }
+
+    public back = () => {
+        if (this.isChartVisible()) {
+            this.isChartVisible(false);
+
+            this.customStartDate = '';
+            this.customEndDate = '';
+
+            // To hide custom datetime picker
+            this.chartPageTitle(null);
+        }
+        else {
+            this.navigator.goHome();
+        }
     }
 
     private onDBError = (transaction: SqlTransaction, sqlError: SqlError) => {
         alert("Data Analyse Page: " + sqlError.message);
     }
 
-    public showTodayChart() {
-        var ctx = (<any>(document.getElementById("myChart"))).getContext("2d");
-        var myChart = new Chart(ctx, {
+    private setChartDataType = (dataType: string) => {
+        switch (dataType) {
+            case "Quantity":
+                if (this.chartDataType() !== "Quantity") {
+                    this.showQuantityChart();
+                }
+                break;
+            case "Total":
+                if (this.chartDataType() !== "Total") {
+                    this.showTotalChart();
+                }
+
+                break;
+            case "Profit":
+                if (this.chartDataType() !== "Profit") {
+                    this.showProfitChart();
+                }
+
+                break;
+        }
+    }
+
+    private showTodayChart() {
+        this.chartTimespanOption = ChartTimespanOptions.Today;
+        this.chartPageTitle("Today");
+
+        this.showQuantityChart();
+    }
+
+    public showWeekChart() {
+        this.chartTimespanOption = ChartTimespanOptions.Week;
+        this.chartPageTitle("Week");
+        this.showQuantityChart();
+    }
+
+    public showMonthChart() {
+        this.chartTimespanOption = ChartTimespanOptions.Month;
+        this.chartPageTitle("Month");
+        this.showQuantityChart();
+    }
+    public showCustomChart() {
+        this.chartTimespanOption = ChartTimespanOptions.CustomTime;
+        this.chartPageTitle("Custom");
+        this.customStartDate = moment(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD");
+        this.customEndDate = moment(new Date(Date.now())).format("YYYY-MM-DD");
+
+        let datePickerOptions = {
+            format: 'YYYY-MM-DD',
+            singleDatePicker: true,
+            showDropdowns: true,
+            autoUpdateInput: true,
+            locale: {
+                applyLabel: '确定',
+                cancelLabel: '取消',
+                daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
+                monthNames: ['一月', '二月', '三月', '四月', '五月', '六月',
+                    '七月', '八月', '九月', '十月', '十一月', '十二月'],
+                firstDay: 1
+            },
+            opens: "center"
+        };
+
+        if (this.isDatePickersInitialized === false) {
+            $('input[name="startDate"]').daterangepicker($.extend(datePickerOptions, {
+                startDate: moment(new Date(this.customStartDate)).format("MM/DD/YYYY")
+            }), (start, end, label) => {
+                this.customStartDate = start.format('YYYY-MM-DD');
+            });
+
+            $('input[name="endDate"]').daterangepicker($.extend(datePickerOptions, {
+                startDate: moment(new Date(this.customEndDate)).format("MM/DD/YYYY")
+            }), (start, end, label) => {
+                this.customEndDate = start.format('YYYY-MM-DD');
+            });
+
+            this.isDatePickersInitialized = true;
+        }
+
+        this.showQuantityChart();
+    }
+
+    private showTotalChart() {
+        this.chartDataType("Total");
+        this.isChartVisible(true);
+        let timeSpanString = this.getTimespanStringByOption(this.chartTimespanOption);
+
+        let labels = [];
+        let data = [];
+        this.orderRepository.getOrdersForDataAnalyse(timeSpanString, this.selectedQuantitySaleType() != -1, this.selectedQuantitySaleType(), (transaction: SqlTransaction, orderSet: SqlResultSet) => {
+            if (orderSet.rows.length > 0) {
+                this.isEmptyData(false);
+                let rows = orderSet.rows;
+                for (let i = 0; i < rows.length; i++) {
+                    let order = rows[i];
+                    this.productRepository.getProductById(order.ProductId, (transaction: SqlTransaction, productSet: SqlResultSet) => {
+                        if (productSet.rows.length > 0) {
+                            labels.push(productSet.rows[0].Name);
+                        }
+                        else {
+                            labels.push("unknown" + i);
+                        }
+
+                        data.push(order.Total);
+
+                        if (rows.length - 1 == i) {
+                            this.initializeChart(labels, data);
+                        }
+                    }, this.onDBError);
+                }
+            }
+            else {
+                this.isEmptyData(true);
+            }
+        }, this.onDBError);
+    }
+
+    private showProfitChart() {
+        this.chartDataType("Profit");
+        this.isChartVisible(true);
+        let timeSpanString = this.getTimespanStringByOption(this.chartTimespanOption);
+
+        let labels = [];
+        let data = [];
+        if (this.selectedQuantitySaleType() != -1) {
+            this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, this.selectedQuantitySaleType(), (transaction: SqlTransaction, orderSet: SqlResultSet) => {
+                if (orderSet.rows.length > 0) {
+                    this.isEmptyData(false);
+                    let rows = orderSet.rows;
+                    for (let i = 0; i < rows.length; i++) {
+                        let order = rows[i];
+                        this.productRepository.getProductById(order.ProductId, (transaction: SqlTransaction, productSet: SqlResultSet) => {
+                            if (productSet.rows.length > 0) {
+                                labels.push(productSet.rows[0].Name);
+                            }
+                            else {
+                                labels.push("unknown" + i);
+                            }
+
+                            //wholesale
+                            if (order.Type == 2) {
+                                data.push(Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost));
+                            }
+                            else {
+                                data.push(Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].RetailCost));
+                            }
+
+                            if (rows.length - 1 == i) {
+                                this.initializeChart(labels, data);
+                            }
+                        }, this.onDBError);
+                    }
+                }
+                else {
+                    this.isEmptyData(true);
+                }
+            }, this.onDBError);
+        }
+        else {
+            this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, OrderTypes.Retail, (transaction: SqlTransaction, orderSet: SqlResultSet) => {
+                if (orderSet.rows.length > 0) {
+                    let rows = orderSet.rows;
+                    for (let i = 0; i < rows.length; i++) {
+                        let order = rows[i];
+                        this.productRepository.getProductById(order.ProductId, (transaction: SqlTransaction, productSet: SqlResultSet) => {
+                            if (productSet.rows.length > 0) {
+                                labels.push(productSet.rows[0].Name);
+                            }
+                            else {
+                                labels.push("unknown" + i);
+                            }
+
+                            //retail
+                            data.push(Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].RetailCost));
+
+                            if (rows.length - 1 == i) {
+                                this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, OrderTypes.Wholesale, (transaction: SqlTransaction, orderSet: SqlResultSet) => {
+                                    if (orderSet.rows.length > 0) {
+                                        let rows = orderSet.rows;
+                                        for (let i = 0; i < rows.length; i++) {
+                                            let order = rows[i];
+                                            this.productRepository.getProductById(order.ProductId, (transaction: SqlTransaction, productSet: SqlResultSet) => {
+                                                let productExisted = false;
+                                                let index = -1;
+                                                if (productSet.rows.length > 0) {
+                                                    index = labels.indexOf(productSet.rows[0].Name);
+                                                    if (index < 0) {
+                                                        labels.push(productSet.rows[0].Name);
+                                                    }
+                                                    else {
+                                                        productExisted = true;
+                                                    }
+                                                }
+                                                else {
+                                                    labels.push("unknown" + i);
+                                                }
+
+                                                //wholesale
+                                                if (productExisted === true) {
+                                                    data[index] = data[index] + (Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost));
+                                                }
+                                                else {
+                                                    data.push(Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost));
+                                                }
+
+                                                if (rows.length - 1 == i) {
+                                                    this.initializeChart(labels, data);
+                                                }
+                                            }, this.onDBError);
+                                        }
+                                    }
+                                }, this.onDBError);
+
+                            }
+                        }, this.onDBError);
+                    }
+                }
+            }, this.onDBError);
+        }
+    }
+
+    public showQuantityChart() {
+        this.chartDataType("Quantity");
+        this.isChartVisible(true);
+        let timeSpanString = this.getTimespanStringByOption(this.chartTimespanOption);
+
+        let labels = [];
+        let data = [];
+        if (this.selectedQuantitySaleType() != -1) {
+            this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, this.selectedQuantitySaleType(), (transaction: SqlTransaction, orderSet: SqlResultSet) => {
+                if (orderSet.rows.length > 0) {
+                    this.isEmptyData(false);
+                    let rows = orderSet.rows;
+                    for (let i = 0; i < rows.length; i++) {
+                        let order = rows[i];
+                        this.productRepository.getProductById(order.ProductId, (transaction: SqlTransaction, productSet: SqlResultSet) => {
+                            if (productSet.rows.length > 0) {
+                                labels.push(productSet.rows[0].Name);
+                            }
+                            else {
+                                labels.push("unknown" + i);
+                            }
+
+                            //wholesale
+                            if (order.Type == 2) {
+                                data.push(order.Quantity * productSet.rows[0].Times);
+                            }
+                            else {
+                                data.push(order.Quantity);
+                            }
+
+                            if (rows.length - 1 == i) {
+                                this.initializeChart(labels, data);
+                            }
+                        }, this.onDBError);
+                    }
+                }
+                else {
+                    this.isEmptyData(true);
+                }
+            }, this.onDBError);
+        }
+        else {
+            this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, OrderTypes.Retail, (transaction: SqlTransaction, orderSet: SqlResultSet) => {
+                if (orderSet.rows.length > 0) {
+                    let rows = orderSet.rows;
+                    for (let i = 0; i < rows.length; i++) {
+                        let order = rows[i];
+                        this.productRepository.getProductById(order.ProductId, (transaction: SqlTransaction, productSet: SqlResultSet) => {
+                            if (productSet.rows.length > 0) {
+                                labels.push(productSet.rows[0].Name);
+                            }
+                            else {
+                                labels.push("unknown" + i);
+                            }
+
+                            //retail
+                            data.push(order.Quantity);
+
+                            if (rows.length - 1 == i) {
+                                this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, OrderTypes.Wholesale, (transaction: SqlTransaction, orderSet: SqlResultSet) => {
+                                    if (orderSet.rows.length > 0) {
+                                        let rows = orderSet.rows;
+                                        for (let i = 0; i < rows.length; i++) {
+                                            let order = rows[i];
+                                            this.productRepository.getProductById(order.ProductId, (transaction: SqlTransaction, productSet: SqlResultSet) => {
+                                                let productExisted = false;
+                                                let index = -1;
+                                                if (productSet.rows.length > 0) {
+                                                    index = labels.indexOf(productSet.rows[0].Name);
+                                                    if (index < 0) {
+                                                        labels.push(productSet.rows[0].Name);
+                                                    }
+                                                    else {
+                                                        productExisted = true;
+                                                    }
+                                                }
+                                                else {
+                                                    labels.push("unknown" + i);
+                                                }
+
+                                                //wholesale
+                                                if (productExisted === true) {
+                                                    data[index] = data[index] + (order.Quantity * productSet.rows[0].Times);
+                                                }
+                                                else {
+                                                    data.push(order.Quantity * productSet.rows[0].Times);
+                                                }
+
+                                                if (rows.length - 1 == i) {
+                                                    this.initializeChart(labels, data);
+                                                }
+                                            }, this.onDBError);
+                                        }
+                                    }
+                                }, this.onDBError);
+
+                            }
+                        }, this.onDBError);
+                    }
+                }
+            }, this.onDBError);
+
+        }
+    }
+
+    private initializeChart = (labels: Array<any>, data: Array<any>) => {
+        var ctx = (<any>(document.getElementById("dataChart"))).getContext("2d");
+
+        //Why have to make the todayChart as a class scoped variable
+        //https://github.com/chartjs/Chart.js/issues/350
+        if (this.chartComponent)
+            this.chartComponent.destroy();
+
+        this.chartComponent = new Chart(ctx, {
             type: 'pie',
             data: {
-                labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+                labels: labels,
                 datasets: [{
-                    label: '# of Votes',
-                    data: [12, 19, 3, 5, 2, 3],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255,99,132,1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
+                    label: 'Retail Quantity',
+                    data: data,
+                    backgroundColor: palette('tol', data.length).map(function (hex) {
+                        return '#' + hex;
+                    })
                 }]
-            },
-            //options: {
-            //    scales: {
-            //        yAxes: [{
-            //            ticks: {
-            //                beginAtZero: true
-            //            }
-            //        }]
-            //    }
-            //}
+            }
         });
     }
+
+    private getTimespanStringByOption(option: ChartTimespanOptions) {
+        let timeSpanString = '';
+        switch (option) {
+            case ChartTimespanOptions.Today:
+                timeSpanString = " CreatedDate >= '" + moment(new Date(Date.now())).format("YYYY-MM-DD") + "' ";
+                break;
+            case ChartTimespanOptions.Week:
+                timeSpanString = " CreatedDate >= '" + moment(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' and CreatedDate < '" + moment(new Date(Date.now() + 1 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' ";
+                break;
+            case ChartTimespanOptions.Month:
+                timeSpanString = " CreatedDate >= '" + moment(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' and CreatedDate < '" + moment(new Date(Date.now() + 1 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' ";
+                break;
+            case ChartTimespanOptions.CustomTime:
+                if (this.customStartDate && this.customEndDate) {
+                    timeSpanString = "CreatedDate >= '" + this.customStartDate + "' and CreatedDate < '" + moment(new Date(new Date(this.customEndDate).getTime() + 1 * 24 * 60 * 60 * 1000)).format("YYYY-MM-DD") + "' ";
+                }
+                break;
+        }
+
+        return timeSpanString;
+    }
+
+}
+
+enum ChartTimespanOptions {
+    Today = 1,
+    Week,
+    Month,
+    CustomTime,
 }
