@@ -90,11 +90,6 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             _this.selectedQuantitySaleType.subscribe(function (newValue) {
                 _this.refreshChart();
             });
-            $('input[name="daterange"]').daterangepicker({
-                opens: 'left'
-            }, function (start, end, label) {
-                alert("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-            });
             return _this;
         }
         DataAnalyse.prototype.refreshChart = function () {
