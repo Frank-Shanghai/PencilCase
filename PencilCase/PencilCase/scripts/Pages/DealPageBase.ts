@@ -49,6 +49,7 @@ export class DealPageBase extends PageBase {
 
     protected orderQuantitySubscriptions: Array<KnockoutSubscription> = [];
     protected invalidOrderCount: KnockoutObservable<number> = ko.observable(0);
+    protected numberOnlyRegExp = /^\d+$/;
 
     constructor() {
         super();
@@ -97,18 +98,19 @@ export class DealPageBase extends PageBase {
             // Use the custom ko observable function subscribeChanged, refer to the file top code for more details about implementation
             //https://stackoverflow.com/questions/12822954/get-previous-value-of-an-observable-in-subscribe-of-same-observable
             this.orderQuantitySubscriptions.push(order.quantity.subscribeChanged((newValue: any, oldValue: any) => {
-                if (newValue < 0) {
-                    if (oldValue >= 0) {
+                if (this.numberOnlyRegExp.test(newValue) == false) {
+                    if (this.numberOnlyRegExp.test(oldValue)) {
                         this.invalidOrderCount(this.invalidOrderCount() + 1);
                     }
                 }
 
-                if (newValue >= 0) {
-                    if (oldValue < 0) {
+                if (this.numberOnlyRegExp.test(newValue)) {
+                    if (this.numberOnlyRegExp.test(oldValue) == false) {
                         this.invalidOrderCount(this.invalidOrderCount() - 1);
                     }
                 }
 
+                // Have to do such re-calculation even when quantity is invalid, because old value changed even quantity is invalid.
                 this.totalNumber(Number(this.totalNumber()) - Number(oldValue) + Number(newValue));
                 this.totalPrice(Number(this.totalPrice()) - Number(oldValue * order.price()) + Number(newValue * order.price()));
             }, null, order));
