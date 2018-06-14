@@ -39,12 +39,6 @@ export class DataAnalyse extends PageBase {
         this.selectedQuantitySaleType.subscribe((newValue: any) => {
             this.refreshChart();
         });
-
-        $('input[name="daterange"]').daterangepicker({
-            opens: 'left'
-        }, function (start, end, label) {
-            alert("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-        });
     }
 
     private refreshChart() {
