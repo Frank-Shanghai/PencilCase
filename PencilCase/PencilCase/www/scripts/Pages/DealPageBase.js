@@ -11,6 +11,18 @@ var __extends = (this && this.__extends) || (function () {
 define(["require", "exports", "./PageBase", "../Navigator", "../Models/Product", "../Repositories/ProductRepository", "../Repositories/OrderRepository", "../Models/Order", "../Utils"], function (require, exports, PageBase_1, Navigator_1, Product_1, ProductRepository_1, OrderRepository_1, Order_1, Utils) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    /*
+    * Extend ko functionality
+    * https://stackoverflow.com/questions/12822954/get-previous-value-of-an-observable-in-subscribe-of-same-observable
+    */
+    ko.subscribable.fn.subscribeChanged = function (callback, dataContext) {
+        var savedValue = this.peek();
+        return this.subscribe(function (latestValue) {
+            var oldValue = savedValue;
+            savedValue = latestValue;
+            callback(latestValue, oldValue, dataContext);
+        });
+    };
     var DealPageBase = (function (_super) {
         __extends(DealPageBase, _super);
         function DealPageBase() {
@@ -34,6 +46,9 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Models/Product",
             _this.totalPrice = ko.observable(0);
             _this.productRepository = new ProductRepository_1.ProductRepository();
             _this.orderRepository = new OrderRepository_1.OrderRepository();
+            _this.orderQuantitySubscriptions = [];
+            _this.invalidOrderCount = ko.observable(0);
+            _this.numberOnlyRegExp = /^\d+$/;
             _this.addOrderWithSpecifiedPrice = function (price, type) {
                 if (_this.batchId == null)
                     _this.batchId = Utils.guid();
@@ -41,18 +56,37 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Models/Product",
                 for (var i = 0; i < _this.orders().length; i++) {
                     if (_this.orders()[i].product().Id === _this.selectedProduct().Id) {
                         // order.total is a ko.computed observable, so, when quantity changed, the total will be updated automatically
-                        _this.orders()[i].quantity(_this.orders()[i].quantity() + _this.selectedProductQuantity());
-                        _this.totalPrice(_this.totalPrice() + _this.selectedProductQuantity() * price);
+                        _this.orders()[i].quantity(Number(_this.orders()[i].quantity()) + Number(_this.selectedProductQuantity()));
+                        // No need to update total price and totoal quantity since the order's subscribeChanged handler will handle them
+                        //this.totalPrice(Number(this.totalPrice()) + Number(this.selectedProductQuantity() * price));
                         isNew = false;
                         break;
                     }
                 }
                 if (isNew) {
-                    var order = new Order_1.Order(Utils.guid(), _this.batchId, _this.selectedProduct(), type, _this.selectedProductQuantity(), price);
-                    _this.orders.push(order);
-                    _this.totalPrice(_this.totalPrice() + order.total());
+                    var order_1 = new Order_1.Order(Utils.guid(), _this.batchId, _this.selectedProduct(), type, _this.selectedProductQuantity(), price);
+                    // Use the custom ko observable function subscribeChanged, refer to the file top code for more details about implementation
+                    //https://stackoverflow.com/questions/12822954/get-previous-value-of-an-observable-in-subscribe-of-same-observable
+                    _this.orderQuantitySubscriptions.push(order_1.quantity.subscribeChanged(function (newValue, oldValue) {
+                        if (_this.numberOnlyRegExp.test(newValue) == false) {
+                            if (_this.numberOnlyRegExp.test(oldValue)) {
+                                _this.invalidOrderCount(_this.invalidOrderCount() + 1);
+                            }
+                        }
+                        if (_this.numberOnlyRegExp.test(newValue)) {
+                            if (_this.numberOnlyRegExp.test(oldValue) == false) {
+                                _this.invalidOrderCount(_this.invalidOrderCount() - 1);
+                            }
+                        }
+                        // Have to do such re-calculation even when quantity is invalid, because old value changed even quantity is invalid.
+                        _this.totalNumber(Number(_this.totalNumber()) - Number(oldValue) + Number(newValue));
+                        _this.totalPrice(Number(_this.totalPrice()) - Number(oldValue * order_1.price()) + Number(newValue * order_1.price()));
+                    }, null, order_1));
+                    _this.orders.push(order_1);
+                    // For new added order, manually updte total number and total price for the first time
+                    _this.totalNumber(Number(_this.totalNumber()) + Number(_this.selectedProductQuantity()));
+                    _this.totalPrice(Number(_this.totalPrice()) + Number(order_1.total()));
                 }
-                _this.totalNumber(_this.totalNumber() + _this.selectedProductQuantity());
                 _this.cancelOrderAdding();
             };
             _this.cancelOrderAdding = function () {
@@ -61,30 +95,32 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Models/Product",
                 _this.selectedProductQuantity(1);
             };
             _this.increaseQuantity = function () {
-                _this.selectedProductQuantity(_this.selectedProductQuantity() + 1);
+                _this.selectedProductQuantity(Number(_this.selectedProductQuantity()) + 1);
             };
             _this.decreaseQuantity = function () {
-                if (_this.selectedProductQuantity() > 0)
-                    _this.selectedProductQuantity(_this.selectedProductQuantity() - 1);
+                if (Number(_this.selectedProductQuantity()) > 0)
+                    _this.selectedProductQuantity(Number(_this.selectedProductQuantity()) - 1);
             };
             _this.increaseOrderProductQuantity = function (order) {
-                order.quantity(order.quantity() + 1);
-                _this.totalNumber(_this.totalNumber() + 1);
-                // Have the order.price() * 1 here, because the order.praice is string, need this * 1 to make it as a number
-                _this.totalPrice(_this.totalPrice() + order.price() * 1);
+                order.quantity(Number(order.quantity()) + 1);
+                // No need to do this because the order's subscribeChanged handler will handle them
+                //this.totalNumber(Number(this.totalNumber()) + 1);
+                //this.totalPrice(Number(this.totalPrice()) + Number(order.price()));
             };
             _this.decreaseOrderProductQuantity = function (order) {
-                if (order.quantity() > 0) {
-                    order.quantity(order.quantity() - 1);
-                    _this.totalNumber(_this.totalNumber() - 1);
-                    // Have the order.price() * 1 here, because the order.praice is string, need this * 1 to make it as a number
-                    _this.totalPrice(_this.totalPrice() - order.price() * 1);
+                if (Number(order.quantity()) > 0) {
+                    order.quantity(Number(order.quantity()) - 1);
+                    // No need to do this because the order's subscribeChanged handler will handle them
+                    //this.totalNumber(Number(this.totalNumber()) - 1);
+                    //this.totalPrice(Number(this.totalPrice()) - Number(order.price()));
                 }
             };
             _this.deleteOrder = function (order) {
                 _this.orders.remove(order);
-                _this.totalNumber(_this.totalNumber() - order.quantity());
-                _this.totalPrice(_this.totalPrice() - order.total());
+                if (order.quantity() < 0)
+                    _this.invalidOrderCount(_this.invalidOrderCount() - 1);
+                _this.totalNumber(Number(_this.totalNumber()) - Number(order.quantity()));
+                _this.totalPrice(Number(_this.totalPrice()) - Number(order.total()));
             };
             _this.cancelOrders = function () {
                 _this.orders([]);
@@ -92,6 +128,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Models/Product",
                 _this.totalPrice(0);
                 _this.batchId = null;
                 _this.cancelOrderAdding();
+                _this.invalidOrderCount(0);
             };
             _this.back = Navigator_1.Navigator.instance.goHome;
             return _this;

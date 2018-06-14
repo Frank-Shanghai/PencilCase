@@ -62,7 +62,8 @@ interface KnockoutSubscription {
 
 interface KnockoutSubscribable<T> extends KnockoutSubscribableFunctions<T> {
     subscribe(callback: (newValue: T) => void, target: any, event: "beforeChange"): KnockoutSubscription;
-	subscribe(callback: (newValue: T) => void, target?: any, event?: "change"): KnockoutSubscription;
+    subscribe(callback: (newValue: T) => void, target?: any, event?: "change"): KnockoutSubscription;
+    subscribeChanged(callback: (newValue: T, oldValue: T) => void, target?: any, dataContext?: any): KnockoutSubscription;
 	subscribe<TEvent>(callback: (newValue: TEvent) => void, target: any, event: string): KnockoutSubscription;
 
 	extend(requestedExtenders: { [key: string]: any; }): KnockoutSubscribable<T>;
