@@ -5,6 +5,49 @@ import * as Consts from './Consts';
 import { Product } from '../Models/Product';
 import { ProductRepository } from '../Repositories/ProductRepository';
 
+(<any>(ko.extenders)).required = function (target, overrideMessage) {
+    //add some sub-observables to our observable
+    target.hasError = ko.observable();
+    target.validationMessage = ko.observable();
+
+    //define a function to do validation
+    function validate(newValue) {
+        target.hasError(newValue ? false : true);
+        target.validationMessage(newValue ? "" : overrideMessage || "This field is required");
+    }
+
+    //initial validation
+    validate(target());
+
+    //validate whenever the value changes
+    target.subscribe(validate);
+
+    //return the original observable
+    return target;
+};
+
+(<any>(ko.extenders)).regExpValidate = function (target, options: { regExp: any, overrideMessage: string }) {
+    //add some sub-observables to our observable
+    target.hasError = ko.observable();
+    target.validationMessage = ko.observable();
+
+    //define a function to do validation
+    function validate(newValue) {
+        target.hasError(options.regExp.test(newValue) ? false : true);
+        target.validationMessage(newValue ? "" : options.overrideMessage || "This field value is invalide.");
+    }
+
+    //initial validation
+    validate(target());
+
+    //validate whenever the value changes
+    target.subscribe(validate);
+
+    //return the original observable
+    return target;
+};
+
+
 export class ProductEditor extends PageBase {
     private navigator: Navigator = Navigator.instance;
     private repository: ProductRepository = new ProductRepository();
@@ -13,17 +56,26 @@ export class ProductEditor extends PageBase {
     private originalProduct: KnockoutObservable<Product> = ko.observable(null);
     private uomDataSource: KnockoutObservableArray<any> = ko.observableArray([]);
 
-    private name: KnockoutObservable<string> = ko.observable('');
+    private name: KnockoutObservable<string> = ko.observable('').extend({ required: '' });
     private description: KnockoutObservable<string> = ko.observable('');
     private inventory: KnockoutObservable<number> = ko.observable(0);
 
-    private retailPrice: KnockoutObservable<number> = ko.observable(0);
+    private floatNumberRegExp = /^[0-9]+([.]{1}[0-9]+){0,1}$/;
+
+    private retailPrice: KnockoutObservable<number> = ko.observable(undefined).extend({ regExpValidate: { regExp: this.floatNumberRegExp, overrideMessage: '' } });
     private retailUnit: KnockoutObservable<string> = ko.observable(null);
     private wholesaleUnit: KnockoutObservable<string> = ko.observable(null);
-    private times: KnockoutObservable<number> = ko.observable(undefined);
-    private wholesalePrice: KnockoutObservable<number> = ko.observable(undefined);
+    private times: KnockoutObservable<number> = ko.observable(undefined).extend({ regExpValidate: { regExp: this.floatNumberRegExp, overrideMessage: '' } });
+    private wholesalePrice: KnockoutObservable<number> = ko.observable(undefined).extend({ regExpValidate: { regExp: this.floatNumberRegExp, overrideMessage: '' } });
 
     private isNewProduct = false;
+
+    private canSave = ko.computed(() => {
+        if ((<any>this.name).hasError() || (<any>this.retailPrice).hasError() || (<any>this.times).hasError() || (<any>this.wholesalePrice).hasError())
+            return false;
+        return true;
+    });
+
 
     constructor(parameters?: any) {
         super(parameters);
