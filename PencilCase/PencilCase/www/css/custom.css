@@ -5,3 +5,12 @@
 .textbox-validation-error {
     border: 2px solid red;
 }
+
+.validation-error-message {
+    margin: -0.4em 0 0.5em;
+}
+
+.validation-error-message > span {
+    font-size: 0.7em;
+    color: red;
+}

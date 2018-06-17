@@ -18,7 +18,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
         //define a function to do validation
         function validate(newValue) {
             target.hasError(newValue ? false : true);
-            target.validationMessage(newValue ? "" : overrideMessage || "This field is required");
+            target.validationMessage(newValue ? "" : overrideMessage || "* 不能为空！");
         }
         //initial validation
         validate(target());
@@ -34,7 +34,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
         //define a function to do validation
         function validate(newValue) {
             target.hasError(options.regExp.test(newValue) ? false : true);
-            target.validationMessage(newValue ? "" : options.overrideMessage || "This field value is invalide.");
+            target.validationMessage(newValue ? "" : options.overrideMessage || "* 非法输入!");
         }
         //initial validation
         validate(target());

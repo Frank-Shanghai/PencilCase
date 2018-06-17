@@ -196,6 +196,9 @@
                     <form>
                         <label style="font-weight: bold" for="productName">名称：</label>
                         <input type="text" name="productName" data-bind="textInput: name, style: { border: name.hasError() ? '1px solid red' : '0'}" />
+                        <div class="validation-error-message" data-bind="visible: name.hasError">
+                            <span data-bind='text: name.validationMessage'></span>
+                        </div>
                         <label style="font-weight: bold" for="productDescription">描述：</label>
                         <textarea name="productDescription" data-bind="value: description"></textarea>
                         <label style="font-weight: bold" for="productInventory">库存：</label>
@@ -210,12 +213,23 @@
                         <select name="productRetailUnit" data-bind="options: uomDataSource, optionsText: 'Name', optionsValue: 'Id', value: retailUnit, selectComponentInitialValue: retailUnit"></select>
                         <label for="productRetailPrice" style="font-weight: bold">零售价(元)：</label>
                         <input type="number" name="productRetailPrice" data-bind="textInput: retailPrice, style: { border: retailPrice.hasError() ? '1px solid red' : '0'}" />
+                        <div class="validation-error-message" data-bind="visible: retailPrice.hasError">
+                            <span data-bind='text: retailPrice.validationMessage'></span>
+                        </div>
+
                         <label for="productWholesaleUnit" style="font-weight: bold">批发单位：</label>
                         <select name="productWholesaleUnit" data-bind="options: uomDataSource, optionsText: 'Name', optionsValue: 'Id', value: wholesaleUnit, selectComponentInitialValue: wholesaleUnit"></select>
                         <label for="productTimes" style="font-weight: bold">单位关系：<span data-bind="text: '(如：12个每箱就填12)'"></span></label>
                         <input type="number" name="productTimes" data-bind="textInput: times, style: { border: times.hasError() ? '1px solid red' : '0'}" />
+                        <div class="validation-error-message" data-bind="visible: times.hasError">
+                            <span data-bind='text: times.validationMessage'></span>
+                        </div>
+
                         <label for="productWholesalePrice" style="font-weight: bold">批发价(元)：</label>
                         <input type="number" name="productWholesalePrice" data-bind="textInput: wholesalePrice, style: { border: wholesalePrice.hasError() ? '1px solid red' : '0'}" />
+                        <div class="validation-error-message" data-bind="visible: wholesalePrice.hasError">
+                            <span data-bind='text: wholesalePrice.validationMessage'></span>
+                        </div>
 
                         <!-- 编辑时不显示下面fields -->
                         <!--<lable for="productImportRetailPrice" style="font-weight: bold">最新进货价(元)（按零售单位）：</lable>
@@ -713,7 +727,7 @@
                     <table>
                         <tr>
                             <td>
-                                <input type="text" name="startDate" style="font-size: 0.8em" />                                
+                                <input type="text" name="startDate" style="font-size: 0.8em" />
                             </td>
                             <td><span style="padding:0 5px">~</span></td>
                             <td>
@@ -723,7 +737,7 @@
                                 <a href="#" class="ui-btn ui-icon-refresh ui-btn-icon-notext ui-corner-all" data-bind="click: refreshChart"></a>
                             </td>
                         </tr>
-                    </table>                    
+                    </table>
                 </div>
             </div>
             <div data-bind="visible: isChartVisible">
