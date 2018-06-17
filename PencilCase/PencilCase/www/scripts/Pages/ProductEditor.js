@@ -11,6 +11,38 @@ var __extends = (this && this.__extends) || (function () {
 define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Consts", "../Models/Product", "../Repositories/ProductRepository"], function (require, exports, PageBase_1, Navigator_1, Utils, Consts, Product_1, ProductRepository_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    (ko.extenders).required = function (target, overrideMessage) {
+        //add some sub-observables to our observable
+        target.hasError = ko.observable();
+        target.validationMessage = ko.observable();
+        //define a function to do validation
+        function validate(newValue) {
+            target.hasError(newValue ? false : true);
+            target.validationMessage(newValue ? "" : overrideMessage || "* 不能为空！");
+        }
+        //initial validation
+        validate(target());
+        //validate whenever the value changes
+        target.subscribe(validate);
+        //return the original observable
+        return target;
+    };
+    (ko.extenders).regExpValidate = function (target, options) {
+        //add some sub-observables to our observable
+        target.hasError = ko.observable();
+        target.validationMessage = ko.observable();
+        //define a function to do validation
+        function validate(newValue) {
+            target.hasError(options.regExp.test(newValue) ? false : true);
+            target.validationMessage(newValue ? "" : options.overrideMessage || "* 非法输入!");
+        }
+        //initial validation
+        validate(target());
+        //validate whenever the value changes
+        target.subscribe(validate);
+        //return the original observable
+        return target;
+    };
     var ProductEditor = (function (_super) {
         __extends(ProductEditor, _super);
         function ProductEditor(parameters) {
@@ -20,15 +52,21 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
             _this.isInEditingMode = ko.observable(false);
             _this.originalProduct = ko.observable(null);
             _this.uomDataSource = ko.observableArray([]);
-            _this.name = ko.observable('');
+            _this.name = ko.observable('').extend({ required: '' });
             _this.description = ko.observable('');
             _this.inventory = ko.observable(0);
-            _this.retailPrice = ko.observable(0);
+            _this.floatNumberRegExp = /^[0-9]+([.]{1}[0-9]+){0,1}$/;
+            _this.retailPrice = ko.observable(undefined).extend({ regExpValidate: { regExp: _this.floatNumberRegExp, overrideMessage: '' } });
             _this.retailUnit = ko.observable(null);
             _this.wholesaleUnit = ko.observable(null);
-            _this.times = ko.observable(undefined);
-            _this.wholesalePrice = ko.observable(undefined);
+            _this.times = ko.observable(undefined).extend({ regExpValidate: { regExp: _this.floatNumberRegExp, overrideMessage: '' } });
+            _this.wholesalePrice = ko.observable(undefined).extend({ regExpValidate: { regExp: _this.floatNumberRegExp, overrideMessage: '' } });
             _this.isNewProduct = false;
+            _this.canSave = ko.computed(function () {
+                if (_this.name.hasError() || _this.retailPrice.hasError() || _this.times.hasError() || _this.wholesalePrice.hasError())
+                    return false;
+                return true;
+            });
             _this.startEditing = function () {
                 _this.isInEditingMode(true);
                 _this.reSetEditingFields();
