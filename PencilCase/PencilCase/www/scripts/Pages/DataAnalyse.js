@@ -31,6 +31,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             _this.customEndDate = '';
             _this.isDatePickersInitialized = false;
             _this.isEmptyData = ko.observable(false);
+            _this.chartSummary = ko.observable('');
             _this.back = function () {
                 if (_this.isChartVisible()) {
                     _this.isChartVisible(false);
@@ -163,6 +164,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             var timeSpanString = this.getTimespanStringByOption(this.chartTimespanOption);
             var labels = [];
             var data = [];
+            var chartTotal = 0;
             this.orderRepository.getOrdersForDataAnalyse(timeSpanString, this.selectedQuantitySaleType() != -1, this.selectedQuantitySaleType(), function (transaction, orderSet) {
                 if (orderSet.rows.length > 0) {
                     _this.isEmptyData(false);
@@ -177,7 +179,9 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                                 labels.push("unknown" + i);
                             }
                             data.push(order.Total);
+                            chartTotal += order.Total;
                             if (rows_1.length - 1 == i) {
+                                _this.chartSummary("总计：" + chartTotal + "元");
                                 _this.initializeChart(labels, data);
                             }
                         }, _this.onDBError);
@@ -198,6 +202,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             var timeSpanString = this.getTimespanStringByOption(this.chartTimespanOption);
             var labels = [];
             var data = [];
+            var total = 0;
             if (this.selectedQuantitySaleType() != -1) {
                 this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, this.selectedQuantitySaleType(), function (transaction, orderSet) {
                     if (orderSet.rows.length > 0) {
@@ -214,12 +219,17 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                                 }
                                 //wholesale
                                 if (order.Type == 2) {
-                                    data.push(Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost));
+                                    var value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost)).toFixed(2));
+                                    data.push(value);
+                                    total += value;
                                 }
                                 else {
-                                    data.push(Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].RetailCost));
+                                    var value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].RetailCost)).toFixed(2));
+                                    data.push(value);
+                                    total += value;
                                 }
                                 if (rows_2.length - 1 == i) {
+                                    _this.chartSummary("总计：" + total + "元");
                                     _this.initializeChart(labels, data);
                                 }
                             }, _this.onDBError);
@@ -247,7 +257,8 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                                     labels.push("unknown" + i);
                                 }
                                 //retail
-                                data.push(Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].RetailCost));
+                                var value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].RetailCost)).toFixed(2));
+                                data.push(value);
                                 if (rows_3.length - 1 == i) {
                                     _this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, Order_1.OrderTypes.Wholesale, function (transaction, orderSet) {
                                         if (orderSet.rows.length > 0) {
@@ -271,13 +282,18 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                                                     }
                                                     //wholesale
                                                     if (productExisted === true) {
+                                                        var value_1 = Number((Number(order_1.Total) - Number(order_1.Quantity) * Number(productSet.rows[0].WholesaleCost)).toFixed(2));
                                                         data[index] = data[index] + (Number(order_1.Total) - Number(order_1.Quantity) * Number(productSet.rows[0].WholesaleCost));
+                                                        total += value_1;
                                                     }
                                                     else {
+                                                        var value_2 = Number((Number(order_1.Total) - Number(order_1.Quantity) * Number(productSet.rows[0].WholesaleCost)).toFixed(2));
                                                         data.push(Number(order_1.Total) - Number(order_1.Quantity) * Number(productSet.rows[0].WholesaleCost));
+                                                        total += value_2;
                                                     }
                                                     if (rows_4.length - 1 == i_1) {
                                                         _this.initializeChart(labels, data);
+                                                        _this.chartSummary("总计：" + total + "元");
                                                     }
                                                 }, _this.onDBError);
                                             };
@@ -303,6 +319,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             var timeSpanString = this.getTimespanStringByOption(this.chartTimespanOption);
             var labels = [];
             var data = [];
+            var total = 0;
             if (this.selectedQuantitySaleType() != -1) {
                 this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, this.selectedQuantitySaleType(), function (transaction, orderSet) {
                     if (orderSet.rows.length > 0) {
@@ -319,12 +336,16 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                                 }
                                 //wholesale
                                 if (order.Type == 2) {
-                                    data.push(order.Quantity * productSet.rows[0].Times);
+                                    var value = order.Quantity * productSet.rows[0].Times;
+                                    data.push(value);
+                                    total += value;
                                 }
                                 else {
                                     data.push(order.Quantity);
+                                    total += order.Quantity;
                                 }
                                 if (rows_5.length - 1 == i) {
+                                    _this.chartSummary("总计：" + total);
                                     _this.initializeChart(labels, data);
                                 }
                             }, _this.onDBError);
@@ -353,6 +374,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                                 }
                                 //retail
                                 data.push(order.Quantity);
+                                total += order.Quantity;
                                 if (rows_6.length - 1 == i) {
                                     _this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, Order_1.OrderTypes.Wholesale, function (transaction, orderSet) {
                                         if (orderSet.rows.length > 0) {
@@ -377,11 +399,14 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                                                     //wholesale
                                                     if (productExisted === true) {
                                                         data[index] = data[index] + (order_2.Quantity * productSet.rows[0].Times);
+                                                        total += (order_2.Quantity * productSet.rows[0].Times);
                                                     }
                                                     else {
                                                         data.push(order_2.Quantity * productSet.rows[0].Times);
+                                                        total += (order_2.Quantity * productSet.rows[0].Times);
                                                     }
                                                     if (rows_7.length - 1 == i_2) {
+                                                        _this.chartSummary("总计：" + total);
                                                         _this.initializeChart(labels, data);
                                                     }
                                                 }, _this.onDBError);

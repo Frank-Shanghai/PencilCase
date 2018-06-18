@@ -30,6 +30,7 @@ export class DataAnalyse extends PageBase {
     private isDatePickersInitialized = false;
 
     private isEmptyData: KnockoutObservable<boolean> = ko.observable(false);
+    private chartSummary: KnockoutObservable<string> = ko.observable('');
 
     constructor() {
         super();
@@ -162,6 +163,7 @@ export class DataAnalyse extends PageBase {
 
         let labels = [];
         let data = [];
+        let chartTotal = 0;
         this.orderRepository.getOrdersForDataAnalyse(timeSpanString, this.selectedQuantitySaleType() != -1, this.selectedQuantitySaleType(), (transaction: SqlTransaction, orderSet: SqlResultSet) => {
             if (orderSet.rows.length > 0) {
                 this.isEmptyData(false);
@@ -177,8 +179,10 @@ export class DataAnalyse extends PageBase {
                         }
 
                         data.push(order.Total);
+                        chartTotal += order.Total;
 
                         if (rows.length - 1 == i) {
+                            this.chartSummary("总计：" + chartTotal + "元");
                             this.initializeChart(labels, data);
                         }
                     }, this.onDBError);
@@ -197,6 +201,7 @@ export class DataAnalyse extends PageBase {
 
         let labels = [];
         let data = [];
+        let total = 0;
         if (this.selectedQuantitySaleType() != -1) {
             this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, this.selectedQuantitySaleType(), (transaction: SqlTransaction, orderSet: SqlResultSet) => {
                 if (orderSet.rows.length > 0) {
@@ -214,13 +219,18 @@ export class DataAnalyse extends PageBase {
 
                             //wholesale
                             if (order.Type == 2) {
-                                data.push(Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost));
+                                let value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost)).toFixed(2));
+                                data.push(value);
+                                total += value;
                             }
                             else {
-                                data.push(Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].RetailCost));
+                                let value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].RetailCost)).toFixed(2));
+                                data.push(value);
+                                total += value;
                             }
 
                             if (rows.length - 1 == i) {
+                                this.chartSummary("总计：" + total + "元");
                                 this.initializeChart(labels, data);
                             }
                         }, this.onDBError);
@@ -246,7 +256,8 @@ export class DataAnalyse extends PageBase {
                             }
 
                             //retail
-                            data.push(Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].RetailCost));
+                            let value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].RetailCost)).toFixed(2));
+                            data.push(value);
 
                             if (rows.length - 1 == i) {
                                 this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, OrderTypes.Wholesale, (transaction: SqlTransaction, orderSet: SqlResultSet) => {
@@ -272,14 +283,19 @@ export class DataAnalyse extends PageBase {
 
                                                 //wholesale
                                                 if (productExisted === true) {
+                                                    let value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost)).toFixed(2));
                                                     data[index] = data[index] + (Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost));
+                                                    total += value;
                                                 }
                                                 else {
+                                                    let value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost)).toFixed(2));
                                                     data.push(Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost));
+                                                    total += value;
                                                 }
 
                                                 if (rows.length - 1 == i) {
                                                     this.initializeChart(labels, data);
+                                                    this.chartSummary("总计：" + total + "元");
                                                 }
                                             }, this.onDBError);
                                         }
@@ -301,6 +317,7 @@ export class DataAnalyse extends PageBase {
 
         let labels = [];
         let data = [];
+        let total = 0;
         if (this.selectedQuantitySaleType() != -1) {
             this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, this.selectedQuantitySaleType(), (transaction: SqlTransaction, orderSet: SqlResultSet) => {
                 if (orderSet.rows.length > 0) {
@@ -318,13 +335,17 @@ export class DataAnalyse extends PageBase {
 
                             //wholesale
                             if (order.Type == 2) {
-                                data.push(order.Quantity * productSet.rows[0].Times);
+                                let value = order.Quantity * productSet.rows[0].Times;
+                                data.push(value);
+                                total += value;
                             }
                             else {
                                 data.push(order.Quantity);
+                                total += order.Quantity;
                             }
 
                             if (rows.length - 1 == i) {
+                                this.chartSummary("总计：" + total);
                                 this.initializeChart(labels, data);
                             }
                         }, this.onDBError);
@@ -351,6 +372,7 @@ export class DataAnalyse extends PageBase {
 
                             //retail
                             data.push(order.Quantity);
+                            total += order.Quantity;
 
                             if (rows.length - 1 == i) {
                                 this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, OrderTypes.Wholesale, (transaction: SqlTransaction, orderSet: SqlResultSet) => {
@@ -377,12 +399,15 @@ export class DataAnalyse extends PageBase {
                                                 //wholesale
                                                 if (productExisted === true) {
                                                     data[index] = data[index] + (order.Quantity * productSet.rows[0].Times);
+                                                    total += (order.Quantity * productSet.rows[0].Times);
                                                 }
                                                 else {
                                                     data.push(order.Quantity * productSet.rows[0].Times);
+                                                    total += (order.Quantity * productSet.rows[0].Times);
                                                 }
 
                                                 if (rows.length - 1 == i) {
+                                                    this.chartSummary("总计：" + total);
                                                     this.initializeChart(labels, data);
                                                 }
                                             }, this.onDBError);

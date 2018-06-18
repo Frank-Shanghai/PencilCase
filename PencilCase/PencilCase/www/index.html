@@ -752,6 +752,9 @@
                     <select data-mini="true" data-native-menu="false" data-bind="options: quantitySaleTypeOptinos, optionsText: 'text', optionsValue: 'value', value: selectedQuantitySaleType"></select>
                     <span style="font-size: 0.8em; color:blue" data-bind="text: '* 此处数量单位为零售单位，便于比较。', visible: (chartDataType() == 'Quantity' && selectedQuantitySaleType().toString() != '1') && (!isEmptyData())"></span>
                     <canvas id="dataChart" width="400" height="400" data-bind="visible: !isEmptyData()"></canvas>
+                    <div style="margin-top: 0.5em; text-align: center">
+                        <span style="font-size: 0.9em; font-weight: bold" data-bind="visible: !isEmptyData(), text: chartSummary"></span>
+                    </div>
                     <span data-bind="visible: isEmptyData">无数据！</span>
                 </div>
             </div>
