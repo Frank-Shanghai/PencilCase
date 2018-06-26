@@ -5,6 +5,7 @@ export class Product {
     public Name: string = '';
     public Description: string = '';
     public RetailPrice: number = 0;
+    public RetailWholesalePrice: number = 0;
     public RetailUnit: string = null;
     public WholesalePrice: number = 0;
     public WholesaleUnit: string = null;
@@ -37,7 +38,7 @@ export class Product {
             this.Times = product.Times;
             this.Inventory = product.Inventory;
             this.Image = product.Image;
-            this.RetailPrice = product.RetailPrice;
+            this.RetailWholesalePrice = product.RetailWholesalePrice;
             // The returned data with sql lite query is string for date type
             this.CreatedDate = new Date(product.CreatedDate);
             this.ModifiedDate = new Date(product.ModifiedDate);

@@ -15,6 +15,11 @@ define(["require", "exports"], function (require, exports) {
                     this.unitId = ko.observable(product.RetailUnit);
                     this.unitName = ko.observable(product.RetailUnitName);
                     break;
+                case OrderTypes.RetailWholesale:
+                    this.price = ko.observable(product.RetailWholesalePrice);
+                    this.unitId = ko.observable(product.RetailUnit);
+                    this.unitName = ko.observable(product.RetailUnitName);
+                    break;
                 case OrderTypes.Wholesale:
                     this.price = ko.observable(product.WholesalePrice);
                     this.unitId = ko.observable(product.WholesaleUnit);
@@ -41,6 +46,7 @@ define(["require", "exports"], function (require, exports) {
         OrderTypes[OrderTypes["Retail"] = 1] = "Retail";
         OrderTypes[OrderTypes["Wholesale"] = 2] = "Wholesale";
         OrderTypes[OrderTypes["Import"] = 3] = "Import";
+        OrderTypes[OrderTypes["RetailWholesale"] = 4] = "RetailWholesale";
     })(OrderTypes = exports.OrderTypes || (exports.OrderTypes = {}));
 });
 //# sourceMappingURL=Order.js.map

@@ -57,13 +57,14 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
             _this.inventory = ko.observable(0);
             _this.floatNumberRegExp = /^[0-9]+([.]{1}[0-9]+){0,1}$/;
             _this.retailPrice = ko.observable(undefined).extend({ regExpValidate: { regExp: _this.floatNumberRegExp, overrideMessage: '' } });
+            _this.retailWholesalePrice = ko.observable(undefined).extend({ regExpValidate: { regExp: _this.floatNumberRegExp, overrideMessage: '' } });
             _this.retailUnit = ko.observable(null);
             _this.wholesaleUnit = ko.observable(null);
             _this.times = ko.observable(undefined).extend({ regExpValidate: { regExp: _this.floatNumberRegExp, overrideMessage: '' } });
             _this.wholesalePrice = ko.observable(undefined).extend({ regExpValidate: { regExp: _this.floatNumberRegExp, overrideMessage: '' } });
             _this.isNewProduct = false;
             _this.canSave = ko.computed(function () {
-                if (_this.name.hasError() || _this.retailPrice.hasError() || _this.times.hasError() || _this.wholesalePrice.hasError())
+                if (_this.name.hasError() || _this.retailPrice.hasError() || _this.retailWholesalePrice.hasError() || _this.times.hasError() || _this.wholesalePrice.hasError())
                     return false;
                 return true;
             });
@@ -76,6 +77,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
                 _this.description(_this.parameters.product.Description);
                 _this.inventory(_this.parameters.product.Inventory);
                 _this.retailPrice(_this.parameters.product.RetailPrice);
+                _this.retailWholesalePrice(_this.parameters.product.RetailWholesalePrice);
                 _this.times(_this.parameters.product.Times);
                 _this.retailUnit(_this.parameters.product.RetailUnit);
                 _this.wholesaleUnit(_this.parameters.product.WholesaleUnit);
@@ -96,6 +98,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
                 product.Name = _this.name();
                 product.Description = _this.description();
                 product.RetailPrice = _this.retailPrice();
+                product.RetailWholesalePrice = _this.retailWholesalePrice();
                 product.RetailUnit = _this.retailUnit();
                 product.WholesalePrice = _this.wholesalePrice();
                 product.WholesaleUnit = _this.wholesaleUnit();

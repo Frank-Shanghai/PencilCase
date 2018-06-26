@@ -26,6 +26,11 @@ export class Order {
                 this.unitId = ko.observable(product.RetailUnit);
                 this.unitName = ko.observable(product.RetailUnitName);
                 break;
+            case OrderTypes.RetailWholesale:
+                this.price = ko.observable(product.RetailWholesalePrice);
+                this.unitId = ko.observable(product.RetailUnit);
+                this.unitName = ko.observable(product.RetailUnitName);
+                break;
             case OrderTypes.Wholesale:
                 this.price = ko.observable(product.WholesalePrice);
                 this.unitId = ko.observable(product.WholesaleUnit);
@@ -50,5 +55,6 @@ export class Order {
 export enum OrderTypes {
     Retail = 1,
     Wholesale,
-    Import
+    Import,
+    RetailWholesale
 }

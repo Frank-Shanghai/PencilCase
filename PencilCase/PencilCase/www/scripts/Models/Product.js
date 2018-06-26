@@ -7,6 +7,7 @@ define(["require", "exports", "../Utils"], function (require, exports, Utils) {
             this.Name = '';
             this.Description = '';
             this.RetailPrice = 0;
+            this.RetailWholesalePrice = 0;
             this.RetailUnit = null;
             this.WholesalePrice = 0;
             this.WholesaleUnit = null;
@@ -32,7 +33,7 @@ define(["require", "exports", "../Utils"], function (require, exports, Utils) {
                 this.Times = product.Times;
                 this.Inventory = product.Inventory;
                 this.Image = product.Image;
-                this.RetailPrice = product.RetailPrice;
+                this.RetailWholesalePrice = product.RetailWholesalePrice;
                 // The returned data with sql lite query is string for date type
                 this.CreatedDate = new Date(product.CreatedDate);
                 this.ModifiedDate = new Date(product.ModifiedDate);
