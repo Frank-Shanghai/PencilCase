@@ -15,7 +15,8 @@ export class DataAnalyse extends PageBase {
     private quantitySaleTypeOptinos = [
         { text: "Retail", value: OrderTypes.Retail },
         { text: "Wholesale", value: OrderTypes.Wholesale },
-        { text: "Both", value: -1 }
+        { text: "Both", value: -1 },
+        { text: "RetailWholesale", value: OrderTypes.RetailWholesale }
     ];
     private selectedQuantitySaleType: KnockoutObservable<any> = ko.observable(OrderTypes.Retail);
 

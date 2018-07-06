@@ -40,6 +40,9 @@ define(["require", "exports", "../application", "../Models/Order"], function (re
                 case Order_1.OrderTypes.Wholesale:
                     conditions += " and Type = 2";
                     break;
+                case Order_1.OrderTypes.RetailWholesale:
+                    conditions += " and Type = 4";
+                    break;
             }
             var sqlString = '';
             if (groupByType == true) {

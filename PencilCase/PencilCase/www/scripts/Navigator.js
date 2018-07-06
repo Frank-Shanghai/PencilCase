@@ -1,4 +1,4 @@
-define(["require", "exports", "./application", "./Pages/Consts", "./Pages/ProductManagement", "./Pages/ProductEditor", "./Pages/HomePage", "./Pages/Retail", "./Pages/ImportProduct", "./Pages/Orders", "./Pages/BatchOrderDetails", "./Pages/Wholesale", "./Pages/DataAnalyse"], function (require, exports, application_1, Consts, ProductManagement_1, ProductEditor_1, HomePage_1, Retail_1, ImportProduct_1, Orders_1, BatchOrderDetails_1, Wholesale_1, DataAnalyse_1) {
+define(["require", "exports", "./application", "./Pages/Consts", "./Pages/ProductManagement", "./Pages/ProductEditor", "./Pages/HomePage", "./Pages/Retail", "./Pages/ImportProduct", "./Pages/Orders", "./Pages/BatchOrderDetails", "./Pages/Wholesale", "./Pages/DataAnalyse", "./Pages/RetailWholesale"], function (require, exports, application_1, Consts, ProductManagement_1, ProductEditor_1, HomePage_1, Retail_1, ImportProduct_1, Orders_1, BatchOrderDetails_1, Wholesale_1, DataAnalyse_1, RetailWholesale_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Navigator = (function () {
@@ -112,6 +112,12 @@ define(["require", "exports", "./application", "./Pages/Consts", "./Pages/Produc
                     pageExisted = !(page == null);
                     if (pageExisted == false)
                         page = new Retail_1.Retail();
+                    break;
+                case Consts.Pages.RetailWholesale:
+                    page = this.getExistedInstance(pageInfo);
+                    pageExisted = !(page == null);
+                    if (pageExisted == false)
+                        page = new RetailWholesale_1.RetailWholesale();
                     break;
                 case Consts.Pages.ImportProduct:
                     page = this.getExistedInstance(pageInfo);

@@ -46,7 +46,7 @@ define(["require", "exports"], function (require, exports) {
         OrderTypes[OrderTypes["Retail"] = 1] = "Retail";
         OrderTypes[OrderTypes["Wholesale"] = 2] = "Wholesale";
         OrderTypes[OrderTypes["Import"] = 3] = "Import";
-        OrderTypes[OrderTypes["RetailWholesale"] = 4] = "RetailWholesale";
+        OrderTypes[OrderTypes["RetailWholesale"] = 4] = "RetailWholesale"; //4
     })(OrderTypes = exports.OrderTypes || (exports.OrderTypes = {}));
 });
 //# sourceMappingURL=Order.js.map

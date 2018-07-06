@@ -21,7 +21,8 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             _this.quantitySaleTypeOptinos = [
                 { text: "Retail", value: Order_1.OrderTypes.Retail },
                 { text: "Wholesale", value: Order_1.OrderTypes.Wholesale },
-                { text: "Both", value: -1 }
+                { text: "Both", value: -1 },
+                { text: "RetailWholesale", value: Order_1.OrderTypes.RetailWholesale }
             ];
             _this.selectedQuantitySaleType = ko.observable(Order_1.OrderTypes.Retail);
             _this.orderRepository = new OrderRepository_1.OrderRepository();

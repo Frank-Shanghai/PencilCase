@@ -54,7 +54,7 @@ export class Order {
 
 export enum OrderTypes {
     Retail = 1,
-    Wholesale,
-    Import,
-    RetailWholesale
+    Wholesale, //2
+    Import, //3
+    RetailWholesale //4
 }
