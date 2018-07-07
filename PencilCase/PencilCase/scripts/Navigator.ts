@@ -10,6 +10,7 @@ import { Orders } from './Pages/Orders';
 import { BatchOrderDetails } from './Pages/BatchOrderDetails';
 import { Wholesale } from './Pages/Wholesale';
 import { DataAnalyse } from './Pages/DataAnalyse';
+import { RetailWholesale } from './Pages/RetailWholesale';
 
 export class Navigator {
     // TODO: Pop up pages/dialogs handle 
@@ -46,139 +47,145 @@ export class Navigator {
     }
 
     public showConfirmDialog(header: string, content: string, showConfirm: boolean, showCancel: boolean, confirm: () => void, cancel?: () => void, confirmButtonText?: string, cancelButtonText?: string) {
-    Application.instance.confirmDialog({
-        header: header,
-        content: content,
-        showConfirm: showConfirm ? true : false,
-        showCancel: showCancel ? true : false,
-        confirmButtonText: confirmButtonText ? confirmButtonText : "是",
-        cancelButtonText: cancelButtonText ? cancelButtonText : "否",
-        confirm: () => {
-            if (confirm) {
-                confirm();
+        Application.instance.confirmDialog({
+            header: header,
+            content: content,
+            showConfirm: showConfirm ? true : false,
+            showCancel: showCancel ? true : false,
+            confirmButtonText: confirmButtonText ? confirmButtonText : "是",
+            cancelButtonText: cancelButtonText ? cancelButtonText : "否",
+            confirm: () => {
+                if (confirm) {
+                    confirm();
+                }
+
+                Application.instance.confirmDialog(null);
+            },
+            cancel: () => {
+                // didn't bind this handler to cancel button click event since it works just by set cancel button as data-rel="back", so cancel handler actually useless here.
+                if (cancel) {
+                    cancel();
+                }
+
+                Application.instance.confirmDialog(null);
             }
+        });
 
-            Application.instance.confirmDialog(null);
-        },
-        cancel: () => {
-            // didn't bind this handler to cancel button click event since it works just by set cancel button as data-rel="back", so cancel handler actually useless here.
-            if (cancel) {
-                cancel();
-            }
-
-            Application.instance.confirmDialog(null);
-        }
-    });
-
-    $(':mobile-pagecontainer').pagecontainer("change", "#" + Consts.Pages.ConfirmDialog.Id, { showLoadMsg: true});
-}
+        $(':mobile-pagecontainer').pagecontainer("change", "#" + Consts.Pages.ConfirmDialog.Id, { showLoadMsg: true });
+    }
 
     public initialize = () => {
-    $(':mobile-pagecontainer').on("pagecontainerbeforechange", (eventObject: JQueryEventObject, parameters: any) => {
-        if (parameters.toPage !== ('#' + Consts.Pages.HomePage.Id) && parameters.toPage !== ('#' + Consts.Pages.ConfirmDialog.Id)) { // No need the handling here for home page
-            if ((parameters.options && parameters.options.data)) {
-                let data = parameters.options.data;
-                let test = Application.instance.activePage().pageId;
-                if (Application.instance.activePage().pageId !== data.pageInfo.Id) {
-                    // Since this page before change event will be called 2 times, so add code here to avoid set active page 2 times
-                    let page = this.getPage(data);
-                    if (data.refresh) {
-                        // If have refresh parameter and value is true, refresh the target page
-                        page.initialize();
-                    }
+        $(':mobile-pagecontainer').on("pagecontainerbeforechange", (eventObject: JQueryEventObject, parameters: any) => {
+            if (parameters.toPage !== ('#' + Consts.Pages.HomePage.Id) && parameters.toPage !== ('#' + Consts.Pages.ConfirmDialog.Id)) { // No need the handling here for home page
+                if ((parameters.options && parameters.options.data)) {
+                    let data = parameters.options.data;
+                    let test = Application.instance.activePage().pageId;
+                    if (Application.instance.activePage().pageId !== data.pageInfo.Id) {
+                        // Since this page before change event will be called 2 times, so add code here to avoid set active page 2 times
+                        let page = this.getPage(data);
+                        if (data.refresh) {
+                            // If have refresh parameter and value is true, refresh the target page
+                            page.initialize();
+                        }
 
-                    Application.instance.activePage(page);
+                        Application.instance.activePage(page);
+                    }
                 }
             }
-        }
 
-        if (parameters.toPage === ('#' + Consts.Pages.HomePage.Id)) {
-            Application.instance.activePage(Application.instance.homePage());
-        }
-    });
-
-    $(':mobile-pagecontainer').pagecontainer({
-        beforeshow: (eventObject: JQueryEventObject, ui: any) => {
-            if (!Application.instance.activePage().equals(Application.instance.homePage())) {
-                // http://demos.jquerymobile.com/1.3.2/faq/injected-content-is-not-enhanced.html
-                // https://www.gajotres.net/jquery-mobile-and-how-to-enhance-the-markup-of-dynamically-added-content/
-                $("body").pagecontainer("getActivePage").trigger("create");
+            if (parameters.toPage === ('#' + Consts.Pages.HomePage.Id)) {
+                Application.instance.activePage(Application.instance.homePage());
             }
-        }
-    });
-}
+        });
+
+        $(':mobile-pagecontainer').pagecontainer({
+            beforeshow: (eventObject: JQueryEventObject, ui: any) => {
+                if (!Application.instance.activePage().equals(Application.instance.homePage())) {
+                    // http://demos.jquerymobile.com/1.3.2/faq/injected-content-is-not-enhanced.html
+                    // https://www.gajotres.net/jquery-mobile-and-how-to-enhance-the-markup-of-dynamically-added-content/
+                    $("body").pagecontainer("getActivePage").trigger("create");
+                }
+            }
+        });
+    }
 
     private getPage(data: any) {
-    let pageInfo = data.pageInfo;
+        let pageInfo = data.pageInfo;
 
-    let page: PageBase;
-    let pageExisted: boolean = false;
-    switch (pageInfo) {
-        case Consts.Pages.ProductManagement:
-            page = this.getExistedInstance(pageInfo);
-            pageExisted = !(page == null);
-            if (pageExisted == false)
-                page = new ProductManagement();
-            break;
-        case Consts.Pages.ProductEditor:
-            page = this.getExistedInstance(pageInfo);
-            pageExisted = !(page == null);
-            if (pageExisted == false)
-                page = new ProductEditor(data.parameters);
-            break;
-        case Consts.Pages.Retail:
-            page = this.getExistedInstance(pageInfo);
-            pageExisted = !(page == null);
-            if (pageExisted == false)
-                page = new Retail();
-            break;
-        case Consts.Pages.ImportProduct:
-            page = this.getExistedInstance(pageInfo);
-            pageExisted = !(page == null);
-            if (pageExisted == false)
-                page = new ImportProduct();
-            break;
-        case Consts.Pages.Whosale:
-            page = this.getExistedInstance(pageInfo);
-            pageExisted = !(page == null);
-            if (pageExisted == false)
-                page = new Wholesale();
-            break;
-        case Consts.Pages.OrderManagement:
-            page = this.getExistedInstance(pageInfo);
-            pageExisted = !(page == null);
-            if (pageExisted == false)
-                page = new Orders();
-            break;
-        case Consts.Pages.BathOrderDetails:
-            page = this.getExistedInstance(pageInfo);
-            pageExisted = !(page == null);
-            if (pageExisted == false)
-                page = new BatchOrderDetails(data.parameters);
-            break;
-        case Consts.Pages.DataAnalyse:
-            page = this.getExistedInstance(pageInfo);
-            pageExisted = !(page == null);
-            if (pageExisted == false)
-                page = new DataAnalyse();
-            break;
+        let page: PageBase;
+        let pageExisted: boolean = false;
+        switch (pageInfo) {
+            case Consts.Pages.ProductManagement:
+                page = this.getExistedInstance(pageInfo);
+                pageExisted = !(page == null);
+                if (pageExisted == false)
+                    page = new ProductManagement();
+                break;
+            case Consts.Pages.ProductEditor:
+                page = this.getExistedInstance(pageInfo);
+                pageExisted = !(page == null);
+                if (pageExisted == false)
+                    page = new ProductEditor(data.parameters);
+                break;
+            case Consts.Pages.Retail:
+                page = this.getExistedInstance(pageInfo);
+                pageExisted = !(page == null);
+                if (pageExisted == false)
+                    page = new Retail();
+                break;
+            case Consts.Pages.RetailWholesale:
+                page = this.getExistedInstance(pageInfo);
+                pageExisted = !(page == null);
+                if (pageExisted == false)
+                    page = new RetailWholesale();
+                break;
+            case Consts.Pages.ImportProduct:
+                page = this.getExistedInstance(pageInfo);
+                pageExisted = !(page == null);
+                if (pageExisted == false)
+                    page = new ImportProduct();
+                break;
+            case Consts.Pages.Whosale:
+                page = this.getExistedInstance(pageInfo);
+                pageExisted = !(page == null);
+                if (pageExisted == false)
+                    page = new Wholesale();
+                break;
+            case Consts.Pages.OrderManagement:
+                page = this.getExistedInstance(pageInfo);
+                pageExisted = !(page == null);
+                if (pageExisted == false)
+                    page = new Orders();
+                break;
+            case Consts.Pages.BathOrderDetails:
+                page = this.getExistedInstance(pageInfo);
+                pageExisted = !(page == null);
+                if (pageExisted == false)
+                    page = new BatchOrderDetails(data.parameters);
+                break;
+            case Consts.Pages.DataAnalyse:
+                page = this.getExistedInstance(pageInfo);
+                pageExisted = !(page == null);
+                if (pageExisted == false)
+                    page = new DataAnalyse();
+                break;
+        }
+
+        if (pageExisted == false && pageInfo.IsPermanent === true)
+            Application.instance.pages.push(page);
+
+        return page;
     }
-
-    if (pageExisted == false && pageInfo.IsPermanent === true)
-        Application.instance.pages.push(page);
-
-    return page;
-}
 
     private getExistedInstance(pageInfo: any) {
-    if (pageInfo.IsPermanent == false) return null;
+        if (pageInfo.IsPermanent == false) return null;
 
-    for (let i = 0; i < Application.instance.pages.length; i++) {
-        if (Application.instance.pages[i].pageId === pageInfo.Id) {
-            return Application.instance.pages[i];
+        for (let i = 0; i < Application.instance.pages.length; i++) {
+            if (Application.instance.pages[i].pageId === pageInfo.Id) {
+                return Application.instance.pages[i];
+            }
         }
-    }
 
-    return null;
-}
+        return null;
+    }
 }

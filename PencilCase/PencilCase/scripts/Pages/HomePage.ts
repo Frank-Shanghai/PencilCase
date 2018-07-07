@@ -30,6 +30,12 @@ export class HomePage extends PageBase {
         });
     }
 
+    private openRetailWholesalePage = () => {
+        this.navigator.navigateTo(Consts.Pages.RetailWholesale, {
+            changeHash: true
+        });
+    }
+
     private openWholesalePage = () => {
         this.navigator.navigateTo(Consts.Pages.Whosale, {
             changeHash: true

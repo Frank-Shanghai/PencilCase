@@ -26,6 +26,11 @@ define(["require", "exports", "./PageBase", "./Consts", "../Navigator"], functio
                     changeHash: true
                 });
             };
+            _this.openRetailWholesalePage = function () {
+                _this.navigator.navigateTo(Consts.Pages.RetailWholesale, {
+                    changeHash: true
+                });
+            };
             _this.openWholesalePage = function () {
                 _this.navigator.navigateTo(Consts.Pages.Whosale, {
                     changeHash: true

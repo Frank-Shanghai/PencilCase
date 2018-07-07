@@ -23,7 +23,7 @@ export class ProductRepository {
     }
 
     public update = (product: Product, successCallback?: (transaction: SqlTransaction, resultSet: SqlResultSet) => void, errorCallback?: (transaction: SqlTransaction, sqlError: SqlError) => void) => {
-        let sqlString = "update Product set Name = '" + product.Name + "', Description = '" + product.Description + "', RetailPrice = " + product.RetailPrice + ", RetailUnit = '" + product.RetailUnit + "', WholesalePrice = " +
+        let sqlString = "update Product set Name = '" + product.Name + "', Description = '" + product.Description + "', RetailPrice = " + product.RetailPrice + ", RetailWholesalePrice = " + product.RetailWholesalePrice + ", RetailUnit = '" + product.RetailUnit + "', WholesalePrice = " +
             product.WholesalePrice + ", WholesaleUnit = '" + product.WholesaleUnit + "', ImportWholesalePrice = " + product.ImportWholesalePrice + ", ImportRetailPrice = " + product.ImportRetailPrice + ", WholesaleCost = " + product.WholesaleCost + ", RetailCost = " + product.RetailCost + ", Times = " + product.Times + ", Inventory = " + product.Inventory + ", Image = '" + product.Image + "', ModifiedDate = '" +
             moment((new Date(Date.now())).toISOString()).format("YYYY-MM-DD hh:mm:ss") + "' where Id = '" + product.Id + "'";
 
@@ -71,7 +71,7 @@ export class ProductRepository {
     }
 
     public insert = (product: Product, successCallback?: (transaction: SqlTransaction, resultSet: SqlResultSet) => void, errorCallback?: (transaction: SqlTransaction, sqlError: SqlError) => void) => {
-        let sqlString = "insert into Product values ('" + product.Id + "','" + product.Name + "','" + product.Description + "'," + product.RetailPrice + ",'" + product.RetailUnit + "'," +
+        let sqlString = "insert into Product values ('" + product.Id + "','" + product.Name + "','" + product.Description + "'," + product.RetailPrice + "," + product.RetailWholesalePrice + ",'" + product.RetailUnit + "'," +
             product.WholesalePrice + ",'" + product.WholesaleUnit + "'," + product.ImportWholesalePrice + "," + product.ImportRetailPrice + "," + product.WholesaleCost + "," + product.RetailCost + "," + product.Times + "," + product.Inventory + ",'" + product.Image + "','" +
             moment(product.CreatedDate.toISOString()).format("YYYY-MM-DD hh:mm:ss") + "','" + moment(product.ModifiedDate.toISOString()).format("YYYY-MM-DD hh:mm:ss") + "')";
 

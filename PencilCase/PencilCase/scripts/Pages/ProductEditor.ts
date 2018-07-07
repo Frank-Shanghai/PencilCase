@@ -63,6 +63,7 @@ export class ProductEditor extends PageBase {
     private floatNumberRegExp = /^[0-9]+([.]{1}[0-9]+){0,1}$/;
 
     private retailPrice: KnockoutObservable<number> = ko.observable(undefined).extend({ regExpValidate: { regExp: this.floatNumberRegExp, overrideMessage: '' } });
+    private retailWholesalePrice: KnockoutObservable<number> = ko.observable(undefined).extend({ regExpValidate: { regExp: this.floatNumberRegExp, overrideMessage: '' } });
     private retailUnit: KnockoutObservable<string> = ko.observable(null);
     private wholesaleUnit: KnockoutObservable<string> = ko.observable(null);
     private times: KnockoutObservable<number> = ko.observable(undefined).extend({ regExpValidate: { regExp: this.floatNumberRegExp, overrideMessage: '' } });
@@ -71,7 +72,7 @@ export class ProductEditor extends PageBase {
     private isNewProduct = false;
 
     private canSave = ko.computed(() => {
-        if ((<any>this.name).hasError() || (<any>this.retailPrice).hasError() || (<any>this.times).hasError() || (<any>this.wholesalePrice).hasError())
+        if ((<any>this.name).hasError() || (<any>this.retailPrice).hasError() || (<any>this.retailWholesalePrice).hasError() || (<any>this.times).hasError() || (<any>this.wholesalePrice).hasError())
             return false;
         return true;
     });
@@ -143,6 +144,7 @@ export class ProductEditor extends PageBase {
         this.description(this.parameters.product.Description);
         this.inventory(this.parameters.product.Inventory);
         this.retailPrice(this.parameters.product.RetailPrice);
+        this.retailWholesalePrice(this.parameters.product.RetailWholesalePrice);
         this.times(this.parameters.product.Times);
         this.retailUnit(this.parameters.product.RetailUnit);
         this.wholesaleUnit(this.parameters.product.WholesaleUnit);
@@ -167,6 +169,7 @@ export class ProductEditor extends PageBase {
         product.Name = this.name();
         product.Description = this.description();
         product.RetailPrice = this.retailPrice();
+        product.RetailWholesalePrice = this.retailWholesalePrice();
         product.RetailUnit = this.retailUnit();
         product.WholesalePrice = this.wholesalePrice();
         product.WholesaleUnit = this.wholesaleUnit();

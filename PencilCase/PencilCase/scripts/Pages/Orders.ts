@@ -41,6 +41,8 @@ export class Orders extends PageBase {
                 return "零售";
             case OrderTypes.Wholesale:
                 return "批发";
+            case OrderTypes.RetailWholesale:
+                return "零批";
         }
     }
 

@@ -60,6 +60,8 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                     return "零售";
                 case Order_1.OrderTypes.Wholesale:
                     return "批发";
+                case Order_1.OrderTypes.RetailWholesale:
+                    return "零批";
             }
         };
         return Orders;

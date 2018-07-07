@@ -7,6 +7,7 @@
     ProductManagement: { Id: "ProductManagement", IsPermanent: false },
     ProductEditor: { Id: "ProductEditor", IsPermanent: false },
     Retail: { Id: "Retail", IsPermanent: true },
+    RetailWholesale: {Id: "RetailWholesale", IsPermanent: true},
     Whosale: { Id: "Wholesale", IsPermanent: true },
     ImportProduct: { Id: "ImportProduct", IsPermanent: false },
     DataAnalysis: { Id: "DataAnalysis", IsPermanent: false },

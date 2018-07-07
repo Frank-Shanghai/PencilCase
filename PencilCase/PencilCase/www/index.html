@@ -13,8 +13,8 @@
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
     <link rel="stylesheet" type="text/css" href="css/index.css">
     <link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.4.5.min.css">
-    <link rel="stylesheet" type="text/css" href="css/daterangepicker.css" />
-    <link rel="stylesheet" type="text/css" href="css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="css/daterangepicker.css">
+    <link rel="stylesheet" type="text/css" href="css/custom.css">
 
     <script type="text/javascript" src="cordova.js"></script>
     <!-- The 'async' attribute is needed for RequireJS to work in a Windows app -->
@@ -44,6 +44,7 @@
         <div role="main" class="ui-content">
             <div style="display: none" data-bind="visible: $parent.isDataLoaded">
                 <a href="#Retail" class="ui-btn ui-corner-all" data-bind="click: openRetailPage">Retail</a>
+                <a href="#RetailWholesale" class="ui-btn ui-corner-all" data-bind="click: openRetailWholesalePage">RetailWholesale</a>
                 <a href="#Wholesale" class="ui-btn ui-corner-all" data-bind="click: openWholesalePage">Wholesale</a>
                 <a href="#ProductManagement" class="ui-btn ui-corner-all" data-bind="click: openProductManagementPage">Product Management</a>
                 <a href="#ImportProduct" class="ui-btn ui-corner-all" data-bind="click: openImportProductPage">进货</a>
@@ -78,11 +79,15 @@
                     <a href="#" data-bind="click: $parent.showDetails">
                         <h2><span data-bind="text: Name"></span></h2>
                         <p>
-                            <span>单价：</span>
+                            <span>零售价:</span>
                             <span data-bind="text: '￥' + RetailPrice"></span>
+                            <span>&nbsp;&nbsp;</span>
+                            <span>零批价:</span>
+                            <span data-bind="text: '￥' + RetailWholesalePrice"></span>
+
                         </p>
                         <p>
-                            <span>批发价：</span>
+                            <span>批发价:</span>
                             <span data-bind="text: '￥' + WholesalePrice"></span>
                             <span data-bind="text: '(' + Times + RetailUnitName + '/' + WholesaleUnitName + ')'"></span>
                             <span class="ui-li-count" data-bind="text: '库存：' + Inventory"></span>
@@ -161,6 +166,9 @@
                             <span style="font-weight: bold">零售价：</span><span data-bind="text: originalProduct().RetailPrice + '元'"></span>
                         </p>
                         <p>
+                            <span style="font-weight: bold">零批价：</span><span data-bind="text: originalProduct().RetailWholesalePrice + '元'"></span>
+                        </p>
+                        <p>
                             <span style="font-weight: bold">批发单位：</span><span data-bind="text: originalProduct().WholesaleUnitName"></span>
                         </p>
                         <p>
@@ -215,6 +223,12 @@
                         <input type="number" name="productRetailPrice" data-bind="textInput: retailPrice, style: { border: retailPrice.hasError() ? '1px solid red' : '0'}" />
                         <div class="validation-error-message" data-bind="visible: retailPrice.hasError">
                             <span data-bind='text: retailPrice.validationMessage'></span>
+                        </div>
+
+                        <label for="productRetailWholesalePrice" style="font-weight: bold">零批价(元)：</label>
+                        <input type="number" name="productRetailWholesalePrice" data-bind="textInput: retailWholesalePrice, style: { border: retailWholesalePrice.hasError() ? '1px solid red' : '0'}" />
+                        <div class="validation-error-message" data-bind="visible: retailWholesalePrice.hasError">
+                            <span data-bind='text: retailWholesalePrice.validationMessage'></span>
                         </div>
 
                         <label for="productWholesaleUnit" style="font-weight: bold">批发单位：</label>
@@ -594,6 +608,114 @@
         <!-- /ko -->
     </div>
 
+    <!-- ==============Retail Wholesale Page================= -->
+    <!-- Make sure the page id here is exactly the same as it defined in Consts.Pages -->
+    <div data-role="page" id="RetailWholesale">
+        <!-- ko if: activePage().pageId === 'RetailWholesale' -->
+        <!-- ko with: activePage() -->
+        <div data-role="header" data-position="fixed" data-tap-toggle="false">
+            <a href="#HomePage" data-icon="home" data-bind="click: navigator.goHome">Home</a>
+            <h1><span data-bind="text: title"></span></h1>
+        </div>
+        <div data-role="main" class="ui-content">
+            <select id="retailSelect" style="margin-left: unset; margin-right: unset" data-mini="true" data-native-menu="false" class="filterable-select" data-bind="selectChange: clearSelection, options: products, optionsText: 'Name', optionsValue: 'Id', value: selectedProductId"></select>
+            <div data-bind="visible: productSelected" style="margin-top: 10px; margin-left: 3px;">
+                <table>
+                    <tr>
+                        <td><label style="font-weight: bold;">价格：</label></td>
+                        <td><input data-mini="true" type="number" style="width: 50px" data-bind="value: selectedProduct() ? selectedProduct().RetailWholesalePrice : 0, enable: false" /></td>
+                        <td><span data-bind="text: selectedProduct() ? '元/' + selectedProduct().RetailUnitName: ''"></span></td>
+                    </tr>
+                </table>
+            </div>
+            <div data-bind="visible: productSelected" style="margin-left: 3px;">
+                <table>
+                    <tr>
+                        <td><span style="font-weight: bold; display: inline">数量：</span></td>
+                        <td><a style="margin: 0" href="#" data-bind="click: decreaseQuantity" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-minus ui-btn-icon-notext ui-btn-inline">Minus</a></td>
+                        <td><input data-mini="true" type="number" style="width: 50px" data-bind="textInput: selectedProductQuantity, style: { border: (numberOnlyRegExp.test(selectedProductQuantity()) == false) ? '1px solid red' : '0'}" /></td>
+                        <td><a style="margin: 0" href="#" data-bind="click: increaseQuantity" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-notext ui-btn-inline">Plus</a></td>
+                    </tr>
+                </table>
+            </div>
+            <div style="margin-left: 3px;" class="ui-grid-a" data-bind="visible: productSelected">
+                <div class="ui-block-a">
+                    <a data-role="button" class="ui-btn ui-mini ui-corner-all ui-shadow" href="#" data-bind="click: addOrder, css:{ 'ui-state-disabled': numberOnlyRegExp.test(selectedProductQuantity()) == false}">添加商品</a>
+                </div>
+                <div class="ui-block-b">
+                    <a data-role="button" class="ui-btn ui-mini ui-corner-all ui-shadow" href="#" data-bind="click: cancelOrderAdding">取消</a>
+                </div>
+            </div>
+            <hr style=" height:2px;border:none;border-top:2px dotted grey;" />
+            <div data-bind="visible: orders().length > 0" style="font-size: 0.8em">
+                <ul data-role="listview" data-inset="true" data-bind="foreach: orders, listview: orders">
+                    <li style="padding-right: 0">
+                        <table style="width: 100%">
+                            <tr>
+                                <td>
+                                    <div>
+                                        <span style="font-weight: bold" data-bind="text: product().Name"></span>
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span data-bind="text: product().RetailWholesalePrice + '元'"></span>
+                                        <span data-bind="text: '/' + product().RetailUnitName"></span>
+                                    </div>
+                                </td>
+                                <th rowspan="2" style="width: 1em">
+                                    <a href="#" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline" data-bind="click: $parent.deleteOrder"></a>
+                                </th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="display:inline">
+                                        <table style="vertical-align: -webkit-baseline-middle; margin-left: -10px; display: inline;">
+                                            <tr>
+                                                <td>
+                                                    <a href="#" style="margin: 0" class="ui-btn ui-mini ui-shadow ui-corner-all ui-icon-minus ui-btn-icon-notext ui-btn-inline" data-bind="click: $parent.decreaseOrderProductQuantity">Minus</a>
+                                                </td>
+                                                <td>
+                                                    <!-- Use textInput binding instead of value binding to make the data changed immediatly, but not on losing focus. -->
+                                                    <!-- http://knockoutjs.com/documentation/textinput-binding.html -->
+                                                    <!--<input type="number" style="width: 30px; text-align: center" data-bind="value: quantity" />-->
+                                                    <input type="number" style="width: 30px; text-align: center" data-bind="textInput: quantity, css: {'textbox-validation-error': $parent.numberOnlyRegExp.test(quantity()) == false}" />
+                                                </td>
+                                                <td>
+                                                    <a href="#" style="margin: 0" class="ui-btn ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-notext ui-btn-inline" data-bind="click: $parent.increaseOrderProductQuantity">Plus</a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <span>&nbsp;&nbsp;</span>
+                                        <span data-bind="text: '小计'"></span>
+                                        <span data-bind="text: total() + '元'"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <footer data-role="footer" data-position="fixed" data-tap-toggle="false" data-bind="visible: orders().length > 0">
+            <div style="padding: 5px; text-align: center; color: orangered">
+                <span>总量：</span><span data-bind="text: totalNumber"></span>
+                <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <span>总价：</span><span data-bind="text: totalPrice"></span>
+            </div>
+            <div data-role="navbar" data-grid="a">
+                <ul>
+                    <li>
+                        <a href="#" data-icon="check" data-bind="click: save, css: {'ui-btn-active': !(orders().length > 0), 'ui-state-disabled': invalidOrderCount() > 0}">结算</a>
+                    </li>
+                    <li>
+                        <a href="#" data-icon="delete" data-bind="click: cancelOrders, css: {'ui-btn-active': !(orders().length > 0)}">取消</a>
+                    </li>
+                </ul>
+            </div>
+        </footer>
+        <!-- /ko -->
+        <!-- /ko -->
+    </div>
+
 
     <!-- ==============Order Management Page================= -->
     <!-- Try not bind UI stuff on Home Page like header and footer, because such UI binding will be applied until device ready,
@@ -750,7 +872,7 @@
                 </div>
                 <div>
                     <select data-mini="true" data-native-menu="false" data-bind="options: quantitySaleTypeOptinos, optionsText: 'text', optionsValue: 'value', value: selectedQuantitySaleType"></select>
-                    <span style="font-size: 0.8em; color:blue" data-bind="text: '* 此处数量单位为零售单位，便于比较。', visible: (chartDataType() == 'Quantity' && selectedQuantitySaleType().toString() != '1') && (!isEmptyData())"></span>
+                    <span style="font-size: 0.8em; color:blue" data-bind="text: '* 此处数量单位为零售单位，便于比较。', visible: (chartDataType() == 'Quantity' && (selectedQuantitySaleType().toString() != '1' && selectedQuantitySaleType().toString() != '4')) && (!isEmptyData())"></span>
                     <canvas id="dataChart" width="400" height="400" data-bind="visible: !isEmptyData()"></canvas>
                     <div style="margin-top: 0.5em; text-align: center">
                         <span style="font-size: 0.9em; font-weight: bold" data-bind="visible: !isEmptyData(), text: chartSummary"></span>

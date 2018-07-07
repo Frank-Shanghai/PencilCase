@@ -14,8 +14,9 @@ export class DataAnalyse extends PageBase {
     private chartDataType: KnockoutObservable<string> = ko.observable("Quantity");
     private quantitySaleTypeOptinos = [
         { text: "Retail", value: OrderTypes.Retail },
+        { text: "RetailWholesale", value: OrderTypes.RetailWholesale },
         { text: "Wholesale", value: OrderTypes.Wholesale },
-        { text: "Both", value: -1 }
+        { text: "All", value: -1 },
     ];
     private selectedQuantitySaleType: KnockoutObservable<any> = ko.observable(OrderTypes.Retail);
 
@@ -242,6 +243,109 @@ export class DataAnalyse extends PageBase {
             }, this.onDBError);
         }
         else {
+            let handleWholesale = () => {
+                this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, OrderTypes.Wholesale, (transaction: SqlTransaction, orderSet: SqlResultSet) => {
+                    if (orderSet.rows.length > 0) {
+                        let rows = orderSet.rows;
+                        for (let i = 0; i < rows.length; i++) {
+                            let order = rows[i];
+                            this.productRepository.getProductById(order.ProductId, (transaction: SqlTransaction, productSet: SqlResultSet) => {
+                                let productExisted = false;
+                                let index = -1;
+                                if (productSet.rows.length > 0) {
+                                    index = labels.indexOf(productSet.rows[0].Name);
+                                    if (index < 0) {
+                                        labels.push(productSet.rows[0].Name);
+                                    }
+                                    else {
+                                        productExisted = true;
+                                    }
+                                }
+                                else {
+                                    labels.push("unknown" + i);
+                                }
+
+                                //wholesale
+                                if (productExisted === true) {
+                                    let value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost)).toFixed(2));
+                                    data[index] = data[index] + value;
+                                    total += value;
+                                }
+                                else {
+                                    let value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost)).toFixed(2));
+                                    data.push(value);
+                                    total += value;
+                                }
+
+                                if (rows.length - 1 == i) {
+                                    this.isEmptyData(false);
+                                    this.initializeChart(labels, data);
+                                    this.chartSummary("总计：" + total + "元");
+                                }
+                            }, this.onDBError);
+                        }
+                    }
+                    else {
+                        if (total > 0) {
+                            this.isEmptyData(false);
+                            this.initializeChart(labels, data);
+                            this.chartSummary("总计：" + total + "元");
+                        }
+                        else {
+                            this.isEmptyData(true);
+                        }
+                    }
+                }, this.onDBError);
+            };
+
+            let handleRetailWholesaleAndWholesale = () => {
+                this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, OrderTypes.RetailWholesale, (transaction: SqlTransaction, orderSet: SqlResultSet) => {
+                    if (orderSet.rows.length > 0) {
+                        let rows = orderSet.rows;
+                        for (let i = 0; i < rows.length; i++) {
+                            let order = rows[i];
+                            this.productRepository.getProductById(order.ProductId, (transaction: SqlTransaction, productSet: SqlResultSet) => {
+                                let productExisted = false;
+                                let index = -1;
+                                if (productSet.rows.length > 0) {
+                                    index = labels.indexOf(productSet.rows[0].Name);
+                                    if (index < 0) {
+                                        labels.push(productSet.rows[0].Name);
+                                    }
+                                    else {
+                                        productExisted = true;
+                                    }
+                                }
+                                else {
+                                    labels.push("unknown" + i);
+                                }
+
+                                //retailWholesale
+                                if (productExisted === true) {
+                                    // When calculating profict, use retail cost
+                                    let value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].RetailCost)).toFixed(2));
+                                    data[index] = data[index] + value;
+                                    total += value;
+                                }
+                                else {
+                                    let value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].RetailCost)).toFixed(2));
+                                    data.push(value);
+                                    total += value;
+                                }
+
+                                if (rows.length - 1 == i) {
+                                    handleWholesale();
+                                }
+                            }, this.onDBError);
+                        }
+                    }
+                    else {
+                        handleWholesale();
+                    }
+                }, this.onDBError);
+            };
+
+
             this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, OrderTypes.Retail, (transaction: SqlTransaction, orderSet: SqlResultSet) => {
                 if (orderSet.rows.length > 0) {
                     let rows = orderSet.rows;
@@ -260,51 +364,13 @@ export class DataAnalyse extends PageBase {
                             data.push(value);
 
                             if (rows.length - 1 == i) {
-                                this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, OrderTypes.Wholesale, (transaction: SqlTransaction, orderSet: SqlResultSet) => {
-                                    if (orderSet.rows.length > 0) {
-                                        let rows = orderSet.rows;
-                                        for (let i = 0; i < rows.length; i++) {
-                                            let order = rows[i];
-                                            this.productRepository.getProductById(order.ProductId, (transaction: SqlTransaction, productSet: SqlResultSet) => {
-                                                let productExisted = false;
-                                                let index = -1;
-                                                if (productSet.rows.length > 0) {
-                                                    index = labels.indexOf(productSet.rows[0].Name);
-                                                    if (index < 0) {
-                                                        labels.push(productSet.rows[0].Name);
-                                                    }
-                                                    else {
-                                                        productExisted = true;
-                                                    }
-                                                }
-                                                else {
-                                                    labels.push("unknown" + i);
-                                                }
-
-                                                //wholesale
-                                                if (productExisted === true) {
-                                                    let value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost)).toFixed(2));
-                                                    data[index] = data[index] + (Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost));
-                                                    total += value;
-                                                }
-                                                else {
-                                                    let value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost)).toFixed(2));
-                                                    data.push(Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost));
-                                                    total += value;
-                                                }
-
-                                                if (rows.length - 1 == i) {
-                                                    this.initializeChart(labels, data);
-                                                    this.chartSummary("总计：" + total + "元");
-                                                }
-                                            }, this.onDBError);
-                                        }
-                                    }
-                                }, this.onDBError);
-
+                                handleRetailWholesaleAndWholesale();
                             }
                         }, this.onDBError);
                     }
+                }
+                else {
+                    handleRetailWholesaleAndWholesale();
                 }
             }, this.onDBError);
         }
@@ -357,6 +423,106 @@ export class DataAnalyse extends PageBase {
             }, this.onDBError);
         }
         else {
+            // Finally, handle wholesale
+            let handleWholesale = () => {
+                this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, OrderTypes.Wholesale, (transaction: SqlTransaction, orderSet: SqlResultSet) => {
+                    if (orderSet.rows.length > 0) {
+                        let rows = orderSet.rows;
+                        for (let i = 0; i < rows.length; i++) {
+                            let order = rows[i];
+                            this.productRepository.getProductById(order.ProductId, (transaction: SqlTransaction, productSet: SqlResultSet) => {
+                                let productExisted = false;
+                                let index = -1;
+                                if (productSet.rows.length > 0) {
+                                    index = labels.indexOf(productSet.rows[0].Name);
+                                    if (index < 0) {
+                                        labels.push(productSet.rows[0].Name);
+                                    }
+                                    else {
+                                        productExisted = true;
+                                    }
+                                }
+                                else {
+                                    labels.push("unknown" + i);
+                                }
+
+                                //wholesale
+                                if (productExisted === true) {
+                                    data[index] = data[index] + (order.Quantity * productSet.rows[0].Times);
+                                    total += (order.Quantity * productSet.rows[0].Times);
+                                }
+                                else {
+                                    data.push(order.Quantity * productSet.rows[0].Times);
+                                    total += (order.Quantity * productSet.rows[0].Times);
+                                }
+
+                                if (rows.length - 1 == i) {
+                                    this.isEmptyData(false);
+                                    this.chartSummary("总计：" + total);
+                                    this.initializeChart(labels, data);
+                                }
+                            }, this.onDBError);
+                        }
+                    }
+                    else {
+                        if (total > 0) {
+                            this.isEmptyData(false);
+                            this.chartSummary("总计：" + total);
+                            this.initializeChart(labels, data);
+                        }
+                        else {
+                            this.isEmptyData(true);
+                        }
+                    }
+                }, this.onDBError);
+            };
+
+            // Second, handle retailWholesale
+            let handleRetailWholesaleAndWholesale = () => {
+                this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, OrderTypes.RetailWholesale, (transaction: SqlTransaction, orderSet: SqlResultSet) => {
+                    if (orderSet.rows.length > 0) {
+                        let rows = orderSet.rows;
+                        for (let i = 0; i < rows.length; i++) {
+                            let order = rows[i];
+                            this.productRepository.getProductById(order.ProductId, (transaction: SqlTransaction, productSet: SqlResultSet) => {
+                                let productExisted = false;
+                                let index = -1;
+                                if (productSet.rows.length > 0) {
+                                    index = labels.indexOf(productSet.rows[0].Name);
+                                    if (index < 0) {
+                                        labels.push(productSet.rows[0].Name);
+                                    }
+                                    else {
+                                        productExisted = true;
+                                    }
+                                }
+                                else {
+                                    labels.push("unknown" + i);
+                                }
+
+                                //retailWholesale
+                                if (productExisted === true) {
+                                    data[index] = data[index] + order.Quantity;
+                                    total += order.Quantity;
+                                }
+                                else {
+                                    data.push(order.Quantity);
+                                    total += order.Quantity;
+                                }
+
+                                if (rows.length - 1 == i) {
+                                    handleWholesale();
+                                }
+                            }, this.onDBError);
+                        }
+                    }
+                    else {
+                        handleWholesale();
+                    }
+                }, this.onDBError);
+            };
+
+            // First, handle retail
             this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, OrderTypes.Retail, (transaction: SqlTransaction, orderSet: SqlResultSet) => {
                 if (orderSet.rows.length > 0) {
                     let rows = orderSet.rows;
@@ -375,49 +541,13 @@ export class DataAnalyse extends PageBase {
                             total += order.Quantity;
 
                             if (rows.length - 1 == i) {
-                                this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, OrderTypes.Wholesale, (transaction: SqlTransaction, orderSet: SqlResultSet) => {
-                                    if (orderSet.rows.length > 0) {
-                                        let rows = orderSet.rows;
-                                        for (let i = 0; i < rows.length; i++) {
-                                            let order = rows[i];
-                                            this.productRepository.getProductById(order.ProductId, (transaction: SqlTransaction, productSet: SqlResultSet) => {
-                                                let productExisted = false;
-                                                let index = -1;
-                                                if (productSet.rows.length > 0) {
-                                                    index = labels.indexOf(productSet.rows[0].Name);
-                                                    if (index < 0) {
-                                                        labels.push(productSet.rows[0].Name);
-                                                    }
-                                                    else {
-                                                        productExisted = true;
-                                                    }
-                                                }
-                                                else {
-                                                    labels.push("unknown" + i);
-                                                }
-
-                                                //wholesale
-                                                if (productExisted === true) {
-                                                    data[index] = data[index] + (order.Quantity * productSet.rows[0].Times);
-                                                    total += (order.Quantity * productSet.rows[0].Times);
-                                                }
-                                                else {
-                                                    data.push(order.Quantity * productSet.rows[0].Times);
-                                                    total += (order.Quantity * productSet.rows[0].Times);
-                                                }
-
-                                                if (rows.length - 1 == i) {
-                                                    this.chartSummary("总计：" + total);
-                                                    this.initializeChart(labels, data);
-                                                }
-                                            }, this.onDBError);
-                                        }
-                                    }
-                                }, this.onDBError);
-
+                                handleRetailWholesaleAndWholesale();
                             }
                         }, this.onDBError);
                     }
+                }
+                else {
+                    handleRetailWholesaleAndWholesale();
                 }
             }, this.onDBError);
 

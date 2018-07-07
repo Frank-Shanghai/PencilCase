@@ -49,6 +49,9 @@ export class OrderRepository {
             case OrderTypes.Wholesale:
                 conditions += " and Type = 2";
                 break;
+            case OrderTypes.RetailWholesale:
+                conditions += " and Type = 4";
+                break;
         }
 
         let sqlString = '';

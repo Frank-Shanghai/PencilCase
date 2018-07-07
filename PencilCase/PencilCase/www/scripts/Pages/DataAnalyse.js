@@ -20,8 +20,9 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
             _this.chartDataType = ko.observable("Quantity");
             _this.quantitySaleTypeOptinos = [
                 { text: "Retail", value: Order_1.OrderTypes.Retail },
+                { text: "RetailWholesale", value: Order_1.OrderTypes.RetailWholesale },
                 { text: "Wholesale", value: Order_1.OrderTypes.Wholesale },
-                { text: "Both", value: -1 }
+                { text: "All", value: -1 },
             ];
             _this.selectedQuantitySaleType = ko.observable(Order_1.OrderTypes.Retail);
             _this.orderRepository = new OrderRepository_1.OrderRepository();
@@ -244,11 +245,113 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                 }, this.onDBError);
             }
             else {
+                var handleWholesale_1 = function () {
+                    _this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, Order_1.OrderTypes.Wholesale, function (transaction, orderSet) {
+                        if (orderSet.rows.length > 0) {
+                            var rows_3 = orderSet.rows;
+                            var _loop_3 = function (i) {
+                                var order = rows_3[i];
+                                _this.productRepository.getProductById(order.ProductId, function (transaction, productSet) {
+                                    var productExisted = false;
+                                    var index = -1;
+                                    if (productSet.rows.length > 0) {
+                                        index = labels.indexOf(productSet.rows[0].Name);
+                                        if (index < 0) {
+                                            labels.push(productSet.rows[0].Name);
+                                        }
+                                        else {
+                                            productExisted = true;
+                                        }
+                                    }
+                                    else {
+                                        labels.push("unknown" + i);
+                                    }
+                                    //wholesale
+                                    if (productExisted === true) {
+                                        var value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost)).toFixed(2));
+                                        data[index] = data[index] + value;
+                                        total += value;
+                                    }
+                                    else {
+                                        var value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].WholesaleCost)).toFixed(2));
+                                        data.push(value);
+                                        total += value;
+                                    }
+                                    if (rows_3.length - 1 == i) {
+                                        _this.isEmptyData(false);
+                                        _this.initializeChart(labels, data);
+                                        _this.chartSummary("总计：" + total + "元");
+                                    }
+                                }, _this.onDBError);
+                            };
+                            for (var i = 0; i < rows_3.length; i++) {
+                                _loop_3(i);
+                            }
+                        }
+                        else {
+                            if (total > 0) {
+                                _this.isEmptyData(false);
+                                _this.initializeChart(labels, data);
+                                _this.chartSummary("总计：" + total + "元");
+                            }
+                            else {
+                                _this.isEmptyData(true);
+                            }
+                        }
+                    }, _this.onDBError);
+                };
+                var handleRetailWholesaleAndWholesale_1 = function () {
+                    _this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, Order_1.OrderTypes.RetailWholesale, function (transaction, orderSet) {
+                        if (orderSet.rows.length > 0) {
+                            var rows_4 = orderSet.rows;
+                            var _loop_4 = function (i) {
+                                var order = rows_4[i];
+                                _this.productRepository.getProductById(order.ProductId, function (transaction, productSet) {
+                                    var productExisted = false;
+                                    var index = -1;
+                                    if (productSet.rows.length > 0) {
+                                        index = labels.indexOf(productSet.rows[0].Name);
+                                        if (index < 0) {
+                                            labels.push(productSet.rows[0].Name);
+                                        }
+                                        else {
+                                            productExisted = true;
+                                        }
+                                    }
+                                    else {
+                                        labels.push("unknown" + i);
+                                    }
+                                    //retailWholesale
+                                    if (productExisted === true) {
+                                        // When calculating profict, use retail cost
+                                        var value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].RetailCost)).toFixed(2));
+                                        data[index] = data[index] + value;
+                                        total += value;
+                                    }
+                                    else {
+                                        var value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].RetailCost)).toFixed(2));
+                                        data.push(value);
+                                        total += value;
+                                    }
+                                    if (rows_4.length - 1 == i) {
+                                        handleWholesale_1();
+                                    }
+                                }, _this.onDBError);
+                            };
+                            for (var i = 0; i < rows_4.length; i++) {
+                                _loop_4(i);
+                            }
+                        }
+                        else {
+                            handleWholesale_1();
+                        }
+                    }, _this.onDBError);
+                };
                 this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, Order_1.OrderTypes.Retail, function (transaction, orderSet) {
                     if (orderSet.rows.length > 0) {
-                        var rows_3 = orderSet.rows;
-                        var _loop_3 = function (i) {
-                            var order = rows_3[i];
+                        var rows_5 = orderSet.rows;
+                        var _loop_5 = function (i) {
+                            var order = rows_5[i];
                             _this.productRepository.getProductById(order.ProductId, function (transaction, productSet) {
                                 if (productSet.rows.length > 0) {
                                     labels.push(productSet.rows[0].Name);
@@ -259,55 +362,17 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                                 //retail
                                 var value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].RetailCost)).toFixed(2));
                                 data.push(value);
-                                if (rows_3.length - 1 == i) {
-                                    _this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, Order_1.OrderTypes.Wholesale, function (transaction, orderSet) {
-                                        if (orderSet.rows.length > 0) {
-                                            var rows_4 = orderSet.rows;
-                                            var _loop_4 = function (i_1) {
-                                                var order_1 = rows_4[i_1];
-                                                _this.productRepository.getProductById(order_1.ProductId, function (transaction, productSet) {
-                                                    var productExisted = false;
-                                                    var index = -1;
-                                                    if (productSet.rows.length > 0) {
-                                                        index = labels.indexOf(productSet.rows[0].Name);
-                                                        if (index < 0) {
-                                                            labels.push(productSet.rows[0].Name);
-                                                        }
-                                                        else {
-                                                            productExisted = true;
-                                                        }
-                                                    }
-                                                    else {
-                                                        labels.push("unknown" + i_1);
-                                                    }
-                                                    //wholesale
-                                                    if (productExisted === true) {
-                                                        var value_1 = Number((Number(order_1.Total) - Number(order_1.Quantity) * Number(productSet.rows[0].WholesaleCost)).toFixed(2));
-                                                        data[index] = data[index] + (Number(order_1.Total) - Number(order_1.Quantity) * Number(productSet.rows[0].WholesaleCost));
-                                                        total += value_1;
-                                                    }
-                                                    else {
-                                                        var value_2 = Number((Number(order_1.Total) - Number(order_1.Quantity) * Number(productSet.rows[0].WholesaleCost)).toFixed(2));
-                                                        data.push(Number(order_1.Total) - Number(order_1.Quantity) * Number(productSet.rows[0].WholesaleCost));
-                                                        total += value_2;
-                                                    }
-                                                    if (rows_4.length - 1 == i_1) {
-                                                        _this.initializeChart(labels, data);
-                                                        _this.chartSummary("总计：" + total + "元");
-                                                    }
-                                                }, _this.onDBError);
-                                            };
-                                            for (var i_1 = 0; i_1 < rows_4.length; i_1++) {
-                                                _loop_4(i_1);
-                                            }
-                                        }
-                                    }, _this.onDBError);
+                                if (rows_5.length - 1 == i) {
+                                    handleRetailWholesaleAndWholesale_1();
                                 }
                             }, _this.onDBError);
                         };
-                        for (var i = 0; i < rows_3.length; i++) {
-                            _loop_3(i);
+                        for (var i = 0; i < rows_5.length; i++) {
+                            _loop_5(i);
                         }
+                    }
+                    else {
+                        handleRetailWholesaleAndWholesale_1();
                     }
                 }, this.onDBError);
             }
@@ -324,9 +389,9 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                 this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, this.selectedQuantitySaleType(), function (transaction, orderSet) {
                     if (orderSet.rows.length > 0) {
                         _this.isEmptyData(false);
-                        var rows_5 = orderSet.rows;
-                        var _loop_5 = function (i) {
-                            var order = rows_5[i];
+                        var rows_6 = orderSet.rows;
+                        var _loop_6 = function (i) {
+                            var order = rows_6[i];
                             _this.productRepository.getProductById(order.ProductId, function (transaction, productSet) {
                                 if (productSet.rows.length > 0) {
                                     labels.push(productSet.rows[0].Name);
@@ -344,14 +409,14 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                                     data.push(order.Quantity);
                                     total += order.Quantity;
                                 }
-                                if (rows_5.length - 1 == i) {
+                                if (rows_6.length - 1 == i) {
                                     _this.chartSummary("总计：" + total);
                                     _this.initializeChart(labels, data);
                                 }
                             }, _this.onDBError);
                         };
-                        for (var i = 0; i < rows_5.length; i++) {
-                            _loop_5(i);
+                        for (var i = 0; i < rows_6.length; i++) {
+                            _loop_6(i);
                         }
                     }
                     else {
@@ -360,11 +425,111 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                 }, this.onDBError);
             }
             else {
+                // Finally, handle wholesale
+                var handleWholesale_2 = function () {
+                    _this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, Order_1.OrderTypes.Wholesale, function (transaction, orderSet) {
+                        if (orderSet.rows.length > 0) {
+                            var rows_7 = orderSet.rows;
+                            var _loop_7 = function (i) {
+                                var order = rows_7[i];
+                                _this.productRepository.getProductById(order.ProductId, function (transaction, productSet) {
+                                    var productExisted = false;
+                                    var index = -1;
+                                    if (productSet.rows.length > 0) {
+                                        index = labels.indexOf(productSet.rows[0].Name);
+                                        if (index < 0) {
+                                            labels.push(productSet.rows[0].Name);
+                                        }
+                                        else {
+                                            productExisted = true;
+                                        }
+                                    }
+                                    else {
+                                        labels.push("unknown" + i);
+                                    }
+                                    //wholesale
+                                    if (productExisted === true) {
+                                        data[index] = data[index] + (order.Quantity * productSet.rows[0].Times);
+                                        total += (order.Quantity * productSet.rows[0].Times);
+                                    }
+                                    else {
+                                        data.push(order.Quantity * productSet.rows[0].Times);
+                                        total += (order.Quantity * productSet.rows[0].Times);
+                                    }
+                                    if (rows_7.length - 1 == i) {
+                                        _this.isEmptyData(false);
+                                        _this.chartSummary("总计：" + total);
+                                        _this.initializeChart(labels, data);
+                                    }
+                                }, _this.onDBError);
+                            };
+                            for (var i = 0; i < rows_7.length; i++) {
+                                _loop_7(i);
+                            }
+                        }
+                        else {
+                            if (total > 0) {
+                                _this.isEmptyData(false);
+                                _this.chartSummary("总计：" + total);
+                                _this.initializeChart(labels, data);
+                            }
+                            else {
+                                _this.isEmptyData(true);
+                            }
+                        }
+                    }, _this.onDBError);
+                };
+                // Second, handle retailWholesale
+                var handleRetailWholesaleAndWholesale_2 = function () {
+                    _this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, Order_1.OrderTypes.RetailWholesale, function (transaction, orderSet) {
+                        if (orderSet.rows.length > 0) {
+                            var rows_8 = orderSet.rows;
+                            var _loop_8 = function (i) {
+                                var order = rows_8[i];
+                                _this.productRepository.getProductById(order.ProductId, function (transaction, productSet) {
+                                    var productExisted = false;
+                                    var index = -1;
+                                    if (productSet.rows.length > 0) {
+                                        index = labels.indexOf(productSet.rows[0].Name);
+                                        if (index < 0) {
+                                            labels.push(productSet.rows[0].Name);
+                                        }
+                                        else {
+                                            productExisted = true;
+                                        }
+                                    }
+                                    else {
+                                        labels.push("unknown" + i);
+                                    }
+                                    //retailWholesale
+                                    if (productExisted === true) {
+                                        data[index] = data[index] + order.Quantity;
+                                        total += order.Quantity;
+                                    }
+                                    else {
+                                        data.push(order.Quantity);
+                                        total += order.Quantity;
+                                    }
+                                    if (rows_8.length - 1 == i) {
+                                        handleWholesale_2();
+                                    }
+                                }, _this.onDBError);
+                            };
+                            for (var i = 0; i < rows_8.length; i++) {
+                                _loop_8(i);
+                            }
+                        }
+                        else {
+                            handleWholesale_2();
+                        }
+                    }, _this.onDBError);
+                };
+                // First, handle retail
                 this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, Order_1.OrderTypes.Retail, function (transaction, orderSet) {
                     if (orderSet.rows.length > 0) {
-                        var rows_6 = orderSet.rows;
-                        var _loop_6 = function (i) {
-                            var order = rows_6[i];
+                        var rows_9 = orderSet.rows;
+                        var _loop_9 = function (i) {
+                            var order = rows_9[i];
                             _this.productRepository.getProductById(order.ProductId, function (transaction, productSet) {
                                 if (productSet.rows.length > 0) {
                                     labels.push(productSet.rows[0].Name);
@@ -375,53 +540,17 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                                 //retail
                                 data.push(order.Quantity);
                                 total += order.Quantity;
-                                if (rows_6.length - 1 == i) {
-                                    _this.orderRepository.getOrdersForDataAnalyse(timeSpanString, true, Order_1.OrderTypes.Wholesale, function (transaction, orderSet) {
-                                        if (orderSet.rows.length > 0) {
-                                            var rows_7 = orderSet.rows;
-                                            var _loop_7 = function (i_2) {
-                                                var order_2 = rows_7[i_2];
-                                                _this.productRepository.getProductById(order_2.ProductId, function (transaction, productSet) {
-                                                    var productExisted = false;
-                                                    var index = -1;
-                                                    if (productSet.rows.length > 0) {
-                                                        index = labels.indexOf(productSet.rows[0].Name);
-                                                        if (index < 0) {
-                                                            labels.push(productSet.rows[0].Name);
-                                                        }
-                                                        else {
-                                                            productExisted = true;
-                                                        }
-                                                    }
-                                                    else {
-                                                        labels.push("unknown" + i_2);
-                                                    }
-                                                    //wholesale
-                                                    if (productExisted === true) {
-                                                        data[index] = data[index] + (order_2.Quantity * productSet.rows[0].Times);
-                                                        total += (order_2.Quantity * productSet.rows[0].Times);
-                                                    }
-                                                    else {
-                                                        data.push(order_2.Quantity * productSet.rows[0].Times);
-                                                        total += (order_2.Quantity * productSet.rows[0].Times);
-                                                    }
-                                                    if (rows_7.length - 1 == i_2) {
-                                                        _this.chartSummary("总计：" + total);
-                                                        _this.initializeChart(labels, data);
-                                                    }
-                                                }, _this.onDBError);
-                                            };
-                                            for (var i_2 = 0; i_2 < rows_7.length; i_2++) {
-                                                _loop_7(i_2);
-                                            }
-                                        }
-                                    }, _this.onDBError);
+                                if (rows_9.length - 1 == i) {
+                                    handleRetailWholesaleAndWholesale_2();
                                 }
                             }, _this.onDBError);
                         };
-                        for (var i = 0; i < rows_6.length; i++) {
-                            _loop_6(i);
+                        for (var i = 0; i < rows_9.length; i++) {
+                            _loop_9(i);
                         }
+                    }
+                    else {
+                        handleRetailWholesaleAndWholesale_2();
                     }
                 }, this.onDBError);
             }

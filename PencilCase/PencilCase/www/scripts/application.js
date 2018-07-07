@@ -122,12 +122,20 @@ define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], fun
                         //transaction.executeSql('drop table if exists UnitOfMeasure', [], null, this.onDBError);
                         transaction.executeSql('create table if not exists UnitOfMeasure (Id text primary key, Name text not null, Description text)', [], null, _this.onDBError);
                         // Uncomment the line below if need to re-create the table, like adding/removing/changing columns
+                        // RetailPrice -- 零售价
+                        // RetailWholesalePrice -- 零批价
+                        // WholesalePrice -- 批发价
+                        // ImportWholesalePrice -- 添加产品中可修改，最新进货价（按批发单位）
+                        // ImportRetailPrice -- 计算得出，最新进货价（按零售单位），其实可以根据上面得出，只是存在了数据库中，懒得改了
+                        // WholesaleCost -- 计算得出，最新批发成本价
+                        // RetailCost -- 计算得出，最新零售成本价，根据WholesaleCost和Times计算得出，存在数据库中方便读取使用，不用每次都计算一次，更新WholesaleCost的时候更新RetailCost
                         //transaction.executeSql('DROP TABLE IF EXISTS Product', [], null, this.onDBError);
                         transaction.executeSql('CREATE TABLE IF NOT EXISTS Product (\
                                         Id text primary key,\
                                         Name text not null, \
                                         Description text,\
                                         RetailPrice real not null,\
+                                        RetailWholesalePrice real not null,\
                                         RetailUnit text,\
                                         WholesalePrice real not null,\
                                         WholesaleUnit text,\
@@ -183,11 +191,11 @@ define(["require", "exports", "./Utils", "./Pages/HomePage", "./Navigator"], fun
                                 transaction.executeSql("insert into UnitOfMeasure (Id, Name) values ('" + guidKuai + "', '块')", [], null, _this.onDBError);
                                 var clearStatement = "delete from Product";
                                 // 箱， 个
-                                var sqlStatement = "insert into Product values ('" + Utils.guid() + "', 'Product1', 'Product description ....', 1.5, '" + guidGe + "', 28, '" + guidXiang + "', 0, 0, 0, 0, 24, 0, null, '4/25/2018', '4/25/2018')";
-                                var sqlStatement1 = "insert into Product values ('" + Utils.guid() + "', '可爱多', 'Product description ....', 6, '" + guidGe + "', 68, '" + guidXiang + "', 0, 0, 0, 0, 12, 0, null, '4/25/2018', '4/25/2018')";
-                                var sqlStatement2 = "insert into Product values ('" + Utils.guid() + "', '东北大板', 'Product description ....', 6, '" + guidKuai + "', 68, '" + guidJian + "', 0, 0, 0, 0, 12, 0, null, '4/25/2018', '4/25/2018')";
-                                var sqlStatement3 = "insert into Product values ('" + Utils.guid() + "', '随变', 'Product description ....', 6, '" + guidGe + "', 68, '" + guidXiang + "', 0, 0, 0, 0, 12, 0, null, '4/25/2018', '4/25/2018')";
-                                var sqlStatement4 = "insert into Product values ('" + Utils.guid() + "', '光明', 'Product description ....', 6, '" + guidKuai + "', 68, '" + guidJian + "', 0, 0, 0, 0, 12, 0, null, '4/25/2018', '4/25/2018')";
+                                var sqlStatement = "insert into Product values ('" + Utils.guid() + "', 'Product1', 'Product description ....', 1.5, 1.2,'" + guidGe + "', 28, '" + guidXiang + "', 0, 0, 0, 0, 24, 0, null, '4/25/2018', '4/25/2018')";
+                                var sqlStatement1 = "insert into Product values ('" + Utils.guid() + "', '可爱多', 'Product description ....', 6, 5,'" + guidGe + "', 68, '" + guidXiang + "', 0, 0, 0, 0, 12, 0, null, '4/25/2018', '4/25/2018')";
+                                var sqlStatement2 = "insert into Product values ('" + Utils.guid() + "', '东北大板', 'Product description ....', 6, 5,'" + guidKuai + "', 68, '" + guidJian + "', 0, 0, 0, 0, 12, 0, null, '4/25/2018', '4/25/2018')";
+                                var sqlStatement3 = "insert into Product values ('" + Utils.guid() + "', '随变', 'Product description ....', 6, 5,'" + guidGe + "', 68, '" + guidXiang + "', 0, 0, 0, 0, 12, 0, null, '4/25/2018', '4/25/2018')";
+                                var sqlStatement4 = "insert into Product values ('" + Utils.guid() + "', '光明', 'Product description ....', 6, 5,'" + guidKuai + "', 68, '" + guidJian + "', 0, 0, 0, 0, 12, 0, null, '4/25/2018', '4/25/2018')";
                                 transaction.executeSql(clearStatement, [], null, _this.onDBError);
                                 transaction.executeSql(sqlStatement, [], null, _this.onDBError);
                                 transaction.executeSql(sqlStatement1, [], null, _this.onDBError);
