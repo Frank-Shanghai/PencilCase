@@ -54,7 +54,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Models/Product",
                     _this.batchId = Utils.guid();
                 var isNew = true;
                 for (var i = 0; i < _this.orders().length; i++) {
-                    if (_this.orders()[i].product().Id === _this.selectedProduct().Id) {
+                    if (_this.orders()[i].product().Id === _this.selectedProduct().Id && _this.orders()[i].price() === price) {
                         // order.total is a ko.computed observable, so, when quantity changed, the total will be updated automatically
                         _this.orders()[i].quantity(Number(_this.orders()[i].quantity()) + Number(_this.selectedProductQuantity()));
                         // No need to update total price and totoal quantity since the order's subscribeChanged handler will handle them

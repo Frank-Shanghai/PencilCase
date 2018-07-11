@@ -80,7 +80,7 @@ export class DealPageBase extends PageBase {
         if (this.batchId == null) this.batchId = Utils.guid();
         let isNew = true;
         for (let i = 0; i < this.orders().length; i++) {
-            if (this.orders()[i].product().Id === this.selectedProduct().Id) {
+            if (this.orders()[i].product().Id === this.selectedProduct().Id && this.orders()[i].price() === price) {
                 // order.total is a ko.computed observable, so, when quantity changed, the total will be updated automatically
                 this.orders()[i].quantity(Number(this.orders()[i].quantity()) + Number(this.selectedProductQuantity()));
 
