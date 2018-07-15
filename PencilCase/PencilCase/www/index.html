@@ -405,7 +405,7 @@
                 <table>
                     <tr>
                         <td><label style="font-weight: bold;">价格：</label></td>
-                        <td><input data-mini="true" type="number" style="width: 50px" data-bind="value: selectedProduct() ? selectedProduct().WholesalePrice : 0, enable: false" /></td>
+                        <td><input data-mini="true" type="number" style="width: 50px" data-bind="value: selectedProductPrice, enable: true" /></td>
                         <td><span data-bind="text: selectedProduct() ? '元/' + selectedProduct().WholesaleUnitName: ''"></span></td>
                     </tr>
                 </table>
@@ -438,7 +438,7 @@
                                     <div>
                                         <span style="font-weight: bold" data-bind="text: product().Name"></span>
                                         <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span data-bind="text: product().WholesalePrice + '元'"></span>
+                                        <span data-bind="text: price() + '元'"></span>
                                         <span data-bind="text: '/' + product().WholesaleUnitName + '/'"></span>
                                         <span data-bind="text: product().Times"></span>
                                         <span data-bind="text: product().RetailUnitName"></span>
@@ -515,7 +515,7 @@
                 <table>
                     <tr>
                         <td><label style="font-weight: bold;">价格：</label></td>
-                        <td><input data-mini="true" type="number" style="width: 50px" data-bind="value: selectedProduct() ? selectedProduct().RetailPrice : 0, enable: false" /></td>
+                        <td><input data-mini="true" type="number" style="width: 50px" data-bind="value: selectedProductPrice, enable: true" /></td>
                         <td><span data-bind="text: selectedProduct() ? '元/' + selectedProduct().RetailUnitName: ''"></span></td>
                     </tr>
                 </table>
@@ -548,7 +548,7 @@
                                     <div>
                                         <span style="font-weight: bold" data-bind="text: product().Name"></span>
                                         <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span data-bind="text: product().RetailPrice + '元'"></span>
+                                        <span data-bind="text: price() + '元'"></span>
                                         <span data-bind="text: '/' + product().RetailUnitName"></span>
                                     </div>
                                 </td>
@@ -623,7 +623,7 @@
                 <table>
                     <tr>
                         <td><label style="font-weight: bold;">价格：</label></td>
-                        <td><input data-mini="true" type="number" style="width: 50px" data-bind="value: selectedProduct() ? selectedProduct().RetailWholesalePrice : 0, enable: false" /></td>
+                        <td><input data-mini="true" type="number" style="width: 50px" data-bind="value: selectedProductPrice, enable: true" /></td>
                         <td><span data-bind="text: selectedProduct() ? '元/' + selectedProduct().RetailUnitName: ''"></span></td>
                     </tr>
                 </table>
@@ -656,7 +656,7 @@
                                     <div>
                                         <span style="font-weight: bold" data-bind="text: product().Name"></span>
                                         <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span data-bind="text: product().RetailWholesalePrice + '元'"></span>
+                                        <span data-bind="text: price() + '元'"></span>
                                         <span data-bind="text: '/' + product().RetailUnitName"></span>
                                     </div>
                                 </td>

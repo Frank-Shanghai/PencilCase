@@ -12,12 +12,15 @@ export class Wholesale extends DealPageBase {
         this.pageId = Consts.Pages.Whosale.Id;
         this.onSelectionChanged = (newValue: string) => {
             this.selectedProduct(this.dict[newValue]);
+            if (this.selectedProduct() && this.selectedProduct().Id !== this.selectOptions.Id) {
+                this.selectedProductPrice(this.selectedProduct().WholesalePrice ? this.selectedProduct().WholesalePrice : 0);
+            }
         };
         this.selectedProductId.subscribe(this.onSelectionChanged);
     }
 
     protected addOrder = () => {
-        this.addOrderWithSpecifiedPrice(this.selectedProduct().WholesalePrice, OrderTypes.Wholesale);
+        this.addOrderWithSpecifiedPrice(this.selectedProductPrice(), OrderTypes.Wholesale);
     }
 
     protected save = () => {

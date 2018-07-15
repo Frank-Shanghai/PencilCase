@@ -12,12 +12,15 @@ export class Retail extends DealPageBase {
         this.pageId = Consts.Pages.Retail.Id;
         this.onSelectionChanged = (newValue: string) => {
             this.selectedProduct(this.dict[newValue]);
+            if (this.selectedProduct() && this.selectedProduct().Id !== this.selectOptions.Id) {
+                this.selectedProductPrice(this.selectedProduct().RetailPrice ? this.selectedProduct().RetailPrice : 0);
+            }
         };
         this.selectedProductId.subscribe(this.onSelectionChanged);
     }
 
     protected addOrder = () => {
-        this.addOrderWithSpecifiedPrice(this.selectedProduct().RetailPrice, OrderTypes.Retail);
+        this.addOrderWithSpecifiedPrice(this.selectedProductPrice(), OrderTypes.Retail);
     }
 
     protected save = () => {

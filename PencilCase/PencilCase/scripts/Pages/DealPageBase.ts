@@ -51,6 +51,8 @@ export class DealPageBase extends PageBase {
     protected invalidOrderCount: KnockoutObservable<number> = ko.observable(0);
     protected numberOnlyRegExp = /^\d+$/;
 
+    protected selectedProductPrice: KnockoutObservable<number> = ko.observable(0);
+
     constructor() {
         super();
         this.back = Navigator.instance.goHome;
@@ -80,7 +82,7 @@ export class DealPageBase extends PageBase {
         if (this.batchId == null) this.batchId = Utils.guid();
         let isNew = true;
         for (let i = 0; i < this.orders().length; i++) {
-            if (this.orders()[i].product().Id === this.selectedProduct().Id) {
+            if (this.orders()[i].product().Id === this.selectedProduct().Id && this.orders()[i].price() === price) {
                 // order.total is a ko.computed observable, so, when quantity changed, the total will be updated automatically
                 this.orders()[i].quantity(Number(this.orders()[i].quantity()) + Number(this.selectedProductQuantity()));
 
@@ -112,13 +114,20 @@ export class DealPageBase extends PageBase {
 
                 // Have to do such re-calculation even when quantity is invalid, because old value changed even quantity is invalid.
                 this.totalNumber(Number(this.totalNumber()) - Number(oldValue) + Number(newValue));
-                this.totalPrice(Number(this.totalPrice()) - Number(oldValue * order.price()) + Number(newValue * order.price()));
+                // JS的小数计算精度问题
+                //	https://www.cnblogs.com/weiqt/articles/2642393.html
+                //  https://blog.csdn.net/liaodehong/article/details/51558292
+                this.totalPrice(Number((Number(this.totalPrice()) - Number(oldValue * order.price()) + Number(newValue * order.price())).toFixed(2)));
             }, null, order));
 
             this.orders.push(order);
             // For new added order, manually updte total number and total price for the first time
             this.totalNumber(Number(this.totalNumber()) + Number(this.selectedProductQuantity()));
-            this.totalPrice(Number(this.totalPrice()) + Number(order.total()));
+
+            // JS的小数计算精度问题
+            //	https://www.cnblogs.com/weiqt/articles/2642393.html
+            //  https://blog.csdn.net/liaodehong/article/details/51558292
+            this.totalPrice(Number((Number(this.totalPrice()) + Number(order.total())).toFixed(2)));
         }
 
         this.cancelOrderAdding();

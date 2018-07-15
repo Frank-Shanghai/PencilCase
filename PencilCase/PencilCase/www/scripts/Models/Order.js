@@ -11,17 +11,17 @@ define(["require", "exports"], function (require, exports) {
             this.type = ko.observable(type);
             switch (type) {
                 case OrderTypes.Retail:
-                    this.price = ko.observable(product.RetailPrice);
+                    this.price = ko.observable(price == undefined ? product.RetailPrice : price);
                     this.unitId = ko.observable(product.RetailUnit);
                     this.unitName = ko.observable(product.RetailUnitName);
                     break;
                 case OrderTypes.RetailWholesale:
-                    this.price = ko.observable(product.RetailWholesalePrice);
+                    this.price = ko.observable(price == undefined ? product.RetailWholesalePrice : price);
                     this.unitId = ko.observable(product.RetailUnit);
                     this.unitName = ko.observable(product.RetailUnitName);
                     break;
                 case OrderTypes.Wholesale:
-                    this.price = ko.observable(product.WholesalePrice);
+                    this.price = ko.observable(price == undefined ? product.WholesalePrice : price);
                     this.unitId = ko.observable(product.WholesaleUnit);
                     this.unitName = ko.observable(product.WholesaleUnitName);
                     break;
@@ -33,7 +33,10 @@ define(["require", "exports"], function (require, exports) {
             }
             this.quantity = ko.observable(quantity);
             this.total = ko.computed(function () {
-                return _this.price() * _this.quantity();
+                // JS的小数计算精度问题
+                //	https://www.cnblogs.com/weiqt/articles/2642393.html
+                //  https://blog.csdn.net/liaodehong/article/details/51558292
+                return _this.price() * 10000 * _this.quantity() / 10000;
             });
             this.createdDate = new Date(Date.now());
             this.modifiedDate = new Date(Date.now());

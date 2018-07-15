@@ -22,17 +22,17 @@ export class Order {
         this.type = ko.observable(type);
         switch (type) {
             case OrderTypes.Retail:
-                this.price = ko.observable(product.RetailPrice);
+                this.price = ko.observable(price == undefined ? product.RetailPrice : price);
                 this.unitId = ko.observable(product.RetailUnit);
                 this.unitName = ko.observable(product.RetailUnitName);
                 break;
             case OrderTypes.RetailWholesale:
-                this.price = ko.observable(product.RetailWholesalePrice);
+                this.price = ko.observable(price == undefined ? product.RetailWholesalePrice : price);
                 this.unitId = ko.observable(product.RetailUnit);
                 this.unitName = ko.observable(product.RetailUnitName);
                 break;
             case OrderTypes.Wholesale:
-                this.price = ko.observable(product.WholesalePrice);
+                this.price = ko.observable(price == undefined ? product.WholesalePrice : price);
                 this.unitId = ko.observable(product.WholesaleUnit);
                 this.unitName = ko.observable(product.WholesaleUnitName);
                 break;
@@ -44,7 +44,10 @@ export class Order {
         }
         this.quantity = ko.observable(quantity);
         this.total = ko.computed(() => {
-            return this.price() * this.quantity();
+            // JS的小数计算精度问题
+            //	https://www.cnblogs.com/weiqt/articles/2642393.html
+            //  https://blog.csdn.net/liaodehong/article/details/51558292
+            return this.price() * 10000 * this.quantity() / 10000;
         });
 
         this.createdDate = new Date(Date.now());

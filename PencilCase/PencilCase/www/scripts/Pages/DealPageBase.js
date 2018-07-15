@@ -49,12 +49,13 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Models/Product",
             _this.orderQuantitySubscriptions = [];
             _this.invalidOrderCount = ko.observable(0);
             _this.numberOnlyRegExp = /^\d+$/;
+            _this.selectedProductPrice = ko.observable(0);
             _this.addOrderWithSpecifiedPrice = function (price, type) {
                 if (_this.batchId == null)
                     _this.batchId = Utils.guid();
                 var isNew = true;
                 for (var i = 0; i < _this.orders().length; i++) {
-                    if (_this.orders()[i].product().Id === _this.selectedProduct().Id) {
+                    if (_this.orders()[i].product().Id === _this.selectedProduct().Id && _this.orders()[i].price() === price) {
                         // order.total is a ko.computed observable, so, when quantity changed, the total will be updated automatically
                         _this.orders()[i].quantity(Number(_this.orders()[i].quantity()) + Number(_this.selectedProductQuantity()));
                         // No need to update total price and totoal quantity since the order's subscribeChanged handler will handle them
@@ -80,12 +81,18 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Models/Product",
                         }
                         // Have to do such re-calculation even when quantity is invalid, because old value changed even quantity is invalid.
                         _this.totalNumber(Number(_this.totalNumber()) - Number(oldValue) + Number(newValue));
-                        _this.totalPrice(Number(_this.totalPrice()) - Number(oldValue * order_1.price()) + Number(newValue * order_1.price()));
+                        // JS的小数计算精度问题
+                        //	https://www.cnblogs.com/weiqt/articles/2642393.html
+                        //  https://blog.csdn.net/liaodehong/article/details/51558292
+                        _this.totalPrice(Number((Number(_this.totalPrice()) - Number(oldValue * order_1.price()) + Number(newValue * order_1.price())).toFixed(2)));
                     }, null, order_1));
                     _this.orders.push(order_1);
                     // For new added order, manually updte total number and total price for the first time
                     _this.totalNumber(Number(_this.totalNumber()) + Number(_this.selectedProductQuantity()));
-                    _this.totalPrice(Number(_this.totalPrice()) + Number(order_1.total()));
+                    // JS的小数计算精度问题
+                    //	https://www.cnblogs.com/weiqt/articles/2642393.html
+                    //  https://blog.csdn.net/liaodehong/article/details/51558292
+                    _this.totalPrice(Number((Number(_this.totalPrice()) + Number(order_1.total())).toFixed(2)));
                 }
                 _this.cancelOrderAdding();
             };
