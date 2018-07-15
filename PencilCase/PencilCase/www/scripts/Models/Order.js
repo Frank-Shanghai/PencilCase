@@ -33,7 +33,10 @@ define(["require", "exports"], function (require, exports) {
             }
             this.quantity = ko.observable(quantity);
             this.total = ko.computed(function () {
-                return _this.price() * _this.quantity();
+                // JS的小数计算精度问题
+                //	https://www.cnblogs.com/weiqt/articles/2642393.html
+                //  https://blog.csdn.net/liaodehong/article/details/51558292
+                return _this.price() * 10000 * _this.quantity() / 10000;
             });
             this.createdDate = new Date(Date.now());
             this.modifiedDate = new Date(Date.now());

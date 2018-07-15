@@ -362,6 +362,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "./Consts", "../Mode
                                 //retail
                                 var value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].RetailCost)).toFixed(2));
                                 data.push(value);
+                                total += value;
                                 if (rows_5.length - 1 == i) {
                                     handleRetailWholesaleAndWholesale_1();
                                 }

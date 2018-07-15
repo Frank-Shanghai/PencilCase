@@ -16,7 +16,7 @@ define(["require", "exports", "./DealPageBase", "./Consts", "../Models/Order", "
         function RetailWholesale() {
             var _this = _super.call(this) || this;
             _this.addOrder = function () {
-                _this.addOrderWithSpecifiedPrice(_this.selectedProduct().RetailWholesalePrice, Order_1.OrderTypes.RetailWholesale);
+                _this.addOrderWithSpecifiedPrice(_this.selectedProductPrice(), Order_1.OrderTypes.RetailWholesale);
             };
             _this.save = function () {
                 var sqlStatements = [];
@@ -61,6 +61,9 @@ define(["require", "exports", "./DealPageBase", "./Consts", "../Models/Order", "
             _this.pageId = Consts.Pages.RetailWholesale.Id;
             _this.onSelectionChanged = function (newValue) {
                 _this.selectedProduct(_this.dict[newValue]);
+                if (_this.selectedProduct() && _this.selectedProduct().Id !== _this.selectOptions.Id) {
+                    _this.selectedProductPrice(_this.selectedProduct().RetailWholesalePrice ? _this.selectedProduct().RetailWholesalePrice : 0);
+                }
             };
             _this.selectedProductId.subscribe(_this.onSelectionChanged);
             return _this;

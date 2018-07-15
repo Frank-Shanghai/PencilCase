@@ -362,6 +362,7 @@ export class DataAnalyse extends PageBase {
                             //retail
                             let value = Number((Number(order.Total) - Number(order.Quantity) * Number(productSet.rows[0].RetailCost)).toFixed(2));
                             data.push(value);
+                            total += value;
 
                             if (rows.length - 1 == i) {
                                 handleRetailWholesaleAndWholesale();

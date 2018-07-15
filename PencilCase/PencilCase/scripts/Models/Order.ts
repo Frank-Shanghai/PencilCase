@@ -44,7 +44,10 @@ export class Order {
         }
         this.quantity = ko.observable(quantity);
         this.total = ko.computed(() => {
-            return this.price() * this.quantity();
+            // JS的小数计算精度问题
+            //	https://www.cnblogs.com/weiqt/articles/2642393.html
+            //  https://blog.csdn.net/liaodehong/article/details/51558292
+            return this.price() * 10000 * this.quantity() / 10000;
         });
 
         this.createdDate = new Date(Date.now());
