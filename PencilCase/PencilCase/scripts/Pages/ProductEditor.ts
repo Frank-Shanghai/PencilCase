@@ -68,6 +68,9 @@ export class ProductEditor extends PageBase {
     private wholesaleUnit: KnockoutObservable<string> = ko.observable(null);
     private times: KnockoutObservable<number> = ko.observable(undefined).extend({ regExpValidate: { regExp: this.floatNumberRegExp, overrideMessage: '' } });
     private wholesalePrice: KnockoutObservable<number> = ko.observable(undefined).extend({ regExpValidate: { regExp: this.floatNumberRegExp, overrideMessage: '' } });
+    private imageSource: KnockoutObservable<any> = ko.observable(null);
+
+    private defaultImagePath = "/images/nophoto.jpg";
 
     private isNewProduct = false;
 
@@ -149,6 +152,7 @@ export class ProductEditor extends PageBase {
         this.retailUnit(this.parameters.product.RetailUnit);
         this.wholesaleUnit(this.parameters.product.WholesaleUnit);
         this.wholesalePrice(this.parameters.product.WholesalePrice);
+        this.imageSource(this.parameters.product.Image);
     }
 
     // 方法名不能是delete，否则前台绑定后，有奇怪的错误，viewmodel识别不了。
@@ -179,7 +183,7 @@ export class ProductEditor extends PageBase {
         product.RetailCost = this.originalProduct().RetailCost;
         product.Times = this.times();
         product.Inventory = this.inventory();
-        product.Image = '暂不可用';
+        product.Image = this.imageSource();
         product.ModifiedDate = new Date(Date.now());
 
         let guid = null;
@@ -224,6 +228,23 @@ export class ProductEditor extends PageBase {
     private validate() {
         // TODO: Fields validation before saving
     }
+
+    private getImage = () => {
+        navigator.camera.getPicture(this.onPhotoDataSuccess, this.onFail, {
+            quality: 50,
+            destinationType: 0
+        })
+    }
+
+    private onPhotoDataSuccess = (imageData) => {
+        console.log(imageData);
+        this.imageSource(imageData);
+    }
+
+    private onFail(message) {
+        alert('Failed because: ' + message);
+    }
+
 
     private onDBError = (transaction: SqlTransaction, sqlError: SqlError) => {
         alert("Product Editor: " + sqlError.message);

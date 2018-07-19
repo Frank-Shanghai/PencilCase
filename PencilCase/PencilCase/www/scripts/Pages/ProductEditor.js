@@ -62,6 +62,8 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
             _this.wholesaleUnit = ko.observable(null);
             _this.times = ko.observable(undefined).extend({ regExpValidate: { regExp: _this.floatNumberRegExp, overrideMessage: '' } });
             _this.wholesalePrice = ko.observable(undefined).extend({ regExpValidate: { regExp: _this.floatNumberRegExp, overrideMessage: '' } });
+            _this.imageSource = ko.observable(null);
+            _this.defaultImagePath = "/images/nophoto.jpg";
             _this.isNewProduct = false;
             _this.canSave = ko.computed(function () {
                 if (_this.name.hasError() || _this.retailPrice.hasError() || _this.retailWholesalePrice.hasError() || _this.times.hasError() || _this.wholesalePrice.hasError())
@@ -82,6 +84,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
                 _this.retailUnit(_this.parameters.product.RetailUnit);
                 _this.wholesaleUnit(_this.parameters.product.WholesaleUnit);
                 _this.wholesalePrice(_this.parameters.product.WholesalePrice);
+                _this.imageSource(_this.parameters.product.Image);
             };
             // 方法名不能是delete，否则前台绑定后，有奇怪的错误，viewmodel识别不了。
             // 花了1小时发现的问题，难道是某种豫留关键字或什么东西。
@@ -108,7 +111,7 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
                 product.RetailCost = _this.originalProduct().RetailCost;
                 product.Times = _this.times();
                 product.Inventory = _this.inventory();
-                product.Image = '暂不可用';
+                product.Image = _this.imageSource();
                 product.ModifiedDate = new Date(Date.now());
                 var guid = null;
                 if (_this.isNewProduct === true) {
@@ -145,6 +148,16 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
                 _this.navigator.navigateTo(Consts.Pages.ProductManagement, {
                     changeHash: true,
                 });
+            };
+            _this.getImage = function () {
+                navigator.camera.getPicture(_this.onPhotoDataSuccess, _this.onFail, {
+                    quality: 50,
+                    destinationType: 0
+                });
+            };
+            _this.onPhotoDataSuccess = function (imageData) {
+                console.log(imageData);
+                _this.imageSource(imageData);
             };
             _this.onDBError = function (transaction, sqlError) {
                 alert("Product Editor: " + sqlError.message);
@@ -202,6 +215,9 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
         };
         ProductEditor.prototype.validate = function () {
             // TODO: Fields validation before saving
+        };
+        ProductEditor.prototype.onFail = function (message) {
+            alert('Failed because: ' + message);
         };
         return ProductEditor;
     }(PageBase_1.PageBase));

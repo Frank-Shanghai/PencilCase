@@ -146,7 +146,8 @@
                             <span style="font-weight: bold">库存：</span><span data-bind="text: originalProduct().Inventory"></span>
                         </p>
                         <p>
-                            <span style="font-weight: bold">图片：</span><span data-bind="text: '暂不可用'"></span>
+                            <span style="font-weight: bold">图片：</span>
+                            <img style="width: 150px; height: 150px;" data-bind="attr: { 'src': originalProduct().Image ? ('data:image/jpeg;base64,' + originalProduct().Image) : defaultImagePath}" />
                         </p>
                         <p>
                             <span style="font-weight: bold">创建时间：</span><span data-bind="text: moment(originalProduct().CreatedDate).format('YYYY-MM-DD')"></span>
@@ -212,7 +213,10 @@
                         <label style="font-weight: bold" for="productInventory">库存：</label>
                         <input type="number" name="productInventory" data-bind="value: inventory, enable: false" />
                         <label style="font-weight: bold">图片：</label>
-                        <span data-bind="text: '暂不可用'"></span>
+                        <a href="#" class="ui-btn ui-shadow ui-corner-all ui-icon-camera ui-btn-icon-notext ui-btn-b ui-btn-inline" data-bind="click: getImage, visible: true"></a>
+                        <!-- ko if: imageSource -->
+                        <img style="width: 150px; height: 150px;" data-bind="attr: { 'src': imageSource() ? ('data:image/jpeg;base64,' + imageSource()) : defaultImagePath}" />
+                        <!-- /ko -->
                     </form>
                 </div>
                 <div id="editingPrice" class="ui-body-d ui-content">
