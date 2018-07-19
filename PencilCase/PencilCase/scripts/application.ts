@@ -183,6 +183,7 @@ export class Application {
                 // ImportRetailPrice -- 计算得出，最新进货价（按零售单位），其实可以根据上面得出，只是存在了数据库中，懒得改了
                 // WholesaleCost -- 计算得出，最新批发成本价
                 // RetailCost -- 计算得出，最新零售成本价，根据WholesaleCost和Times计算得出，存在数据库中方便读取使用，不用每次都计算一次，更新WholesaleCost的时候更新RetailCost
+                // Image -- 默认blob类型
 
                 //transaction.executeSql('DROP TABLE IF EXISTS Product', [], null, this.onDBError);
                 transaction.executeSql('CREATE TABLE IF NOT EXISTS Product (\
