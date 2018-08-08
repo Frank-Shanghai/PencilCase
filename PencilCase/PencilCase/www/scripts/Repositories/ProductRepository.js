@@ -26,13 +26,12 @@ define(["require", "exports", "../application"], function (require, exports, app
                 var fieldValues = '';
                 for (var i = 0; i < keyValuePairs.length; i++) {
                     switch (keyValuePairs[i].Type) {
-                        case "string":
-                        case "date":
-                            fieldValues = ' ' + keyValuePairs[i].Field + " = '" + keyValuePairs[i].Value + "',";
-                            sqlString += fieldValues;
-                            break;
                         case "number":
                             fieldValues = ' ' + keyValuePairs[i].Field + " = " + keyValuePairs[i].Value + ",";
+                            sqlString += fieldValues;
+                            break;
+                        default:
+                            fieldValues = ' ' + keyValuePairs[i].Field + " = '" + keyValuePairs[i].Value + "',";
                             sqlString += fieldValues;
                             break;
                     }
