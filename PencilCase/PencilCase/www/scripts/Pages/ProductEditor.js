@@ -151,11 +151,21 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
                     changeHash: true,
                 });
             };
-            _this.getImage = function () {
+            _this.getImageByCamera = function () {
                 navigator.camera.getPicture(_this.onPhotoDataSuccess, _this.onFail, {
                     quality: 50,
                     destinationType: 0
                 });
+            };
+            _this.getImageFromAlbum = function () {
+                navigator.camera.getPicture(_this.onPhotoDataSuccess, _this.onFail, {
+                    quality: 50,
+                    destinationType: 0,
+                    sourceType: Camera.PictureSourceType.PHOTOLIBRARY
+                });
+            };
+            _this.removeImage = function () {
+                _this.imageSource('');
             };
             _this.onPhotoDataSuccess = function (imageData) {
                 console.log(imageData);

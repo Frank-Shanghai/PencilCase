@@ -231,11 +231,23 @@ export class ProductEditor extends PageBase {
         // TODO: Fields validation before saving
     }
 
-    private getImage = () => {
+    private getImageByCamera = () => {
         navigator.camera.getPicture(this.onPhotoDataSuccess, this.onFail, {
             quality: 50,
             destinationType: 0
         })
+    }
+
+    private getImageFromAlbum = () => {
+        navigator.camera.getPicture(this.onPhotoDataSuccess, this.onFail, {
+            quality: 50,
+            destinationType: 0,
+            sourceType: Camera.PictureSourceType.PHOTOLIBRARY
+        })
+    }
+
+    private removeImage = () => {
+        this.imageSource('');
     }
 
     private onPhotoDataSuccess = (imageData) => {
