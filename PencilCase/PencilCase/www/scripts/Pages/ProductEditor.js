@@ -77,16 +77,16 @@ define(["require", "exports", "./PageBase", "../Navigator", "../Utils", "./Const
                 _this.reSetEditingFields();
             };
             _this.reSetEditingFields = function () {
-                _this.name(_this.parameters.product.Name);
-                _this.description(_this.parameters.product.Description);
-                _this.inventory(_this.parameters.product.Inventory);
-                _this.retailPrice(_this.parameters.product.RetailPrice);
-                _this.retailWholesalePrice(_this.parameters.product.RetailWholesalePrice);
-                _this.times(_this.parameters.product.Times);
-                _this.retailUnit(_this.parameters.product.RetailUnit);
-                _this.wholesaleUnit(_this.parameters.product.WholesaleUnit);
-                _this.wholesalePrice(_this.parameters.product.WholesalePrice);
-                _this.imageSource(_this.parameters.product.Image);
+                _this.name(_this.originalProduct().Name);
+                _this.description(_this.originalProduct().Description);
+                _this.inventory(_this.originalProduct().Inventory);
+                _this.retailPrice(_this.originalProduct().RetailPrice);
+                _this.retailWholesalePrice(_this.originalProduct().RetailWholesalePrice);
+                _this.times(_this.originalProduct().Times);
+                _this.retailUnit(_this.originalProduct().RetailUnit);
+                _this.wholesaleUnit(_this.originalProduct().WholesaleUnit);
+                _this.wholesalePrice(_this.originalProduct().WholesalePrice);
+                _this.imageSource(_this.originalProduct().Image);
             };
             // 方法名不能是delete，否则前台绑定后，有奇怪的错误，viewmodel识别不了。
             // 花了1小时发现的问题，难道是某种豫留关键字或什么东西。
