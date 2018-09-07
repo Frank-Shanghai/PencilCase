@@ -145,16 +145,16 @@ export class ProductEditor extends PageBase {
     }
 
     private reSetEditingFields = () => {
-        this.name(this.parameters.product.Name);
-        this.description(this.parameters.product.Description);
-        this.inventory(this.parameters.product.Inventory);
-        this.retailPrice(this.parameters.product.RetailPrice);
-        this.retailWholesalePrice(this.parameters.product.RetailWholesalePrice);
-        this.times(this.parameters.product.Times);
-        this.retailUnit(this.parameters.product.RetailUnit);
-        this.wholesaleUnit(this.parameters.product.WholesaleUnit);
-        this.wholesalePrice(this.parameters.product.WholesalePrice);
-        this.imageSource(this.parameters.product.Image);
+        this.name(this.originalProduct().Name);
+        this.description(this.originalProduct().Description);
+        this.inventory(this.originalProduct().Inventory);
+        this.retailPrice(this.originalProduct().RetailPrice);
+        this.retailWholesalePrice(this.originalProduct().RetailWholesalePrice);
+        this.times(this.originalProduct().Times);
+        this.retailUnit(this.originalProduct().RetailUnit);
+        this.wholesaleUnit(this.originalProduct().WholesaleUnit);
+        this.wholesalePrice(this.originalProduct().WholesalePrice);
+        this.imageSource(this.originalProduct().Image);
     }
 
     // 方法名不能是delete，否则前台绑定后，有奇怪的错误，viewmodel识别不了。
